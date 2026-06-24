@@ -90,14 +90,21 @@ else
 fi
 pm2 save
 
-# 5. nginx vhost (HTTP; SSL добавит certbot)
+# 5. nginx vhost: apex = приложение, www → редирект на apex (канонично).
+# Переписываем HTTP-конфиг только если в нём ещё нет www-редиректа —
+# чтобы не затирать SSL, добавленный certbot на повторных деплоях.
 NGINX_CONF=/etc/nginx/sites-available/razumeyka.conf
-if [ ! -f "$NGINX_CONF" ]; then
-  echo "[nginx] создаю vhost"
+if ! grep -q "return 301 https://$DOMAIN" "$NGINX_CONF" 2>/dev/null; then
+  echo "[nginx] пишу канонический vhost (www → без www)"
   cat > "$NGINX_CONF" <<EOF
 server {
     listen 80;
-    server_name $DOMAIN www.$DOMAIN;
+    server_name www.$DOMAIN;
+    return 301 https://$DOMAIN\$request_uri;
+}
+server {
+    listen 80;
+    server_name $DOMAIN;
     location / {
         proxy_pass http://127.0.0.1:$PORT;
         proxy_http_version 1.1;
@@ -113,7 +120,7 @@ server {
 EOF
   ln -sf "$NGINX_CONF" /etc/nginx/sites-enabled/razumeyka.conf
 else
-  echo "[nginx] vhost уже есть"
+  echo "[nginx] vhost уже канонический"
 fi
 nginx -t && systemctl reload nginx
 

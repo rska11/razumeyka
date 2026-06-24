@@ -98,6 +98,14 @@ model Achievement {
   @@index([childId])
 }
 
+/// Глобальные настройки-тумблеры (key-value), управляемые из админки без деплоя.
+/// Сейчас: authDisabled = "true"|"false" — рубильник авторизации.
+model SystemSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
 /// Оплата
 model Payment {
   id           String      @id @default(cuid())

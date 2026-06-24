@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { createAndSaveEmailCode } from "@/lib/email-code";
 import { sendLoginCodeEmail } from "@/lib/mailer";
+import { isAuthDisabled } from "@/lib/settings";
+import { isAdminEmail } from "@/lib/admin";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -15,6 +17,11 @@ export async function POST(req: Request) {
 
   if (!EMAIL_RE.test(email)) {
     return NextResponse.json({ error: "INVALID_EMAIL" }, { status: 400 });
+  }
+
+  // Рубильник: при выключенной авторизации код выдаём только админам
+  if ((await isAuthDisabled()) && !isAdminEmail(email)) {
+    return NextResponse.json({ error: "AUTH_DISABLED" }, { status: 403 });
   }
 
   const result = await createAndSaveEmailCode(email);

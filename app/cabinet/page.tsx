@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getAuthSession } from "@/lib/auth";
-import { ensureDemoData, getCabinetData } from "@/lib/cabinet";
+import { getCabinetData } from "@/lib/cabinet";
 
 function rub(n: number) {
   return n.toLocaleString("ru-RU") + " ₽";
@@ -21,7 +21,6 @@ export default async function CabinetOverview() {
   const session = await getAuthSession();
   if (!session?.user?.id) redirect("/login?callbackUrl=/cabinet");
   const userId = session.user.id;
-  await ensureDemoData(userId);
   const { children, payments, upcomingLessons, activeEnrollments, achievementsCount } = await getCabinetData(userId);
 
   const nextLesson = upcomingLessons[0];

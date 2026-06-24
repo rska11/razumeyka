@@ -1,0 +1,130 @@
+import { prisma } from "@/lib/prisma";
+import { isAuthDisabled } from "@/lib/settings";
+import { toggleAuth } from "./actions";
+
+function rub(n: number) {
+  return n.toLocaleString("ru-RU") + " ₽";
+}
+function fmtDate(d: Date) {
+  return new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "short", year: "numeric" }).format(d);
+}
+
+const STATUS: Record<string, string> = {
+  active: "активно", pending: "ожидает", paused: "пауза", finished: "завершено",
+  paid: "оплачено", failed: "ошибка", refunded: "возврат",
+};
+
+export default async function AdminPage() {
+  const [authDisabled, users, payments] = await Promise.all([
+    isAuthDisabled(),
+    prisma.user.findMany({
+      orderBy: { createdAt: "desc" },
+      include: { children: { include: { enrollments: true } } },
+    }),
+    prisma.payment.findMany({
+      orderBy: { createdAt: "desc" },
+      include: { user: { select: { email: true } } },
+    }),
+  ]);
+
+  const childrenCount = users.reduce((s, u) => s + u.children.length, 0);
+  const enrollCount = users.reduce((s, u) => s + u.children.reduce((a, c) => a + c.enrollments.length, 0), 0);
+  const paidTotal = payments.filter((p) => p.status === "paid").reduce((s, p) => s + p.amount, 0);
+
+  const stats = [
+    { label: "Родителей", value: String(users.length), accent: "text-brand-blue" },
+    { label: "Детей", value: String(childrenCount), accent: "text-brand-pink" },
+    { label: "Записей", value: String(enrollCount), accent: "text-brand-orange" },
+    { label: "Оплачено", value: rub(paidTotal), accent: "text-brand-green" },
+  ];
+
+  return (
+    <div className="grid gap-6">
+      {/* Рубильник авторизации */}
+      <section className={`rounded-[24px] border p-5 shadow-card backdrop-blur-xl sm:p-6 ${authDisabled ? "border-brand-orange/30 bg-brand-orange/[0.06]" : "border-brand-green/30 bg-brand-green/[0.05]"}`}>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3">
+              <h2 className="font-display text-xl font-extrabold text-ink">Авторизация на сайте</h2>
+              <span className={`rounded-full px-3 py-1 text-xs font-extrabold uppercase tracking-[0.12em] ${authDisabled ? "bg-brand-orange/15 text-brand-orange" : "bg-brand-green/15 text-brand-green"}`}>
+                {authDisabled ? "Выключена" : "Включена"}
+              </span>
+            </div>
+            <p className="mt-2 max-w-2xl text-sm font-medium leading-6 text-ink/64">
+              {authDisabled
+                ? "Кнопка «Войти» скрыта, вход и регистрация закрыты для всех (кроме админов). Режим доработки сайта."
+                : "Кнопка «Войти» видна, родители могут входить и регистрироваться."}
+            </p>
+          </div>
+          <form action={toggleAuth}>
+            <input type="hidden" name="disabled" value={authDisabled ? "false" : "true"} />
+            <button
+              type="submit"
+              className={`inline-flex min-h-[52px] items-center gap-2 rounded-full px-6 py-3 text-base font-extrabold text-white shadow-color transition hover:-translate-y-0.5 ${authDisabled ? "bg-brand-green hover:bg-brand-green/90" : "bg-brand-orange hover:bg-brand-orange/90"}`}
+            >
+              {authDisabled ? "Включить вход" : "Выключить вход (режим доработки)"}
+            </button>
+          </form>
+        </div>
+      </section>
+
+      {/* Статистика */}
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {stats.map((s) => (
+          <div key={s.label} className="rounded-[20px] border border-white/80 bg-white/85 p-4 shadow-card backdrop-blur-xl">
+            <p className={`font-display text-2xl font-extrabold sm:text-3xl ${s.accent}`}>{s.value}</p>
+            <p className="mt-1 text-xs font-extrabold leading-5 text-ink/56 sm:text-sm">{s.label}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Родители */}
+      <section className="rounded-[24px] border border-white/80 bg-white/85 p-5 shadow-card backdrop-blur-xl sm:p-6">
+        <h2 className="font-display text-xl font-extrabold text-ink">Родители ({users.length})</h2>
+        <div className="mt-4 grid gap-3">
+          {users.length === 0 && <p className="rounded-[16px] bg-ink/[0.02] px-4 py-6 text-center text-sm font-bold text-ink/50">Пока нет зарегистрированных родителей.</p>}
+          {users.map((u) => (
+            <div key={u.id} className="rounded-[16px] border border-ink/6 bg-white px-4 py-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-sm font-extrabold text-ink">{u.email}</p>
+                <span className="text-xs font-bold text-ink/46">с {fmtDate(u.createdAt)}</span>
+              </div>
+              {u.children.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {u.children.map((c) => (
+                    <span key={c.id} className="rounded-full bg-ink/[0.04] px-3 py-1 text-xs font-extrabold text-ink/70">
+                      {c.name}
+                      {c.enrollments.length > 0 && (
+                        <span className="font-bold text-ink/44"> · {c.enrollments.map((e) => `${e.directionTitle} (${STATUS[e.status] ?? e.status})`).join(", ")}</span>
+                      )}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Оплаты */}
+      <section className="rounded-[24px] border border-white/80 bg-white/85 p-5 shadow-card backdrop-blur-xl sm:p-6">
+        <h2 className="font-display text-xl font-extrabold text-ink">Все оплаты ({payments.length})</h2>
+        <div className="mt-4 grid gap-2">
+          {payments.length === 0 && <p className="rounded-[16px] bg-ink/[0.02] px-4 py-6 text-center text-sm font-bold text-ink/50">Оплат пока нет.</p>}
+          {payments.map((p) => (
+            <div key={p.id} className="flex flex-wrap items-center justify-between gap-2 rounded-[16px] border border-ink/6 bg-white px-4 py-3">
+              <div className="min-w-0">
+                <p className="truncate text-sm font-extrabold text-ink">{p.description ?? "Оплата"}</p>
+                <p className="text-xs font-bold text-ink/52">{p.user?.email ?? "—"} · {fmtDate(p.createdAt)}</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-extrabold text-ink">{rub(p.amount)}</span>
+                <span className="rounded-full bg-ink/8 px-2.5 py-1 text-[11px] font-extrabold text-ink/64">{STATUS[p.status] ?? p.status}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}

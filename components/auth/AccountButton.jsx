@@ -1,11 +1,24 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 
 export function AccountButton({ className = '' }) {
   const { status } = useSession();
   const authed = status === 'authenticated';
+  const [authEnabled, setAuthEnabled] = useState(null);
+
+  useEffect(() => {
+    fetch('/api/public-status')
+      .then((r) => r.json())
+      .then((d) => setAuthEnabled(Boolean(d.authEnabled)))
+      .catch(() => setAuthEnabled(true));
+  }, []);
+
+  // Вошедшим всегда показываем «Кабинет». Гостям — «Войти» только если
+  // авторизация включена (и статус уже загружен), иначе кнопку прячем.
+  if (!authed && authEnabled !== true) return null;
 
   return (
     <Link

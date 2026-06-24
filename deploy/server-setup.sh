@@ -69,6 +69,9 @@ else
   echo "[env] .env уже существует — оставляю как есть"
 fi
 
+# Гарантируем наличие строки ADMIN_EMAILS (не затирая существующую)
+grep -q '^ADMIN_EMAILS=' "$APP_DIR/.env" || echo 'ADMIN_EMAILS=' >> "$APP_DIR/.env"
+
 # 3. Зависимости, БД, сборка
 echo "[build] npm install..."
 npm install --legacy-peer-deps

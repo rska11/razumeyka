@@ -11,7 +11,7 @@ const links = [
   ['/cabinet/payments', 'Оплаты', 'M3 7h18v10H3zM3 11h18'],
 ];
 
-export function CabinetNav() {
+export function CabinetNav({ isAdmin = false }) {
   const pathname = usePathname();
 
   return (
@@ -33,6 +33,20 @@ export function CabinetNav() {
           </Link>
         );
       })}
+
+      {isAdmin && (
+        <Link
+          href="/admin"
+          className={`mt-1 flex items-center gap-3 rounded-[14px] px-3 py-2.5 text-sm font-extrabold transition ${
+            pathname.startsWith('/admin') ? 'bg-ink text-white' : 'text-brand-blue hover:bg-brand-blue/8'
+          }`}
+        >
+          <svg className="h-4.5 w-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z" />
+          </svg>
+          Админка
+        </Link>
+      )}
 
       <button
         type="button"

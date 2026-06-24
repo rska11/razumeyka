@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import { verifyEmailLoginCode } from "@/lib/email-code";
+import { isAuthDisabled } from "@/lib/settings";
+import { isAdminEmail } from "@/lib/admin";
 
 declare module "next-auth" {
   interface Session {
@@ -40,6 +42,9 @@ export const authOptions: NextAuthOptions = {
         const email = credentials?.email?.trim().toLowerCase() ?? "";
         const code = credentials?.code?.trim() ?? "";
         if (!email || !code) return null;
+
+        // Рубильник: при выключенной авторизации вход разрешён только админам
+        if ((await isAuthDisabled()) && !isAdminEmail(email)) return null;
 
         const result = await verifyEmailLoginCode(email, code);
         if (!result.ok) return null;
@@ -84,5 +89,12 @@ export function getAuthSession() {
 export async function requireAuthSession() {
   const session = await getAuthSession();
   if (!session?.user?.id) return null;
+  return session;
+}
+
+/** Сессия, если пользователь — админ (по ADMIN_EMAILS); иначе null. */
+export async function getAdminSession() {
+  const session = await getAuthSession();
+  if (!session?.user?.id || !isAdminEmail(session.user.email)) return null;
   return session;
 }

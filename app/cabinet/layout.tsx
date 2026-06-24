@@ -1,12 +1,20 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getAuthSession } from "@/lib/auth";
+import { isAdminEmail } from "@/lib/admin";
+import { isAuthDisabled } from "@/lib/settings";
 import { CabinetNav } from "@/components/cabinet/CabinetNav.jsx";
 
 export default async function CabinetLayout({ children }: { children: React.ReactNode }) {
   const session = await getAuthSession();
   if (!session?.user?.id) {
     redirect("/login?callbackUrl=/cabinet");
+  }
+
+  const admin = isAdminEmail(session.user.email);
+  // На время доработок (рубильник): кабинет доступен только админам
+  if ((await isAuthDisabled()) && !admin) {
+    redirect("/");
   }
 
   const displayName = session.user.name || session.user.email || "Родитель";
@@ -31,7 +39,7 @@ export default async function CabinetLayout({ children }: { children: React.Reac
               </span>
             </div>
 
-            <CabinetNav />
+            <CabinetNav isAdmin={admin} />
           </div>
         </aside>
 

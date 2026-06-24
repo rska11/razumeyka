@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Icon } from './Icon.jsx';
 import { Logo } from './Logo.jsx';
+import { AccountButton } from './auth/AccountButton.jsx';
 
 const nav = [
   ['Возраст', '#age'],
@@ -38,6 +39,7 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-3">
+          <AccountButton className="hidden lg:inline-flex" />
           <a href="#form" className="primary-btn hidden min-h-[54px] px-7 py-3 text-base shadow-color hover:scale-105 md:inline-flex">
             Урок
             <Icon name="arrow" className="relative h-5 w-5" />
@@ -83,6 +85,7 @@ export function Header() {
               Записаться на занятие
               <Icon name="arrow" className="relative h-5 w-5" />
             </a>
+            <AccountButton className="mt-2 justify-center" />
           </nav>
         </div>
       )}

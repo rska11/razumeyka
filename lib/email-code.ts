@@ -47,6 +47,13 @@ export async function createAndSaveEmailCode(email: string): Promise<CreateCodeR
   return { ok: true, code };
 }
 
+/** Удалить неиспользованные коды email — чтобы после сбоя отправки можно было сразу повторить. */
+export async function discardEmailCodes(email: string): Promise<void> {
+  await prisma.emailLoginCode.deleteMany({
+    where: { email: email.trim().toLowerCase(), usedAt: null },
+  });
+}
+
 export type VerifyCodeResult =
   | { ok: true; userId: string; email: string }
   | { ok: false; error: "INVALID_CODE" | "EXPIRED" | "TOO_MANY_ATTEMPTS" | "NOT_FOUND" };

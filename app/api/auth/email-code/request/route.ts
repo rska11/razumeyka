@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createAndSaveEmailCode } from "@/lib/email-code";
+import { createAndSaveEmailCode, discardEmailCodes } from "@/lib/email-code";
 import { sendLoginCodeEmail } from "@/lib/mailer";
 import { isAuthDisabled } from "@/lib/settings";
 import { isAdminEmail } from "@/lib/admin";
@@ -35,6 +35,8 @@ export async function POST(req: Request) {
     await sendLoginCodeEmail(email, result.code);
   } catch (e) {
     console.error("[email-code/request] не удалось отправить письмо:", e);
+    // Сбрасываем код, чтобы пользователь мог повторить сразу (без минутной паузы)
+    await discardEmailCodes(email);
     return NextResponse.json({ error: "MAIL_FAILED" }, { status: 502 });
   }
 

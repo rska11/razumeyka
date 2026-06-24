@@ -33,6 +33,10 @@ function createTransport() {
       user: env(process.env.MAIL_USER),
       pass: env(process.env.MAIL_PASS),
     },
+    // Короткие таймауты — чтобы не висеть минутами, если Zoho тормозит
+    connectionTimeout: 12000,
+    greetingTimeout: 12000,
+    socketTimeout: 20000,
   });
 }
 
@@ -43,8 +47,7 @@ export async function sendLoginCodeEmail(to: string, code: string): Promise<void
     return;
   }
 
-  const transport = createTransport();
-  await transport.sendMail({
+  const message = {
     from: getFrom(),
     to,
     subject: `${code} — код для входа в Разумейку`,
@@ -52,7 +55,22 @@ export async function sendLoginCodeEmail(to: string, code: string): Promise<void
       `Ваш код для входа в личный кабинет Разумейки: ${code}\n\n` +
       `Код действует 10 минут. Если вы не запрашивали вход — просто игнорируйте это письмо.`,
     html: buildCodeEmail(code),
-  });
+  };
+
+  // До 3 попыток: соединение с Zoho бывает нестабильным
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const transport = createTransport();
+      await transport.sendMail(message);
+      return;
+    } catch (e) {
+      lastError = e;
+      const errCode = (e as { code?: string })?.code ?? (e as { message?: string })?.message;
+      console.warn(`[mailer] попытка ${attempt}/3 не удалась: ${errCode}`);
+    }
+  }
+  throw lastError;
 }
 
 function buildCodeEmail(code: string): string {

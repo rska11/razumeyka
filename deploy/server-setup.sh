@@ -72,6 +72,11 @@ fi
 # Гарантируем наличие строки ADMIN_EMAILS (не затирая существующую)
 grep -q '^ADMIN_EMAILS=' "$APP_DIR/.env" || echo 'ADMIN_EMAILS=' >> "$APP_DIR/.env"
 
+# ЮKassa (онлайн-оплата) — пустые по умолчанию, заполняются вручную в .env
+for K in YOOKASSA_SHOP_ID YOOKASSA_SECRET_KEY YOOKASSA_TEST_MODE YOOKASSA_RECEIPT; do
+  grep -q "^$K=" "$APP_DIR/.env" || echo "$K=" >> "$APP_DIR/.env"
+done
+
 # 3. Зависимости, БД, сборка
 echo "[build] npm install..."
 npm install --legacy-peer-deps

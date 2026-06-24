@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import { getAuthSession } from "@/lib/auth";
 import { getCabinetData } from "@/lib/cabinet";
 import { directionsData } from "@/data/directions.js";
+import { enrollmentPrice, rub } from "@/lib/pricing";
+import { PayButton } from "@/components/cabinet/PayButton.jsx";
 import { addChild, deleteChild, addEnrollment, removeEnrollment } from "../actions";
 
 const TARIFFS: Record<string, string> = { "1m": "1 месяц", "3m": "3 месяца", "6m": "6 месяцев" };
@@ -95,6 +97,11 @@ export default async function ChildrenPage() {
                     </div>
                     <span className="text-xs font-extrabold text-ink/64">{e.progress}%</span>
                   </div>
+                  {e.status === "pending" && enrollmentPrice(e.format, e.tariff) > 0 && (
+                    <div className="mt-3">
+                      <PayButton enrollmentId={e.id} label={`Оплатить ${rub(enrollmentPrice(e.format, e.tariff))}`} />
+                    </div>
+                  )}
                 </div>
               );
             })}

@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { getAuthSession } from "@/lib/auth";
 import { getCabinetData } from "@/lib/cabinet";
 
@@ -14,7 +15,8 @@ const STATUS: Record<string, { label: string; cls: string }> = {
 
 export default async function PaymentsPage() {
   const session = await getAuthSession();
-  const { payments } = await getCabinetData(session!.user.id);
+  if (!session?.user?.id) redirect("/login?callbackUrl=/cabinet");
+  const { payments } = await getCabinetData(session.user.id);
 
   const paidTotal = payments.filter((p) => p.status === "paid").reduce((s, p) => s + p.amount, 0);
 

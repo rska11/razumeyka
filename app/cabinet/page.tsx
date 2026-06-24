@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { getAuthSession } from "@/lib/auth";
 import { ensureDemoData, getCabinetData } from "@/lib/cabinet";
 
@@ -18,7 +19,8 @@ function fmtDateTime(d: Date) {
 
 export default async function CabinetOverview() {
   const session = await getAuthSession();
-  const userId = session!.user.id;
+  if (!session?.user?.id) redirect("/login?callbackUrl=/cabinet");
+  const userId = session.user.id;
   await ensureDemoData(userId);
   const { children, payments, upcomingLessons, activeEnrollments, achievementsCount } = await getCabinetData(userId);
 

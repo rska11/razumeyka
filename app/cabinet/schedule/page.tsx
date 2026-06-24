@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { getAuthSession } from "@/lib/auth";
 import { getCabinetData } from "@/lib/cabinet";
 
@@ -13,7 +14,8 @@ function fmt(d: Date) {
 
 export default async function SchedulePage() {
   const session = await getAuthSession();
-  const { children } = await getCabinetData(session!.user.id);
+  if (!session?.user?.id) redirect("/login?callbackUrl=/cabinet");
+  const { children } = await getCabinetData(session.user.id);
 
   const now = new Date();
   const all = children.flatMap((c) =>

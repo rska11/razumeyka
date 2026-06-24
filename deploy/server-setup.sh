@@ -70,8 +70,8 @@ else
 fi
 
 # 3. Зависимости, БД, сборка
-echo "[build] npm ci..."
-npm ci --legacy-peer-deps
+echo "[build] npm install..."
+npm install --legacy-peer-deps
 echo "[build] prisma generate + db push (создаст $DATA_DIR/prod.db)..."
 npx prisma generate
 npx prisma db push --skip-generate

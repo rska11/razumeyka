@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { getAuthSession } from "@/lib/auth";
 import { getCabinetData } from "@/lib/cabinet";
 import { directionsData } from "@/data/directions.js";
@@ -13,7 +14,8 @@ const STATUS: Record<string, { label: string; cls: string }> = {
 
 export default async function ChildrenPage() {
   const session = await getAuthSession();
-  const { children } = await getCabinetData(session!.user.id);
+  if (!session?.user?.id) redirect("/login?callbackUrl=/cabinet");
+  const { children } = await getCabinetData(session.user.id);
   const directions = directionsData as { slug: string; title: string }[];
 
   return (

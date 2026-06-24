@@ -18,6 +18,18 @@ export function enrollmentPrice(format: string, tariff: string | null | undefine
   return format === "individual" ? t.individual : t.collective;
 }
 
+/** Итог для лендинга: пробный = 400 ₽, иначе цена тарифа × число направлений. */
+export function landingTotal(
+  isTrial: boolean,
+  format: string,
+  tariff: string | null,
+  dirCount: number,
+): number {
+  const count = Math.max(1, dirCount);
+  if (isTrial) return 400 * count;
+  return enrollmentPrice(format, tariff) * count;
+}
+
 export function rub(n: number) {
   return n.toLocaleString("ru-RU") + " ₽";
 }

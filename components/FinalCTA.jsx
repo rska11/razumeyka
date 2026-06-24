@@ -5,16 +5,6 @@ import { Icon } from './Icon.jsx';
 
 const MAX_DIRECTIONS = 3;
 
-const PAYMENT_LINKS = {
-  trial:           'ВСТАВИТЬ_ССЫЛКУ',
-  'collective-1m': 'ВСТАВИТЬ_ССЫЛКУ',
-  'collective-3m': 'ВСТАВИТЬ_ССЫЛКУ',
-  'collective-6m': 'ВСТАВИТЬ_ССЫЛКУ',
-  'individual-1m': 'ВСТАВИТЬ_ССЫЛКУ',
-  'individual-3m': 'ВСТАВИТЬ_ССЫЛКУ',
-  'individual-6m': 'ВСТАВИТЬ_ССЫЛКУ',
-};
-
 const DIRECTIONS = [
   { name: 'Ментальная арифметика', short: 'Арифметика', icon: 'abacus',
     bar: 'bg-brand-blue', badgeBg: 'bg-brand-blue', iconSel: 'bg-brand-blue text-white',
@@ -90,8 +80,11 @@ export function FinalCTA() {
   const [daysByDir, setDaysByDir] = useState({});
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   // dirs paused/excluded in review step
   const [pausedDirs, setPausedDirs] = useState([]);
+  const [payLoading, setPayLoading] = useState(false);
+  const [payError, setPayError] = useState('');
 
   const isTrial      = format === 'trial';
   const activeFormat = FORMATS.find((f) => f.id === format);
@@ -110,10 +103,6 @@ export function FinalCTA() {
 
   const perLesson = !isTrial && activeDur && format
     ? activeDur[format]?.per ?? null : null;
-
-  const paymentKey = isTrial ? 'trial'
-    : format && duration ? `${format}-${duration}` : null;
-  const paymentLink = paymentKey ? PAYMENT_LINKS[paymentKey] : null;
 
   function getDays(dirName) { return daysByDir[dirName] ?? []; }
 
@@ -190,8 +179,43 @@ export function FinalCTA() {
     );
   }
 
-  function handlePayment() {
-    if (paymentLink) window.location.href = paymentLink;
+  async function handlePayment() {
+    setPayError('');
+    if (!email.trim()) {
+      setPayError('Укажите email — на него придёт чек и доступ в кабинет');
+      setActiveStep(5);
+      return;
+    }
+    setPayLoading(true);
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          isTrial,
+          format,
+          tariff: duration,
+          directions: activeDirsInReview,
+          email,
+          name,
+          phone,
+          schedule: scheduleSummary,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.url) {
+        window.location.href = data.url;
+        return;
+      }
+      setPayError(
+        data.error === 'PAYMENTS_DISABLED' ? 'Оплата временно недоступна'
+          : data.error === 'INVALID_EMAIL' ? 'Укажите корректный email'
+          : 'Не удалось создать оплату. Попробуйте ещё раз.',
+      );
+    } catch {
+      setPayError('Сеть недоступна. Попробуйте ещё раз.');
+    }
+    setPayLoading(false);
   }
 
   // Плашка «Записаться на пробный урок — 400 ₽» из Hero открывает мастер сразу на сценарии пробного урока
@@ -642,6 +666,10 @@ export function FinalCTA() {
                           className="field-input mt-0 h-[52px] bg-white" placeholder="+7 (___) ___-__-__" />
                       </Field>
                     </div>
+                    <Field label="Email" icon="screen">
+                      <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+                        className="field-input mt-0 h-[52px] bg-white" placeholder="anna@example.com" />
+                    </Field>
                     <button type="submit" className="secondary-btn min-h-[52px] w-full">Перейти к проверке</button>
                   </form>
                 </StepBlock>
@@ -761,11 +789,12 @@ export function FinalCTA() {
                         <p className="text-xs font-bold leading-5 text-ink/52">После оплаты мы свяжемся в течение 5–10 минут и пришлём ссылки на первые занятия.</p>
                       </div>
                       <div className="px-4 pb-4 pt-3">
-                        <button type="button" onClick={handlePayment} disabled={!paymentLink || activeDirsInReview.length === 0}
+                        <button type="button" onClick={handlePayment} disabled={payLoading || activeDirsInReview.length === 0 || !totalPrice}
                           className="primary-btn w-full disabled:cursor-not-allowed disabled:opacity-40">
-                          <span className="relative">{totalPrice ? `Оплатить ${rub(totalPrice)}` : 'Перейти к оплате'}</span>
+                          <span className="relative">{payLoading ? 'Переход к оплате…' : totalPrice ? `Оплатить ${rub(totalPrice)}` : 'Перейти к оплате'}</span>
                           <Icon name="arrow" className="relative h-5 w-5" />
                         </button>
+                        {payError && <p className="mt-2 text-center text-xs font-bold text-brand-red">{payError}</p>}
                       </div>
                     </div>
 

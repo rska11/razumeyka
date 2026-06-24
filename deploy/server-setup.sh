@@ -90,21 +90,33 @@ else
 fi
 pm2 save
 
-# 5. nginx vhost: apex = приложение, www → редирект на apex (канонично).
-# Переписываем HTTP-конфиг только если в нём ещё нет www-редиректа —
-# чтобы не затирать SSL, добавленный certbot на повторных деплоях.
+# 5+6. nginx + SSL: apex = сайт, www → редирект на apex.
+# БЕЗОПАСНО: если сертификат уже есть — пишем сразу полный HTTPS-конфиг с ним,
+# чтобы apex НИКОГДА не оставался без 443 (иначе домен проваливается на чужой сайт).
 NGINX_CONF=/etc/nginx/sites-available/razumeyka.conf
-if ! grep -q "return 301 https://$DOMAIN" "$NGINX_CONF" 2>/dev/null; then
-  echo "[nginx] пишу канонический vhost (www → без www)"
+CERT=/etc/letsencrypt/live/$DOMAIN
+if [ ! -d /etc/letsencrypt ] && command -v apt >/dev/null; then apt install -y certbot python3-certbot-nginx >/dev/null 2>&1 || true; fi
+
+if [ -f "$CERT/fullchain.pem" ]; then
+  echo "[nginx] сертификат есть — пишу HTTPS-конфиг (apex + www→apex)"
   cat > "$NGINX_CONF" <<EOF
 server {
     listen 80;
-    server_name www.$DOMAIN;
+    server_name $DOMAIN www.$DOMAIN;
     return 301 https://$DOMAIN\$request_uri;
 }
 server {
-    listen 80;
+    listen 443 ssl;
+    server_name www.$DOMAIN;
+    ssl_certificate $CERT/fullchain.pem;
+    ssl_certificate_key $CERT/privkey.pem;
+    return 301 https://$DOMAIN\$request_uri;
+}
+server {
+    listen 443 ssl;
     server_name $DOMAIN;
+    ssl_certificate $CERT/fullchain.pem;
+    ssl_certificate_key $CERT/privkey.pem;
     location / {
         proxy_pass http://127.0.0.1:$PORT;
         proxy_http_version 1.1;
@@ -119,18 +131,25 @@ server {
 }
 EOF
   ln -sf "$NGINX_CONF" /etc/nginx/sites-enabled/razumeyka.conf
+  nginx -t && systemctl reload nginx
+  # Тихо расширим/обновим сертификат на www. Если упадёт (лимит/сеть) — сайт уже работает на apex.
+  command -v certbot >/dev/null && certbot --nginx -d "$DOMAIN" -d "www.$DOMAIN" --non-interactive --agree-tos -m "$LE_EMAIL" --redirect --keep-until-expiring >/dev/null 2>&1 || echo "[ssl] (расширение на www отложено, apex работает)"
 else
-  echo "[nginx] vhost уже канонический"
-fi
-nginx -t && systemctl reload nginx
-
-# 6. SSL (Let's Encrypt)
-if command -v certbot >/dev/null; then
-  echo "[ssl] выпускаю сертификат для $DOMAIN"
-  certbot --nginx -d "$DOMAIN" -d "www.$DOMAIN" --non-interactive --agree-tos -m "$LE_EMAIL" --redirect || \
-    echo "[ssl] certbot не смог сразу — проверь DNS/80 порт и запусти: certbot --nginx -d $DOMAIN -d www.$DOMAIN"
-else
-  echo "[ssl] certbot не установлен. Поставь: apt install -y certbot python3-certbot-nginx — затем перезапусти скрипт"
+  echo "[nginx] сертификата ещё нет — первичный выпуск"
+  cat > "$NGINX_CONF" <<EOF
+server {
+    listen 80;
+    server_name $DOMAIN www.$DOMAIN;
+    location / {
+        proxy_pass http://127.0.0.1:$PORT;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+    }
+}
+EOF
+  ln -sf "$NGINX_CONF" /etc/nginx/sites-enabled/razumeyka.conf
+  nginx -t && systemctl reload nginx
+  command -v certbot >/dev/null && certbot --nginx -d "$DOMAIN" -d "www.$DOMAIN" --non-interactive --agree-tos -m "$LE_EMAIL" --redirect || echo "[ssl] certbot не смог — запусти вручную"
 fi
 
 echo "==================================================="

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getAuthSession } from "@/lib/auth";
 import { getCabinetData } from "@/lib/cabinet";
+import { reconcileUserPayments } from "@/lib/payments";
 
 function rub(n: number) {
   return n.toLocaleString("ru-RU") + " ₽";
@@ -16,6 +17,8 @@ const STATUS: Record<string, { label: string; cls: string }> = {
 export default async function PaymentsPage() {
   const session = await getAuthSession();
   if (!session?.user?.id) redirect("/login?callbackUrl=/cabinet");
+  // Подтверждаем оплаты по возвращении с ЮKassa (без зависимости от вебхука)
+  await reconcileUserPayments(session.user.id);
   const { payments } = await getCabinetData(session.user.id);
 
   const paidTotal = payments.filter((p) => p.status === "paid").reduce((s, p) => s + p.amount, 0);

@@ -110,6 +110,17 @@ export default async function ChildrenPage() {
             )}
           </div>
 
+          {child.achievements.length > 0 && (
+            <div className="mt-4">
+              <p className="text-[11px] font-extrabold uppercase tracking-[0.12em] text-ink/44">Достижения</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {child.achievements.map((a) => (
+                  <span key={a.id} className="inline-flex items-center gap-1.5 rounded-full bg-brand-orange/12 px-3 py-1.5 text-xs font-extrabold text-brand-orange">🏅 {a.title}</span>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Записать на направление */}
           <form action={addEnrollment} className="mt-4 grid gap-2 rounded-[18px] bg-ink/[0.02] p-3 sm:grid-cols-[1.4fr_1fr_0.8fr_auto] sm:items-end">
             <input type="hidden" name="childId" value={child.id} />

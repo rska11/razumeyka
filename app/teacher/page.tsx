@@ -1,6 +1,13 @@
 import { getTeacherSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { teacherSetZoom, teacherAddLesson, teacherDeleteLesson } from "./actions";
+import {
+  teacherSetZoom,
+  teacherAddLesson,
+  teacherDeleteLesson,
+  teacherSetProgress,
+  teacherAddAchievement,
+  teacherDeleteAchievement,
+} from "./actions";
 
 const DAY_LABELS: Record<string, string> = {
   mon: "Пн", tue: "Вт", wed: "Ср", thu: "Чт", fri: "Пт", sat: "Сб", sun: "Вс",
@@ -26,7 +33,13 @@ export default async function TeacherDashboard() {
     where: { teacherId },
     orderBy: { createdAt: "asc" },
     include: {
-      child: { select: { name: true, avatarColor: true } },
+      child: {
+        select: {
+          name: true,
+          avatarColor: true,
+          achievements: { orderBy: { earnedAt: "desc" }, select: { id: true, title: true } },
+        },
+      },
       lessons: {
         where: { startsAt: { gte: new Date(now.getTime() - 2 * 3600_000) } },
         orderBy: { startsAt: "asc" },
@@ -118,8 +131,24 @@ export default async function TeacherDashboard() {
               </div>
             </div>
 
+            {/* Прогресс */}
+            <form action={teacherSetProgress} className="mt-4 flex flex-wrap items-end gap-3">
+              <input type="hidden" name="enrollmentId" value={e.id} />
+              <div className="min-w-[180px] flex-1">
+                <div className="flex items-center justify-between">
+                  <label className="text-[11px] font-extrabold uppercase tracking-[0.12em] text-ink/44">Прогресс ученика</label>
+                  <span className="text-xs font-extrabold text-ink/64">{e.progress}%</span>
+                </div>
+                <div className="mt-2 h-2 overflow-hidden rounded-full bg-ink/8">
+                  <div className="h-full rounded-full bg-brand-blue" style={{ width: `${e.progress}%` }} />
+                </div>
+              </div>
+              <input type="number" name="progress" min="0" max="100" defaultValue={e.progress} className="field-input h-[44px] w-24" />
+              <button type="submit" className="secondary-btn h-[44px] min-h-0 px-4 py-0">Сохранить %</button>
+            </form>
+
             {/* Zoom-ссылка */}
-            <form action={teacherSetZoom} className="mt-4 grid gap-2 sm:grid-cols-[1fr_auto] sm:items-end">
+            <form action={teacherSetZoom} className="mt-3 grid gap-2 sm:grid-cols-[1fr_auto] sm:items-end">
               <input type="hidden" name="enrollmentId" value={e.id} />
               <div>
                 <label className="text-[11px] font-extrabold uppercase tracking-[0.12em] text-ink/44">Zoom-ссылка занятий</label>
@@ -159,6 +188,26 @@ export default async function TeacherDashboard() {
                 ))}
               </div>
             )}
+
+            {/* Достижения */}
+            <div className="mt-4">
+              <p className="text-[11px] font-extrabold uppercase tracking-[0.12em] text-ink/44">Достижения</p>
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                {e.child.achievements.map((a) => (
+                  <form key={a.id} action={teacherDeleteAchievement} className="inline-flex items-center gap-1.5 rounded-full bg-brand-orange/12 px-3 py-1.5 text-xs font-extrabold text-brand-orange">
+                    <input type="hidden" name="achievementId" value={a.id} />
+                    <span>🏅 {a.title}</span>
+                    <button type="submit" title="Удалить достижение" className="leading-none text-brand-orange/55 transition hover:text-brand-red">×</button>
+                  </form>
+                ))}
+                {e.child.achievements.length === 0 && <span className="text-xs font-bold text-ink/40">Пока нет</span>}
+              </div>
+              <form action={teacherAddAchievement} className="mt-2 flex gap-2">
+                <input type="hidden" name="enrollmentId" value={e.id} />
+                <input name="title" placeholder="Например: Освоил счёт до 100" className="field-input h-[44px] flex-1" />
+                <button type="submit" className="secondary-btn h-[44px] min-h-0 px-4 py-0">Добавить</button>
+              </form>
+            </div>
           </div>
         ))}
       </section>

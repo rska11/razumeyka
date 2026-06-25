@@ -40,6 +40,52 @@ export async function teacherAddLesson(formData: FormData) {
   revalidatePath("/cabinet");
 }
 
+export async function teacherSetProgress(formData: FormData) {
+  const s = await getTeacherSession();
+  if (!s) return;
+  const enrollmentId = String(formData.get("enrollmentId") ?? "");
+  let progress = Number(formData.get("progress") ?? 0);
+  if (!Number.isFinite(progress)) progress = 0;
+  progress = Math.max(0, Math.min(100, Math.round(progress)));
+  if (!(await ownsEnrollment(enrollmentId, s.user.id))) return;
+  await prisma.enrollment.update({ where: { id: enrollmentId }, data: { progress } });
+  revalidatePath("/teacher");
+  revalidatePath("/cabinet");
+  revalidatePath("/cabinet/children");
+}
+
+export async function teacherAddAchievement(formData: FormData) {
+  const s = await getTeacherSession();
+  if (!s) return;
+  const enrollmentId = String(formData.get("enrollmentId") ?? "");
+  const title = String(formData.get("title") ?? "").trim().slice(0, 80);
+  if (!title) return;
+  const e = await prisma.enrollment.findFirst({
+    where: { id: enrollmentId, teacherId: s.user.id },
+    select: { childId: true },
+  });
+  if (!e) return;
+  await prisma.achievement.create({ data: { childId: e.childId, title, icon: "spark" } });
+  revalidatePath("/teacher");
+  revalidatePath("/cabinet");
+  revalidatePath("/cabinet/children");
+}
+
+export async function teacherDeleteAchievement(formData: FormData) {
+  const s = await getTeacherSession();
+  if (!s) return;
+  const achievementId = String(formData.get("achievementId") ?? "");
+  if (!achievementId) return;
+  // удаляем только если ребёнок учится у этого преподавателя
+  const ach = await prisma.achievement.findFirst({
+    where: { id: achievementId, child: { enrollments: { some: { teacherId: s.user.id } } } },
+  });
+  if (!ach) return;
+  await prisma.achievement.delete({ where: { id: achievementId } });
+  revalidatePath("/teacher");
+  revalidatePath("/cabinet/children");
+}
+
 export async function teacherDeleteLesson(formData: FormData) {
   const s = await getTeacherSession();
   if (!s) return;

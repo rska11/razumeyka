@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
+import { CookieConsent } from "@/components/CookieConsent.jsx";
 
 export const metadata: Metadata = {
   title: "Разумейка — онлайн-школа развития детей",
@@ -17,6 +18,7 @@ export default function RootLayout({
     <html lang="ru">
       <body>
         <Providers>{children}</Providers>
+        <CookieConsent />
       </body>
     </html>
   );

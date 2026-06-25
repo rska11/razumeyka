@@ -86,6 +86,7 @@ export function FinalCTA() {
   const [payLoading, setPayLoading] = useState(false);
   const [payError, setPayError] = useState('');
   const [consent, setConsent] = useState(false);
+  const [authEnabled, setAuthEnabled] = useState(true);
 
   const isTrial      = format === 'trial';
   const activeFormat = FORMATS.find((f) => f.id === format);
@@ -232,6 +233,30 @@ export function FinalCTA() {
     window.addEventListener('razumeika:trial', onTrialIntent);
     return () => window.removeEventListener('razumeika:trial', onTrialIntent);
   }, []);
+
+  // Режим доработки (рубильник): если авторизация выключена — форму записи скрываем
+  useEffect(() => {
+    fetch('/api/public-status')
+      .then((r) => r.json())
+      .then((d) => setAuthEnabled(Boolean(d.authEnabled)))
+      .catch(() => {});
+  }, []);
+
+  if (!authEnabled) {
+    return (
+      <section id="form" className="presentation-slide mesh-bg py-16 sm:py-20 lg:py-24">
+        <div className="container-pad">
+          <div className="mx-auto max-w-2xl rounded-[28px] border border-white/80 bg-white/85 p-8 text-center shadow-color backdrop-blur-xl sm:p-10">
+            <span className="section-kicker">Скоро открытие</span>
+            <h2 className="section-title mt-5">Онлайн-запись временно закрыта</h2>
+            <p className="mt-4 text-lg font-medium leading-8 text-ink/64">
+              Сайт в режиме доработки. Совсем скоро здесь снова можно будет записаться на занятия и пробный урок.
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="form" className="presentation-slide mesh-bg py-16 sm:py-20 lg:py-24">

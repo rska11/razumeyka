@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { verifyEmailLoginCode } from "@/lib/email-code";
 import { isAuthDisabled } from "@/lib/settings";
 import { isAdminEmail } from "@/lib/admin";
+import { isTeacherEmail } from "@/lib/staff";
 
 declare module "next-auth" {
   interface Session {
@@ -43,8 +44,11 @@ export const authOptions: NextAuthOptions = {
         const code = credentials?.code?.trim() ?? "";
         if (!email || !code) return null;
 
-        // Рубильник: при выключенной авторизации вход разрешён только админам
-        if ((await isAuthDisabled()) && !isAdminEmail(email)) return null;
+        // Рубильник: при выключенной авторизации вход разрешён только персоналу (админ/препод)
+        if (await isAuthDisabled()) {
+          const staff = isAdminEmail(email) || (await isTeacherEmail(email));
+          if (!staff) return null;
+        }
 
         const result = await verifyEmailLoginCode(email, code);
         if (!result.ok) return null;
@@ -96,5 +100,13 @@ export async function requireAuthSession() {
 export async function getAdminSession() {
   const session = await getAuthSession();
   if (!session?.user?.id || !isAdminEmail(session.user.email)) return null;
+  return session;
+}
+
+/** Сессия, если пользователь — действующий преподаватель; иначе null. */
+export async function getTeacherSession() {
+  const session = await getAuthSession();
+  if (!session?.user?.id) return null;
+  if (!(await isTeacherEmail(session.user.email))) return null;
   return session;
 }

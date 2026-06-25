@@ -15,11 +15,13 @@ model User {
   phone     String?
   image     String?
   provider  String    @default("email-code")
+  role      String    @default("parent") // parent | teacher
   isBlocked Boolean   @default(false)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   children  Child[]
   payments  Payment[]
+  taughtEnrollments Enrollment[] @relation("TeacherEnrollments")
 }
 
 /// Одноразовый код входа на email (как в genpic)
@@ -65,14 +67,17 @@ model Enrollment {
   daysOfWeek     String?    // CSV дни недели: "mon,thu"
   time           String?    // "18:30"
   zoomUrl        String?    // постоянная Zoom-ссылка на занятия этой записи
+  teacherId      String?    // назначенный преподаватель (User с role=teacher)
   startedAt      DateTime   @default(now())
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
   child          Child      @relation(fields: [childId], references: [id], onDelete: Cascade)
+  teacher        User?      @relation("TeacherEnrollments", fields: [teacherId], references: [id], onDelete: SetNull)
   lessons        Lesson[]
   payments       Payment[]
 
   @@index([childId])
+  @@index([teacherId])
 }
 
 /// Конкретное занятие в расписании

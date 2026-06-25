@@ -3,6 +3,7 @@ import { createAndSaveEmailCode, discardEmailCodes } from "@/lib/email-code";
 import { sendLoginCodeEmail } from "@/lib/mailer";
 import { isAuthDisabled } from "@/lib/settings";
 import { isAdminEmail } from "@/lib/admin";
+import { isTeacherEmail } from "@/lib/staff";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -19,9 +20,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "INVALID_EMAIL" }, { status: 400 });
   }
 
-  // Рубильник: при выключенной авторизации код выдаём только админам
-  if ((await isAuthDisabled()) && !isAdminEmail(email)) {
-    return NextResponse.json({ error: "AUTH_DISABLED" }, { status: 403 });
+  // Рубильник: при выключенной авторизации код выдаём только персоналу (админ/препод)
+  if (await isAuthDisabled()) {
+    const staff = isAdminEmail(email) || (await isTeacherEmail(email));
+    if (!staff) {
+      return NextResponse.json({ error: "AUTH_DISABLED" }, { status: 403 });
+    }
   }
 
   const result = await createAndSaveEmailCode(email);

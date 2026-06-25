@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { setZoom, addLesson, deleteLesson } from "./actions";
+import { assignTeacher } from "../teachers/actions";
 
 function fmt(d: Date) {
   return new Intl.DateTimeFormat("ru-RU", {
@@ -13,13 +14,17 @@ const STATUS: Record<string, string> = {
 
 export default async function AdminLessonsPage() {
   const now = new Date();
-  const enrollments = await prisma.enrollment.findMany({
-    orderBy: { createdAt: "desc" },
-    include: {
-      child: { include: { parent: { select: { email: true } } } },
-      lessons: { where: { startsAt: { gte: new Date(now.getTime() - 2 * 3600_000) } }, orderBy: { startsAt: "asc" } },
-    },
-  });
+  const [enrollments, teachers] = await Promise.all([
+    prisma.enrollment.findMany({
+      orderBy: { createdAt: "desc" },
+      include: {
+        child: { include: { parent: { select: { email: true } } } },
+        teacher: { select: { id: true, name: true, email: true } },
+        lessons: { where: { startsAt: { gte: new Date(now.getTime() - 2 * 3600_000) } }, orderBy: { startsAt: "asc" } },
+      },
+    }),
+    prisma.user.findMany({ where: { role: "teacher", isBlocked: false }, orderBy: { name: "asc" } }),
+  ]);
 
   return (
     <div className="grid gap-6">
@@ -49,8 +54,23 @@ export default async function AdminLessonsPage() {
             </div>
           </div>
 
+          {/* Назначение преподавателя */}
+          <form action={assignTeacher} className="mt-4 grid gap-2 sm:grid-cols-[1fr_auto] sm:items-end">
+            <input type="hidden" name="enrollmentId" value={e.id} />
+            <div>
+              <label className="text-[11px] font-extrabold uppercase tracking-[0.12em] text-ink/44">Преподаватель</label>
+              <select name="teacherId" defaultValue={e.teacherId ?? ""} className="field-input mt-1 h-[48px]">
+                <option value="">— не назначен —</option>
+                {teachers.map((t) => (
+                  <option key={t.id} value={t.id}>{t.name || t.email}</option>
+                ))}
+              </select>
+            </div>
+            <button type="submit" className="secondary-btn h-[48px] min-h-0 px-5 py-0">Назначить</button>
+          </form>
+
           {/* Постоянная Zoom-ссылка записи */}
-          <form action={setZoom} className="mt-4 grid gap-2 sm:grid-cols-[1fr_auto] sm:items-end">
+          <form action={setZoom} className="mt-3 grid gap-2 sm:grid-cols-[1fr_auto] sm:items-end">
             <input type="hidden" name="enrollmentId" value={e.id} />
             <div>
               <label className="text-[11px] font-extrabold uppercase tracking-[0.12em] text-ink/44">Постоянная Zoom-ссылка</label>

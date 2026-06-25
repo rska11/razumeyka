@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getAuthSession } from "@/lib/auth";
 import { isAdminEmail } from "@/lib/admin";
+import { isTeacherEmail } from "@/lib/staff";
 import { isAuthDisabled } from "@/lib/settings";
 import { CabinetNav } from "@/components/cabinet/CabinetNav.jsx";
 
@@ -9,6 +10,11 @@ export default async function CabinetLayout({ children }: { children: React.Reac
   const session = await getAuthSession();
   if (!session?.user?.id) {
     redirect("/login?callbackUrl=/cabinet");
+  }
+
+  // Преподаватель — в свой кабинет
+  if (await isTeacherEmail(session.user.email)) {
+    redirect("/teacher");
   }
 
   const admin = isAdminEmail(session.user.email);

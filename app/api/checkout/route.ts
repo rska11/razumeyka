@@ -2,11 +2,16 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { landingTotal, TARIFF_LABELS } from "@/lib/pricing";
 import { createYooKassaPayment, isYooKassaConfigured } from "@/lib/yookassa";
+import { isAuthDisabled } from "@/lib/settings";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Гостевой чекаут с лендинга: создаёт родителя по email + платёж → ЮKassa.
 export async function POST(req: Request) {
+  // Режим доработки (рубильник): не собираем ПД и не принимаем оплату
+  if (await isAuthDisabled()) {
+    return NextResponse.json({ error: "MAINTENANCE" }, { status: 503 });
+  }
   if (!isYooKassaConfigured()) {
     return NextResponse.json({ error: "PAYMENTS_DISABLED" }, { status: 503 });
   }

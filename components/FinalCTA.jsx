@@ -209,7 +209,8 @@ export function FinalCTA() {
         return;
       }
       setPayError(
-        data.error === 'PAYMENTS_DISABLED' ? 'Оплата временно недоступна'
+        data.error === 'MAINTENANCE' ? 'Сайт в режиме доработки — запись временно закрыта.'
+          : data.error === 'PAYMENTS_DISABLED' ? 'Оплата временно недоступна'
           : data.error === 'INVALID_EMAIL' ? 'Укажите корректный email'
           : 'Не удалось создать оплату. Попробуйте ещё раз.',
       );

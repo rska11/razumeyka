@@ -73,6 +73,50 @@ export async function sendLoginCodeEmail(to: string, code: string): Promise<void
   throw lastError;
 }
 
+export async function sendLessonReminderEmail(
+  to: string,
+  data: { childName: string; direction: string; whenText: string; topic?: string | null; joinUrl?: string | null },
+): Promise<void> {
+  if (!isMailConfigured()) {
+    console.info(`\n[Разумейка] Напоминание для ${to}: ${data.childName} · ${data.direction} · ${data.whenText} · ${data.joinUrl ?? "без ссылки"}\n`);
+    return;
+  }
+  const transport = createTransport();
+  await transport.sendMail({
+    from: getFrom(),
+    to,
+    subject: `Напоминание: занятие ${data.whenText}`,
+    text:
+      `Напоминаем о занятии.\n\n` +
+      `Ученик: ${data.childName}\nНаправление: ${data.direction}\nКогда: ${data.whenText}\n` +
+      (data.topic ? `Тема: ${data.topic}\n` : "") +
+      (data.joinUrl ? `\nПодключиться: ${data.joinUrl}\n` : "") +
+      `\n— Разумейка`,
+    html: buildReminderEmail(data),
+  });
+}
+
+function buildReminderEmail(d: { childName: string; direction: string; whenText: string; topic?: string | null; joinUrl?: string | null }): string {
+  const button = d.joinUrl
+    ? `<p style="margin:22px 0"><a href="${d.joinUrl}" style="display:inline-block;background:#3b82f6;color:#fff;text-decoration:none;padding:13px 26px;border-radius:999px;font-weight:800">Подключиться к занятию</a></p>`
+    : "";
+  return `<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f5fbff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Manrope,sans-serif">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f5fbff"><tr><td align="center" style="padding:40px 16px">
+<table width="100%" style="max-width:480px" cellpadding="0" cellspacing="0">
+<tr><td style="padding-bottom:22px"><span style="font-size:22px;font-weight:800;color:#0b1f3a">Разумейка</span></td></tr>
+<tr><td style="background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;padding:28px 30px;box-shadow:0 18px 54px rgba(59,130,246,0.10)">
+  <p style="margin:0 0 6px;font-size:16px;font-weight:800;color:#0b1f3a">Скоро занятие</p>
+  <p style="margin:0 0 16px;font-size:14px;color:#64748b">${d.whenText}</p>
+  <p style="margin:0;font-size:15px;color:#0b1f3a"><strong>${d.childName}</strong> · ${d.direction}</p>
+  ${d.topic ? `<p style="margin:6px 0 0;font-size:14px;color:#64748b">Тема: ${d.topic}</p>` : ""}
+  ${button}
+  <p style="margin:8px 0 0;font-size:13px;color:#94a3b8">Если кнопка не открывается — ссылка есть в личном кабинете.</p>
+</td></tr>
+<tr><td style="padding-top:20px;text-align:center"><p style="margin:0;font-size:12px;color:#94a3b8">Разумейка · razumeyka-school.ru</p></td></tr>
+</table></td></tr></table></body></html>`;
+}
+
 function buildCodeEmail(code: string): string {
   return `<!DOCTYPE html>
 <html lang="ru">

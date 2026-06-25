@@ -85,10 +85,11 @@ model Lesson {
   id           String     @id @default(cuid())
   enrollmentId String
   startsAt     DateTime
-  status       String     @default("scheduled") // scheduled | done | canceled
-  topic        String?
-  joinUrl      String?    // Zoom-ссылка на конкретное занятие (если не задана — берётся из записи)
-  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  status         String     @default("scheduled") // scheduled | done | canceled
+  topic          String?
+  joinUrl        String?    // Zoom-ссылка на конкретное занятие (если не задана — берётся из записи)
+  reminderSentAt DateTime?  // когда отправлено email-напоминание (чтобы не дублировать)
+  enrollment     Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
 
   @@index([enrollmentId, startsAt])
 }

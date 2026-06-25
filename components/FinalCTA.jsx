@@ -85,6 +85,7 @@ export function FinalCTA() {
   const [pausedDirs, setPausedDirs] = useState([]);
   const [payLoading, setPayLoading] = useState(false);
   const [payError, setPayError] = useState('');
+  const [consent, setConsent] = useState(false);
 
   const isTrial      = format === 'trial';
   const activeFormat = FORMATS.find((f) => f.id === format);
@@ -789,7 +790,15 @@ export function FinalCTA() {
                         <p className="text-xs font-bold leading-5 text-ink/52">После оплаты мы свяжемся в течение 5–10 минут и пришлём ссылки на первые занятия.</p>
                       </div>
                       <div className="px-4 pb-4 pt-3">
-                        <button type="button" onClick={handlePayment} disabled={payLoading || activeDirsInReview.length === 0 || !totalPrice}
+                        <label className="mb-3 flex items-start gap-2.5 text-xs font-medium leading-5 text-ink/60">
+                          <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)}
+                            className="mt-0.5 h-4 w-4 shrink-0 accent-brand-blue" />
+                          <span>
+                            Я соглашаюсь на обработку персональных данных и принимаю{' '}
+                            <a href="/privacy" target="_blank" rel="noopener" className="font-extrabold text-brand-blue underline">Политику конфиденциальности</a>.
+                          </span>
+                        </label>
+                        <button type="button" onClick={handlePayment} disabled={payLoading || activeDirsInReview.length === 0 || !totalPrice || !consent}
                           className="primary-btn w-full disabled:cursor-not-allowed disabled:opacity-40">
                           <span className="relative">{payLoading ? 'Переход к оплате…' : totalPrice ? `Оплатить ${rub(totalPrice)}` : 'Перейти к оплате'}</span>
                           <Icon name="arrow" className="relative h-5 w-5" />

@@ -24,6 +24,7 @@ function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [consent, setConsent] = useState(false);
 
   async function requestCode(e?: React.FormEvent) {
     e?.preventDefault();
@@ -118,7 +119,15 @@ function LoginForm() {
                 className="field-input"
               />
             </div>
-            <button type="submit" disabled={loading} className="primary-btn w-full disabled:opacity-50">
+            <label className="flex items-start gap-2.5 text-xs font-medium leading-5 text-ink/60">
+              <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)}
+                className="mt-0.5 h-4 w-4 shrink-0 accent-brand-blue" />
+              <span>
+                Я соглашаюсь на обработку персональных данных и принимаю{" "}
+                <a href="/privacy" target="_blank" rel="noopener" className="font-extrabold text-brand-blue underline">Политику конфиденциальности</a>.
+              </span>
+            </label>
+            <button type="submit" disabled={loading || !consent} className="primary-btn w-full disabled:opacity-50">
               {loading ? "Отправляем…" : "Получить код"}
             </button>
           </form>

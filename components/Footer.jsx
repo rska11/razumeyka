@@ -106,11 +106,11 @@ export function Footer() {
             © {year} Разумейка. Все права защищены.
           </p>
           <div className="flex flex-wrap gap-5">
-            <a href="/legal/privacy" className="text-sm font-bold text-white/38 transition hover:text-white">
+            <a href="/privacy" className="text-sm font-bold text-white/38 transition hover:text-white">
               Политика конфиденциальности
             </a>
-            <a href="/legal/offer" className="text-sm font-bold text-white/38 transition hover:text-white">
-              Договор оферты
+            <a href="/offer" className="text-sm font-bold text-white/38 transition hover:text-white">
+              Публичная оферта
             </a>
           </div>
         </div>

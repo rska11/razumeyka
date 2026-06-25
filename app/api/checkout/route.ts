@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { landingTotal, TARIFF_LABELS } from "@/lib/pricing";
 import { createYooKassaPayment, isYooKassaConfigured } from "@/lib/yookassa";
 import { isAuthDisabled } from "@/lib/settings";
+import { directionsData } from "@/data/directions.js";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -26,6 +27,7 @@ export async function POST(req: Request) {
   const email = String(b.email ?? "").trim().toLowerCase();
   const name = String(b.name ?? "").trim().slice(0, 80);
   const phone = String(b.phone ?? "").trim().slice(0, 40);
+  const childName = String(b.childName ?? "").trim().slice(0, 80);
   const isTrial = Boolean(b.isTrial);
   const format = b.format === "individual" ? "individual" : "collective";
   const tariff = typeof b.tariff === "string" ? b.tariff : null;
@@ -56,6 +58,33 @@ export async function POST(req: Request) {
     update: { name: name || undefined, phone: phone || undefined },
     create: { email, name: name || null, phone: phone || null, provider: "landing" },
   });
+
+  // Профиль ребёнка + записи на направления (станут активными после оплаты — см. /spasibo)
+  if (childName) {
+    let child = await prisma.child.findFirst({ where: { parentId: user.id, name: childName } });
+    if (!child) {
+      child = await prisma.child.create({ data: { parentId: user.id, name: childName } });
+    }
+    const dirs = directionsData as { slug: string; title: string }[];
+    for (const dirName of directions) {
+      const d = dirs.find((x) => x.title === dirName);
+      const exists = await prisma.enrollment.findFirst({
+        where: { childId: child.id, directionTitle: dirName, status: "pending" },
+      });
+      if (!exists) {
+        await prisma.enrollment.create({
+          data: {
+            childId: child.id,
+            directionSlug: d?.slug ?? "",
+            directionTitle: dirName,
+            format,
+            tariff: isTrial ? null : tariff,
+            status: "pending",
+          },
+        });
+      }
+    }
+  }
 
   const payment = await prisma.payment.create({
     data: {

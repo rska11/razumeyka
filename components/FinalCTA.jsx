@@ -81,6 +81,7 @@ export function FinalCTA() {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
+  const [childName, setChildName] = useState('');
   // dirs paused/excluded in review step
   const [pausedDirs, setPausedDirs] = useState([]);
   const [payLoading, setPayLoading] = useState(false);
@@ -201,6 +202,7 @@ export function FinalCTA() {
           email,
           name,
           phone,
+          childName,
           schedule: scheduleSummary,
         }),
       });
@@ -693,10 +695,16 @@ export function FinalCTA() {
                           className="field-input mt-0 h-[52px] bg-white" placeholder="+7 (___) ___-__-__" />
                       </Field>
                     </div>
-                    <Field label="Email" icon="screen">
-                      <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                        className="field-input mt-0 h-[52px] bg-white" placeholder="anna@example.com" />
-                    </Field>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <Field label="Email" icon="screen">
+                        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+                          className="field-input mt-0 h-[52px] bg-white" placeholder="anna@example.com" />
+                      </Field>
+                      <Field label="Имя ребёнка" icon="users">
+                        <input type="text" value={childName} onChange={(e) => setChildName(e.target.value)}
+                          className="field-input mt-0 h-[52px] bg-white" placeholder="Имя ребёнка" />
+                      </Field>
+                    </div>
                     <button type="submit" className="secondary-btn min-h-[52px] w-full">Перейти к проверке</button>
                   </form>
                 </StepBlock>

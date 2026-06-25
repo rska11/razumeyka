@@ -23,6 +23,11 @@ export default async function SpasiboPage({
         if (yk.status === "succeeded") {
           if (payment.status !== "paid") {
             await prisma.payment.update({ where: { id: payment.id }, data: { status: "paid" } });
+            // активируем записи ребёнка, созданные при оплате с лендинга
+            await prisma.enrollment.updateMany({
+              where: { child: { parentId: payment.userId }, status: "pending" },
+              data: { status: "active" },
+            });
           }
           paid = true;
           amount = payment.amount;

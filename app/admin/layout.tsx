@@ -17,7 +17,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <span className="font-display text-2xl font-extrabold text-ink">Разумейка</span>
             <span className="rounded-full bg-ink px-3 py-1 text-xs font-extrabold uppercase tracking-[0.14em] text-white">Админ</span>
           </div>
-          <nav className="flex items-center gap-2 text-sm font-extrabold">
+          <nav className="flex flex-wrap items-center gap-2 text-sm font-extrabold">
+            <Link href="/admin" className="rounded-full border border-ink/12 bg-white/78 px-4 py-2 text-ink transition hover:bg-white">Обзор</Link>
+            <Link href="/admin/lessons" className="rounded-full border border-ink/12 bg-white/78 px-4 py-2 text-ink transition hover:bg-white">Занятия</Link>
             <Link href="/cabinet" className="rounded-full border border-ink/12 bg-white/78 px-4 py-2 text-ink transition hover:bg-white">Кабинет</Link>
             <Link href="/" className="rounded-full border border-ink/12 bg-white/78 px-4 py-2 text-ink transition hover:bg-white">На сайт</Link>
           </nav>

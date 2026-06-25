@@ -64,18 +64,28 @@ export default async function CabinetOverview() {
                 Пока нет запланированных занятий.
               </p>
             )}
-            {upcomingLessons.slice(0, 4).map(({ lesson, child, enrollment }) => (
-              <div key={lesson.id} className="flex items-center gap-3 rounded-[16px] border border-ink/6 bg-white px-4 py-3">
-                <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-black text-white ${child.avatarColor ?? "bg-brand-blue"}`}>
-                  {child.name.slice(0, 1)}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-extrabold text-ink">{enrollment.directionTitle}</p>
-                  <p className="truncate text-xs font-bold text-ink/52">{child.name} · {lesson.topic ?? "Занятие"}</p>
+            {upcomingLessons.slice(0, 4).map(({ lesson, child, enrollment }) => {
+              const join = lesson.joinUrl || enrollment.zoomUrl;
+              return (
+                <div key={lesson.id} className="flex items-center gap-3 rounded-[16px] border border-ink/6 bg-white px-4 py-3">
+                  <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-black text-white ${child.avatarColor ?? "bg-brand-blue"}`}>
+                    {child.name.slice(0, 1)}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-extrabold text-ink">{enrollment.directionTitle}</p>
+                    <p className="truncate text-xs font-bold text-ink/52">{child.name} · {lesson.topic ?? "Занятие"}</p>
+                  </div>
+                  <div className="flex shrink-0 flex-col items-end gap-1.5">
+                    <span className="text-right text-xs font-extrabold text-ink/64">{fmtDateTime(lesson.startsAt)}</span>
+                    {join && (
+                      <a href={join} target="_blank" rel="noopener" className="inline-flex items-center gap-1 rounded-full bg-brand-blue px-3 py-1.5 text-xs font-extrabold text-white transition hover:-translate-y-0.5 hover:bg-brand-blue/90">
+                        Подключиться
+                      </a>
+                    )}
+                  </div>
                 </div>
-                <span className="shrink-0 text-right text-xs font-extrabold text-ink/64">{fmtDateTime(lesson.startsAt)}</span>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
 

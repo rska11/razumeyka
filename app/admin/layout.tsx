@@ -3,6 +3,8 @@ import Link from "next/link";
 import { getAuthSession } from "@/lib/auth";
 import { isAdminEmail } from "@/lib/admin";
 
+export const metadata = { robots: { index: false, follow: false } };
+
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await getAuthSession();
   if (!session?.user?.id || !isAdminEmail(session.user.email)) {

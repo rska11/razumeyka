@@ -15,12 +15,22 @@ export async function generateMetadata({ params }) {
   const direction = getDirectionBySlug(slug);
 
   if (!direction) {
-    return { title: 'Страница не найдена — Разумейка' };
+    return { title: 'Страница не найдена' };
   }
 
   return {
-    title: `${direction.title} — Разумейка`,
+    title: direction.title,
     description: direction.offer,
+    alternates: { canonical: `/${slug}` },
+    openGraph: {
+      type: 'article',
+      locale: 'ru_RU',
+      siteName: 'Разумейка',
+      url: `https://razumeyka-school.ru/${slug}`,
+      title: `${direction.title} — Разумейка`,
+      description: direction.offer,
+      images: [{ url: direction.image, width: 1200, height: 630, alt: direction.title }],
+    },
   };
 }
 

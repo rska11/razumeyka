@@ -20,6 +20,23 @@ import { Testimonials } from '@/components/Testimonials.jsx';
 export default function HomePage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "EducationalOrganization",
+            name: "Разумейка",
+            alternateName: "Онлайн-школа Разумейка",
+            url: "https://razumeyka-school.ru",
+            description:
+              "Онлайн-школа развития детей 4–12 лет: ментальная арифметика, скорочтение, правополушарное рисование и другие направления.",
+            logo: "https://razumeyka-school.ru/images/course-arithmetic.png",
+            areaServed: "RU",
+            audience: { "@type": "EducationalAudience", educationalRole: "student" },
+          }),
+        }}
+      />
       <Header />
       <main>
         <Hero />

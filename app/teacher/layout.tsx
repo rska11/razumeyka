@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import { getTeacherSession } from "@/lib/auth";
 import { LogoutButton } from "@/components/auth/LogoutButton.jsx";
 
+export const metadata = { robots: { index: false, follow: false } };
+
 export default async function TeacherLayout({ children }: { children: React.ReactNode }) {
   const session = await getTeacherSession();
   if (!session) {

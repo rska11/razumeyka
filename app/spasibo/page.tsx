@@ -4,6 +4,7 @@ import { getYooKassaPayment, isYooKassaConfigured } from "@/lib/yookassa";
 import { rub } from "@/lib/pricing";
 
 export const dynamic = "force-dynamic";
+export const metadata = { robots: { index: false } };
 
 export default async function SpasiboPage({
   searchParams,

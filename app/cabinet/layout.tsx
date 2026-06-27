@@ -6,6 +6,8 @@ import { isTeacherEmail } from "@/lib/staff";
 import { isAuthDisabled } from "@/lib/settings";
 import { CabinetNav } from "@/components/cabinet/CabinetNav.jsx";
 
+export const metadata = { robots: { index: false, follow: false } };
+
 export default async function CabinetLayout({ children }: { children: React.ReactNode }) {
   const session = await getAuthSession();
   if (!session?.user?.id) {

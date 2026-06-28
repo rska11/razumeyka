@@ -1,6 +1,7 @@
 import type { DefaultSession, NextAuthOptions } from "next-auth";
 import { getServerSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import YandexProvider from "next-auth/providers/yandex";
 import { prisma } from "@/lib/prisma";
 import { verifyEmailLoginCode } from "@/lib/email-code";
 import { isAuthDisabled } from "@/lib/settings";
@@ -66,14 +67,41 @@ export const authOptions: NextAuthOptions = {
         return { id: user.id, email: user.email, name: user.name, image: user.image };
       },
     }),
+    YandexProvider({
+      clientId: process.env.YANDEX_CLIENT_ID ?? "",
+      clientSecret: process.env.YANDEX_CLIENT_SECRET ?? "",
+    }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async signIn({ user, account }) {
+      // Яндекс ID: не пускаем заблокированных пользователей
+      if (account?.provider === "yandex") {
+        const email = user.email?.toLowerCase();
+        if (!email) return false;
+        const existing = await prisma.user.findUnique({
+          where: { email },
+          select: { isBlocked: true },
+        });
+        if (existing?.isBlocked) return false;
+      }
+      return true;
+    },
+    async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
-        token.email = user.email;
-        token.name = user.name;
-        token.picture = user.image ?? null;
+        token.email = user.email ?? token.email;
+        token.name = user.name ?? token.name;
+        token.picture = user.image ?? token.picture ?? null;
+      }
+      // Яндекс ID: находим/создаём пользователя в нашей БД и ставим НАШ id
+      if (account?.provider === "yandex" && token.email) {
+        const email = token.email.toLowerCase();
+        const dbUser = await prisma.user.upsert({
+          where: { email },
+          update: { name: token.name ?? undefined, provider: "yandex" },
+          create: { email, name: token.name ?? null, provider: "yandex" },
+        });
+        token.id = dbUser.id;
       }
       return token;
     },

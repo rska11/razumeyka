@@ -137,6 +137,18 @@ function LoginForm() {
             <button type="submit" disabled={loading || !consent} className="primary-btn w-full disabled:opacity-50">
               {loading ? "Отправляем…" : "Получить код"}
             </button>
+            <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.14em] text-ink/36">
+              <span className="h-px flex-1 bg-ink/10" /> или <span className="h-px flex-1 bg-ink/10" />
+            </div>
+            <button
+              type="button"
+              onClick={() => signIn("yandex", { callbackUrl })}
+              disabled={!consent}
+              className="flex w-full items-center justify-center gap-2 rounded-full bg-[#fc3f1d] px-5 py-3 text-base font-extrabold text-white transition hover:brightness-95 disabled:opacity-50"
+            >
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white text-sm font-black text-[#fc3f1d]">Я</span>
+              Войти через Яндекс
+            </button>
           </form>
         ) : (
           <form onSubmit={submitCode} className="mt-6 grid gap-4">

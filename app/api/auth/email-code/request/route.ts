@@ -4,6 +4,7 @@ import { sendLoginCodeEmail } from "@/lib/mailer";
 import { isAuthDisabled } from "@/lib/settings";
 import { isAdminEmail } from "@/lib/admin";
 import { isTeacherEmail } from "@/lib/staff";
+import { isRussianEmail } from "@/lib/ru-email";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -18,6 +19,11 @@ export async function POST(req: Request) {
 
   if (!EMAIL_RE.test(email)) {
     return NextResponse.json({ error: "INVALID_EMAIL" }, { status: 400 });
+  }
+
+  // Закон РФ (с 26.06.2026): авторизация только через российскую почту — для всех.
+  if (!isRussianEmail(email)) {
+    return NextResponse.json({ error: "FOREIGN_EMAIL" }, { status: 400 });
   }
 
   // Рубильник: при выключенной авторизации код выдаём только персоналу (админ/препод)

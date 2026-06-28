@@ -47,7 +47,11 @@ function LoginForm() {
             ? "Код уже отправлен. Подождите минуту перед повторной отправкой."
             : data.error === "INVALID_EMAIL"
               ? "Введите корректный email."
-              : "Не удалось отправить код. Попробуйте ещё раз.",
+              : data.error === "FOREIGN_EMAIL"
+                ? "Вход только с российской почты (Яндекс, Mail.ru и др.) — требование закона РФ."
+                : data.error === "AUTH_DISABLED"
+                  ? "Вход временно закрыт — сайт в разработке."
+                  : "Не удалось отправить код. Попробуйте ещё раз.",
         );
       }
     } catch {
@@ -108,16 +112,19 @@ function LoginForm() {
         {step === "email" ? (
           <form onSubmit={requestCode} className="mt-6 grid gap-4">
             <div>
-              <label className="text-xs font-extrabold uppercase tracking-[0.14em] text-ink/46">Email</label>
+              <label className="text-xs font-extrabold uppercase tracking-[0.14em] text-ink/46">Email (российская почта)</label>
               <input
                 type="email"
                 required
                 autoFocus
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="parent@example.com"
+                placeholder="parent@yandex.ru"
                 className="field-input"
               />
+              <p className="mt-1.5 text-xs font-medium text-ink/46">
+                Только российская почта (Яндекс, Mail.ru и др.) — требование закона РФ.
+              </p>
             </div>
             <label className="flex items-start gap-2.5 text-xs font-medium leading-5 text-ink/60">
               <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)}

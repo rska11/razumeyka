@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { landingTotal, TARIFF_LABELS } from "@/lib/pricing";
 import { createYooKassaPayment, isYooKassaConfigured } from "@/lib/yookassa";
 import { isAuthDisabled } from "@/lib/settings";
+import { isRussianEmail } from "@/lib/ru-email";
 import { directionsData } from "@/data/directions.js";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -36,6 +37,11 @@ export async function POST(req: Request) {
 
   if (!EMAIL_RE.test(email)) {
     return NextResponse.json({ error: "INVALID_EMAIL" }, { status: 400 });
+  }
+
+  // Закон РФ: регистрация только с российской почты
+  if (!isRussianEmail(email)) {
+    return NextResponse.json({ error: "FOREIGN_EMAIL" }, { status: 400 });
   }
 
   // Сумму считаем на сервере — клиенту не доверяем

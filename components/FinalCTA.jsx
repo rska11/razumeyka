@@ -213,6 +213,7 @@ export function FinalCTA() {
       }
       setPayError(
         data.error === 'MAINTENANCE' ? 'Сайт в режиме доработки — запись временно закрыта.'
+          : data.error === 'FOREIGN_EMAIL' ? 'Укажите российскую почту (Яндекс, Mail.ru) — требование закона РФ.'
           : data.error === 'PAYMENTS_DISABLED' ? 'Оплата временно недоступна'
           : data.error === 'INVALID_EMAIL' ? 'Укажите корректный email'
           : 'Не удалось создать оплату. Попробуйте ещё раз.',
@@ -698,7 +699,7 @@ export function FinalCTA() {
                     <div className="grid gap-3 sm:grid-cols-2">
                       <Field label="Email" icon="screen">
                         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                          className="field-input mt-0 h-[52px] bg-white" placeholder="anna@example.com" />
+                          className="field-input mt-0 h-[52px] bg-white" placeholder="anna@yandex.ru" />
                       </Field>
                       <Field label="Имя ребёнка" icon="users">
                         <input type="text" value={childName} onChange={(e) => setChildName(e.target.value)}

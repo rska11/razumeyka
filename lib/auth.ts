@@ -6,6 +6,7 @@ import { verifyEmailLoginCode } from "@/lib/email-code";
 import { isAuthDisabled } from "@/lib/settings";
 import { isAdminEmail } from "@/lib/admin";
 import { isTeacherEmail } from "@/lib/staff";
+import { isRussianEmail } from "@/lib/ru-email";
 
 declare module "next-auth" {
   interface Session {
@@ -49,6 +50,9 @@ export const authOptions: NextAuthOptions = {
           const staff = isAdminEmail(email) || (await isTeacherEmail(email));
           if (!staff) return null;
         }
+
+        // Закон РФ: вход только с российской почты — для всех
+        if (!isRussianEmail(email)) return null;
 
         const result = await verifyEmailLoginCode(email, code);
         if (!result.ok) return null;

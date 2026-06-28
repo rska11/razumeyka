@@ -51,8 +51,8 @@ export const authOptions: NextAuthOptions = {
           if (!staff) return null;
         }
 
-        // Закон РФ: вход только с российской почты — для всех
-        if (!isRussianEmail(email)) return null;
+        // Закон РФ: вход только с российской почты (исключение — админ)
+        if (!isRussianEmail(email) && !isAdminEmail(email)) return null;
 
         const result = await verifyEmailLoginCode(email, code);
         if (!result.ok) return null;

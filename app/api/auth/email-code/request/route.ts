@@ -21,8 +21,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "INVALID_EMAIL" }, { status: 400 });
   }
 
-  // Закон РФ (с 26.06.2026): авторизация только через российскую почту — для всех.
-  if (!isRussianEmail(email)) {
+  // Закон РФ (с 26.06.2026): авторизация только через российскую почту.
+  // Исключение — администратор (ADMIN_EMAILS), чтобы не терять доступ к управлению.
+  if (!isRussianEmail(email) && !isAdminEmail(email)) {
     return NextResponse.json({ error: "FOREIGN_EMAIL" }, { status: 400 });
   }
 

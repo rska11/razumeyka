@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { Icon } from '@/components/Icon.jsx';
 import { Logo } from '@/components/Logo.jsx';
 import { directionsData, getDirectionBySlug } from '@/data/directions.js';
-import { landingsData, getLandingBySlug } from '@/data/landings.js';
+import { allLandings, getLandingBySlug } from '@/data/landings.js';
 import { LandingPage } from '@/components/LandingPage.jsx';
 
 const stepIcons = ['spark', 'focus', 'confidence', 'creative', 'logic', 'check'];
@@ -11,7 +11,7 @@ const stepIcons = ['spark', 'focus', 'confidence', 'creative', 'logic', 'check']
 export function generateStaticParams() {
   return [
     ...directionsData.map((d) => ({ slug: d.slug })),
-    ...landingsData.map((l) => ({ slug: l.slug })),
+    ...allLandings.map((l) => ({ slug: l.slug })),
   ];
 }
 

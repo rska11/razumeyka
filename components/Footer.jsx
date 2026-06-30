@@ -17,6 +17,10 @@ const directions = [
   ['Правополушарное рисование', '/right-brain-drawing'],
   ['Интуиция', '/intuition'],
   ['Языки', '/languages'],
+  ['Подготовка к школе', '/podgotovka-k-shkole'],
+  ['Актёрское мастерство', '/akterskoe-masterstvo'],
+  ['Английский для детей', '/english-for-kids'],
+  ['Русский язык для детей', '/russkiy-yazyk-dlya-detey'],
 ];
 
 export function Footer() {

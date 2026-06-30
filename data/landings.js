@@ -1,6 +1,8 @@
 // SEO-посадочные страницы (лёгкий шаблон, отдельно от богатых страниц направлений).
 // Рендерятся через app/[slug]/page.jsx → components/LandingPage.jsx.
 
+import { generatedLandings } from './landing-generator.js';
+
 export const landingsData = [
   {
     slug: 'podgotovka-k-shkole',
@@ -139,6 +141,8 @@ export const landingsData = [
   },
 ];
 
+export const allLandings = [...landingsData, ...generatedLandings];
+
 export function getLandingBySlug(slug) {
-  return landingsData.find((l) => l.slug === slug) ?? null;
+  return allLandings.find((l) => l.slug === slug) ?? null;
 }

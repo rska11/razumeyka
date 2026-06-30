@@ -3,10 +3,17 @@ import { Header } from '@/components/Header.jsx';
 import { Footer } from '@/components/Footer.jsx';
 import { Icon } from '@/components/Icon.jsx';
 import { getDirectionBySlug } from '@/data/directions.js';
+import { getLandingBySlug } from '@/data/landings.js';
 
 export function LandingPage({ landing }) {
   const related = (landing.relatedSlugs ?? [])
-    .map((s) => getDirectionBySlug(s))
+    .map((s) => {
+      const d = getDirectionBySlug(s);
+      if (d) return { slug: d.slug, title: d.title };
+      const l = getLandingBySlug(s);
+      if (l) return { slug: l.slug, title: l.h1 };
+      return null;
+    })
     .filter(Boolean);
 
   const faqSchema = {

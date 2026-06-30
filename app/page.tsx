@@ -3,6 +3,7 @@ import { BeforeAfter } from '@/components/BeforeAfter.jsx';
 import { BetterThanSchool } from '@/components/BetterThanSchool.jsx';
 import { Directions } from '@/components/Directions.jsx';
 import { FAQ } from '@/components/FAQ.jsx';
+import { faqItems } from '@/data/faq.js';
 import { FinalCTA } from '@/components/FinalCTA.jsx';
 import { Footer } from '@/components/Footer.jsx';
 import { Header } from '@/components/Header.jsx';
@@ -34,6 +35,20 @@ export default function HomePage() {
             logo: "https://razumeyka-school.ru/images/course-arithmetic.png",
             areaServed: "RU",
             audience: { "@type": "EducationalAudience", educationalRole: "student" },
+          }),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: faqItems.map((f) => ({
+              "@type": "Question",
+              name: f.q,
+              acceptedAnswer: { "@type": "Answer", text: f.a },
+            })),
           }),
         }}
       />

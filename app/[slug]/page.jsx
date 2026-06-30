@@ -3,45 +3,72 @@ import { notFound } from 'next/navigation';
 import { Icon } from '@/components/Icon.jsx';
 import { Logo } from '@/components/Logo.jsx';
 import { directionsData, getDirectionBySlug } from '@/data/directions.js';
+import { landingsData, getLandingBySlug } from '@/data/landings.js';
+import { LandingPage } from '@/components/LandingPage.jsx';
 
 const stepIcons = ['spark', 'focus', 'confidence', 'creative', 'logic', 'check'];
 
 export function generateStaticParams() {
-  return directionsData.map((direction) => ({ slug: direction.slug }));
+  return [
+    ...directionsData.map((d) => ({ slug: d.slug })),
+    ...landingsData.map((l) => ({ slug: l.slug })),
+  ];
 }
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const direction = getDirectionBySlug(slug);
 
-  if (!direction) {
-    return { title: 'Страница не найдена' };
+  if (direction) {
+    return {
+      title: direction.title,
+      description: direction.offer,
+      alternates: { canonical: `/${slug}` },
+      openGraph: {
+        type: 'article',
+        locale: 'ru_RU',
+        siteName: 'Разумейка',
+        url: `https://razumeyka-school.ru/${slug}`,
+        title: `${direction.title} — Разумейка`,
+        description: direction.offer,
+        images: [{ url: direction.image, width: 1200, height: 630, alt: direction.title }],
+      },
+    };
   }
 
-  return {
-    title: direction.title,
-    description: direction.offer,
-    alternates: { canonical: `/${slug}` },
-    openGraph: {
-      type: 'article',
-      locale: 'ru_RU',
-      siteName: 'Разумейка',
-      url: `https://razumeyka-school.ru/${slug}`,
-      title: `${direction.title} — Разумейка`,
-      description: direction.offer,
-      images: [{ url: direction.image, width: 1200, height: 630, alt: direction.title }],
-    },
-  };
+  const landing = getLandingBySlug(slug);
+  if (landing) {
+    return {
+      title: landing.title,
+      description: landing.description,
+      alternates: { canonical: `/${slug}` },
+      openGraph: {
+        type: 'article',
+        locale: 'ru_RU',
+        siteName: 'Разумейка',
+        url: `https://razumeyka-school.ru/${slug}`,
+        title: `${landing.h1} — Разумейка`,
+        description: landing.description,
+      },
+    };
+  }
+
+  return { title: 'Страница не найдена' };
 }
 
 export default async function DirectionPage({ params }) {
   const { slug } = await params;
   const direction = getDirectionBySlug(slug);
-  const isMentalArithmetic = direction?.slug === 'mental-arithmetic';
 
   if (!direction) {
+    const landing = getLandingBySlug(slug);
+    if (landing) {
+      return <LandingPage landing={landing} />;
+    }
     notFound();
   }
+
+  const isMentalArithmetic = direction?.slug === 'mental-arithmetic';
 
   return (
     <main className="mesh-bg min-h-screen">

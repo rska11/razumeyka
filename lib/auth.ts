@@ -78,6 +78,11 @@ export const authOptions: NextAuthOptions = {
       if (account?.provider === "yandex") {
         const email = user.email?.toLowerCase();
         if (!email) return false;
+        // Рубильник: при выключенной авторизации пускаем только персонал
+        if (await isAuthDisabled()) {
+          const staff = isAdminEmail(email) || (await isTeacherEmail(email));
+          if (!staff) return false;
+        }
         const existing = await prisma.user.findUnique({
           where: { email },
           select: { isBlocked: true },

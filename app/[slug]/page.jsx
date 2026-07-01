@@ -20,17 +20,19 @@ export async function generateMetadata({ params }) {
   const direction = getDirectionBySlug(slug);
 
   if (direction) {
+    const metaTitle = direction.seoTitle ?? direction.title;
+    const metaDesc = direction.seoDescription ?? direction.offer;
     return {
-      title: direction.title,
-      description: direction.offer,
+      title: metaTitle,
+      description: metaDesc,
       alternates: { canonical: `/${slug}` },
       openGraph: {
         type: 'article',
         locale: 'ru_RU',
         siteName: 'Разумейка',
         url: `https://razumeyka-school.ru/${slug}`,
-        title: `${direction.title} — Разумейка`,
-        description: direction.offer,
+        title: `${metaTitle} — Разумейка`,
+        description: metaDesc,
         images: [{ url: direction.image, width: 1200, height: 630, alt: direction.title }],
       },
     };

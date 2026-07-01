@@ -25,10 +25,30 @@ export function LandingPage({ landing }) {
       acceptedAnswer: { '@type': 'Answer', text: f.a },
     })),
   };
+  const courseSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Course',
+    name: landing.h1,
+    description: landing.description,
+    url: `https://razumeyka-school.ru/${landing.slug}`,
+    inLanguage: 'ru',
+    provider: { '@type': 'Organization', name: 'Разумейка', url: 'https://razumeyka-school.ru' },
+    hasCourseInstance: { '@type': 'CourseInstance', courseMode: 'online', courseWorkload: 'PT55M' },
+  };
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Главная', item: 'https://razumeyka-school.ru' },
+      { '@type': 'ListItem', position: 2, name: landing.h1 },
+    ],
+  };
 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <Header />
       <main className="mesh-bg min-h-screen">
         {/* Hero */}

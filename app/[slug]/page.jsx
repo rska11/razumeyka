@@ -72,8 +72,33 @@ export default async function DirectionPage({ params }) {
 
   const isMentalArithmetic = direction?.slug === 'mental-arithmetic';
 
+  const courseSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Course',
+    name: direction.seoTitle ?? direction.title,
+    description: direction.seoDescription ?? direction.offer,
+    url: `https://razumeyka-school.ru/${direction.slug}`,
+    inLanguage: 'ru',
+    provider: { '@type': 'Organization', name: 'Разумейка', url: 'https://razumeyka-school.ru' },
+    hasCourseInstance: {
+      '@type': 'CourseInstance',
+      courseMode: 'online',
+      courseWorkload: 'PT55M',
+    },
+  };
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Главная', item: 'https://razumeyka-school.ru' },
+      { '@type': 'ListItem', position: 2, name: direction.title },
+    ],
+  };
+
   return (
     <main className="mesh-bg min-h-screen">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <DirectionHeader title={direction.shortTitle} />
 
       <section className="relative overflow-hidden px-5 pb-14 pt-28 sm:px-8 sm:pb-20 sm:pt-32 lg:px-14">

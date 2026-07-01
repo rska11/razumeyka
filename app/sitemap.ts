@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { directionsData } from "@/data/directions.js";
-import { allLandings } from "@/data/landings.js";
+import { landingsData } from "@/data/landings.js";
+import { blogPosts } from "@/data/blog.js";
 
 const BASE = "https://razumeyka-school.ru";
 
@@ -12,16 +13,25 @@ export default function sitemap(): MetadataRoute.Sitemap {
     changeFrequency: "monthly" as const,
     priority: 0.8,
   }));
-  const landings = (allLandings as { slug: string }[]).map((l) => ({
+  const landings = (landingsData as { slug: string }[]).map((l) => ({
     url: `${BASE}/${l.slug}`,
     lastModified: now,
     changeFrequency: "monthly" as const,
     priority: 0.7,
   }));
 
+  const blog = (blogPosts as { slug: string; date: string }[]).map((p) => ({
+    url: `${BASE}/blog/${p.slug}`,
+    lastModified: new Date(p.date),
+    changeFrequency: "monthly" as const,
+    priority: 0.6,
+  }));
+
   return [
     { url: BASE, lastModified: now, changeFrequency: "weekly", priority: 1 },
+    { url: `${BASE}/blog`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
     ...directions,
     ...landings,
+    ...blog,
   ];
 }

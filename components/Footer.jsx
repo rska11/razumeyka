@@ -8,6 +8,7 @@ const navLinks = [
   ['Направления', '#programs'],
   ['Результаты', '#results'],
   ['Отзывы', '#reviews'],
+  ['Блог', '/blog'],
   ['Запись', '#form'],
 ];
 

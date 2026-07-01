@@ -6,10 +6,11 @@ import { Logo } from './Logo.jsx';
 import { AccountButton } from './auth/AccountButton.jsx';
 
 const nav = [
-  ['Возраст', '#age'],
-  ['Направления', '#programs'],
-  ['Результаты', '#results'],
-  ['Отзывы', '#reviews'],
+  ['Возраст', '/#age'],
+  ['Направления', '/#programs'],
+  ['Результаты', '/#results'],
+  ['Отзывы', '/#reviews'],
+  ['Блог', '/blog'],
 ];
 
 export function Header() {
@@ -22,7 +23,7 @@ export function Header() {
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-3 pt-4 sm:px-6 sm:pt-5">
       <div className="mx-auto flex min-h-[96px] max-w-[1380px] items-center justify-between gap-6 rounded-[8px] border border-white/70 bg-porcelain/86 px-5 py-4 shadow-color backdrop-blur-2xl sm:px-7 lg:px-8">
-        <a href="#top" className="flex items-center gap-5 pr-4" aria-label="На главный экран">
+        <a href="/" className="flex items-center gap-5 pr-4" aria-label="На главную">
           <Logo />
           <span className="hidden border-l border-ink/10 pl-5 leading-tight sm:block">
             <span className="block text-sm font-extrabold uppercase tracking-[0.18em] text-forest-700">онлайн школа</span>
@@ -40,7 +41,7 @@ export function Header() {
 
         <div className="flex items-center gap-3">
           <AccountButton className="hidden lg:inline-flex" />
-          <a href="#form" className="primary-btn hidden min-h-[54px] px-7 py-3 text-base shadow-color hover:scale-105 md:inline-flex">
+          <a href="/#form" className="primary-btn hidden min-h-[54px] px-7 py-3 text-base shadow-color hover:scale-105 md:inline-flex">
             Урок
             <Icon name="arrow" className="relative h-5 w-5" />
           </a>
@@ -78,7 +79,7 @@ export function Header() {
               </a>
             ))}
             <a
-              href="#form"
+              href="/#form"
               onClick={closeMenu}
               className="primary-btn mt-3 justify-center"
             >

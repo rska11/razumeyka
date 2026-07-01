@@ -22,6 +22,13 @@ function fmtDate(iso) {
   return new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(iso));
 }
 
+const coverThemes = {
+  blue: 'from-brand-blue to-brand-purple',
+  pink: 'from-brand-pink to-brand-orange',
+  green: 'from-brand-green to-brand-blue',
+  orange: 'from-brand-orange to-brand-pink',
+};
+
 export default function BlogIndex() {
   const posts = [...blogPosts].sort((a, b) => (a.date < b.date ? 1 : -1));
   return (
@@ -39,14 +46,23 @@ export default function BlogIndex() {
                 <Link
                   key={p.slug}
                   href={`/blog/${p.slug}`}
-                  className="group rounded-[24px] border border-white/80 bg-white/85 p-6 shadow-card backdrop-blur-xl transition hover:-translate-y-1"
+                  className="group overflow-hidden rounded-[24px] border border-white/80 bg-white/85 shadow-card backdrop-blur-xl transition hover:-translate-y-1"
                 >
-                  <p className="text-xs font-bold text-ink/44">{fmtDate(p.date)}</p>
-                  <h2 className="mt-2 font-display text-xl font-extrabold leading-tight text-ink transition group-hover:text-brand-blue">
-                    {p.title}
-                  </h2>
-                  <p className="mt-3 text-base font-medium leading-7 text-ink/64">{p.excerpt}</p>
-                  <span className="mt-4 inline-flex text-sm font-extrabold text-brand-blue">Читать →</span>
+                  {p.cover?.image ? (
+                    <img src={p.cover.image} alt={p.title} className="h-40 w-full object-cover" />
+                  ) : (
+                    <div className={`flex h-36 items-center justify-center bg-gradient-to-br ${coverThemes[p.cover?.theme] ?? coverThemes.blue}`}>
+                      <span className="text-6xl drop-shadow-md">{p.cover?.emoji ?? '📚'}</span>
+                    </div>
+                  )}
+                  <div className="p-6">
+                    <p className="text-xs font-bold text-ink/44">{fmtDate(p.date)}</p>
+                    <h2 className="mt-2 font-display text-xl font-extrabold leading-tight text-ink transition group-hover:text-brand-blue">
+                      {p.title}
+                    </h2>
+                    <p className="mt-3 text-base font-medium leading-7 text-ink/64">{p.excerpt}</p>
+                    <span className="mt-4 inline-flex text-sm font-extrabold text-brand-blue">Читать →</span>
+                  </div>
                 </Link>
               ))}
             </div>

@@ -27,7 +27,7 @@ export function Teachers() {
         <div className="relative">
           <div className="absolute -left-8 -top-8 h-32 w-32 rounded-full bg-brand-yellow/32 blur-3xl" />
           <img
-            src="/images/teacher-session.png"
+            src="/images/teacher-session.webp"
             alt="Преподаватель ведет онлайн-занятие с ребенком"
             className="relative h-[520px] w-full rounded-[8px] object-cover shadow-color"
           />

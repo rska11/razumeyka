@@ -21,7 +21,7 @@ const rows = [
     color: 'from-brand-pink to-brand-purple',
     icon: 'theater',
     note: 'голос + подача',
-    photo: '/images/course-acting.png',
+    photo: '/images/course-acting.webp',
   },
   {
     beforeLabel: 'Было',
@@ -79,7 +79,7 @@ export function BeforeAfter() {
 
             <div className="relative mt-8 overflow-hidden rounded-[8px] border-2 border-white bg-cream p-3 shadow-color">
               <img
-                src="/images/before-after-progress.png"
+                src="/images/before-after-progress.webp"
                 alt="Ребенок из Восточной Европы занимается онлайн и радуется прогрессу"
                 className={`h-[360px] w-full rounded-[8px] object-cover object-[52%_45%] transition duration-1000 ${
                   isVisible ? 'scale-100 opacity-100' : 'scale-[1.04] opacity-0'

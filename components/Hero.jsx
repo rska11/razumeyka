@@ -136,6 +136,7 @@ export function Hero() {
             <video
               ref={videoRef}
               src="/images/video1.mp4"
+              poster="/images/video-poster.webp"
               autoPlay
               muted
               loop

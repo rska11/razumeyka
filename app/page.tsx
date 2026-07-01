@@ -32,7 +32,7 @@ export default function HomePage() {
             url: "https://razumeyka-school.ru",
             description:
               "Онлайн-школа развития детей 4–12 лет: ментальная арифметика, скорочтение, правополушарное рисование и другие направления.",
-            logo: "https://razumeyka-school.ru/images/course-arithmetic.png",
+            logo: "https://razumeyka-school.ru/images/course-arithmetic.webp",
             areaServed: "RU",
             audience: { "@type": "EducationalAudience", educationalRole: "student" },
           }),

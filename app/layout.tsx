@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
 import { CookieConsent } from "@/components/CookieConsent.jsx";
+import { YandexMetrika } from "@/components/analytics/YandexMetrika.jsx";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://razumeyka-school.ru"),
@@ -44,6 +45,7 @@ export default function RootLayout({
       <body>
         <Providers>{children}</Providers>
         <CookieConsent />
+        <YandexMetrika />
       </body>
     </html>
   );

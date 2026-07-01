@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     title: "Разумейка — онлайн-школа развития детей 4–12 лет",
     description:
       "Ментальная арифметика, скорочтение, рисование и другие направления онлайн. Мини-группы до 6 детей. Пробный урок 400 ₽.",
-    images: [{ url: "/images/course-arithmetic.webp", width: 1200, height: 630, alt: "Разумейка — онлайн-школа развития детей" }],
+    images: [{ url: "/images/og.png", width: 1200, height: 630, alt: "Разумейка — онлайн-школа развития детей 4–12 лет" }],
   },
   robots: { index: true, follow: true },
 };

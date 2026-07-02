@@ -12,6 +12,7 @@ import { PainPoints } from '@/components/PainPoints.jsx';
 import { PresentationMap } from '@/components/PresentationMap.jsx';
 import { Process } from '@/components/Process.jsx';
 import { Program } from '@/components/Program.jsx';
+import { QuizAI } from '@/components/QuizAI.jsx';
 import { Results } from '@/components/Results.jsx';
 import { Scarcity } from '@/components/Scarcity.jsx';
 import { StickyMobileCTA } from '@/components/StickyMobileCTA.jsx';
@@ -58,6 +59,7 @@ export default function HomePage() {
         <PainPoints />
         <AgePrograms />
         <Directions />
+        <QuizAI />
         <BetterThanSchool />
         <PresentationMap />
         <BeforeAfter />

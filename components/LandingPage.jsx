@@ -5,12 +5,14 @@ import { Icon } from '@/components/Icon.jsx';
 import { getDirectionBySlug } from '@/data/directions.js';
 import { getLandingBySlug } from '@/data/landings.js';
 import { DirectionGame } from '@/components/games/DirectionGame.jsx';
+import { LanguagesHub } from '@/components/LanguagesHub.jsx';
 
 const accents = {
   blue: { soft: 'bg-brand-blue/8', text: 'text-brand-blue', grad: 'from-brand-blue/25 to-brand-purple/20' },
   pink: { soft: 'bg-brand-pink/8', text: 'text-brand-pink', grad: 'from-brand-pink/25 to-brand-orange/20' },
   green: { soft: 'bg-brand-green/10', text: 'text-forest-700', grad: 'from-brand-green/25 to-brand-blue/20' },
   orange: { soft: 'bg-brand-orange/10', text: 'text-brand-orange', grad: 'from-brand-orange/25 to-brand-pink/20' },
+  purple: { soft: 'bg-brand-purple/8', text: 'text-brand-purple', grad: 'from-brand-purple/25 to-brand-pink/20' },
 };
 
 // утончённая «премиум» карточка — мягкая рамка и тень + живой ховер (приподнимается)
@@ -23,6 +25,7 @@ const h1grad = {
   pink: 'from-brand-pink via-brand-purple to-brand-blue',
   green: 'from-forest-700 via-brand-blue to-brand-cyan',
   orange: 'from-brand-orange via-brand-pink to-brand-purple',
+  purple: 'from-brand-purple via-brand-pink to-brand-blue',
 };
 
 const whyUs = [
@@ -141,6 +144,8 @@ export function LandingPage({ landing }) {
             </div>
           </div>
         </section>
+
+        {landing.slug === 'languages' && <LanguagesHub />}
 
         {/* Узнали своего ребёнка? */}
         {landing.pains?.length > 0 && (

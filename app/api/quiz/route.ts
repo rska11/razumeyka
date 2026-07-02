@@ -60,8 +60,9 @@ ${list.map((c) => `- ${c.slug} — ${c.name}: ${c.about}`).join("\n")}
     });
 
     if (!r.ok) {
-      console.error("[quiz] anthropic", r.status, (await r.text()).slice(0, 300));
-      return NextResponse.json({ error: "AI_ERROR" }, { status: 502 });
+      const t = await r.text();
+      console.error("[quiz] anthropic", r.status, t.slice(0, 300));
+      return NextResponse.json({ error: "AI_ERROR", status: r.status, detail: t.slice(0, 250) }, { status: 502 });
     }
 
     const data = await r.json();
@@ -78,12 +79,12 @@ ${list.map((c) => `- ${c.slug} — ${c.name}: ${c.about}`).join("\n")}
 
     const valid = rec?.slug ? list.find((c) => c.slug === rec!.slug) : null;
     if (!valid) {
-      return NextResponse.json({ error: "AI_PARSE" }, { status: 502 });
+      return NextResponse.json({ error: "AI_PARSE", detail: text.slice(0, 250) }, { status: 502 });
     }
 
     return NextResponse.json({ slug: valid.slug, title: valid.name, reason: rec?.reason ?? "" });
   } catch (e) {
     console.error("[quiz] error", e);
-    return NextResponse.json({ error: "AI_ERROR" }, { status: 502 });
+    return NextResponse.json({ error: "AI_ERROR", detail: String(e).slice(0, 250) }, { status: 502 });
   }
 }

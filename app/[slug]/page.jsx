@@ -6,6 +6,7 @@ import { directionsData, getDirectionBySlug } from '@/data/directions.js';
 import { landingsData, getLandingBySlug } from '@/data/landings.js';
 import { LandingPage } from '@/components/LandingPage.jsx';
 import { DirectionGame } from '@/components/games/DirectionGame.jsx';
+import { LanguagesHub } from '@/components/LanguagesHub.jsx';
 
 const stepIcons = ['spark', 'focus', 'confidence', 'creative', 'logic', 'check'];
 
@@ -170,6 +171,8 @@ export default async function DirectionPage({ params }) {
           </div>
         </div>
       </section>
+
+      {direction.slug === 'languages' && <LanguagesHub />}
 
       <DirectionGame slug={direction.slug} />
 

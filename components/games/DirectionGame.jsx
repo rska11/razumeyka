@@ -12,7 +12,6 @@ const games = {
   'speed-reading': { title: 'Мини-игра: таблица Шульте', Comp: SchulteTable },
   'right-brain-drawing': { title: 'Порисуем: волшебная симметрия', Comp: SymmetryDraw },
   'intuition': { title: 'Игра на интуицию', Comp: IntuitionGuess },
-  'languages': { title: 'Мини-игра: учим английские слова', Comp: WordCards },
   'podgotovka-k-shkole': { title: 'Тест: готов ли ребёнок к школе?', Comp: SchoolReadinessTest },
   'english-for-kids': { title: 'Мини-игра: учим английские слова', Comp: WordCards },
   'russkiy-yazyk-dlya-detey': { title: 'Игра: как пишется правильно?', Comp: RussianSpelling },

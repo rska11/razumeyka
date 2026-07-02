@@ -9,8 +9,6 @@ const programCards = directionsData;
 const moreDirections = [
   { title: 'Подготовка к школе', slug: 'podgotovka-k-shkole', emoji: '🎒', blurb: 'Чтение, счёт, внимание и усидчивость к первому классу' },
   { title: 'Актёрское мастерство', slug: 'akterskoe-masterstvo', emoji: '🎭', blurb: 'Раскрепощение, речь и уверенность на публике' },
-  { title: 'Английский для детей', slug: 'english-for-kids', emoji: '🇬🇧', blurb: 'Живая речь без зубрёжки, в мини-группах' },
-  { title: 'Русский язык для детей', slug: 'russkiy-yazyk-dlya-detey', emoji: '✏️', blurb: 'Грамотность через понимание, а не зубрёжку' },
 ];
 const SLIDE_INTERVAL = 3000;
 
@@ -181,7 +179,7 @@ export function Directions() {
 
         <div className="mt-10">
           <h3 className="text-center font-display text-2xl font-extrabold text-ink sm:text-3xl">Ещё направления</h3>
-          <div className="mx-auto mt-6 grid max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mx-auto mt-6 grid max-w-3xl gap-4 sm:grid-cols-2">
             {moreDirections.map((d) => (
               <Link
                 key={d.slug}

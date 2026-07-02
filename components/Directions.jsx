@@ -6,6 +6,12 @@ import { Icon } from './Icon.jsx';
 import { directionsData } from '../data/directions.js';
 
 const programCards = directionsData;
+const moreDirections = [
+  { title: 'Подготовка к школе', slug: 'podgotovka-k-shkole', emoji: '🎒', blurb: 'Чтение, счёт, внимание и усидчивость к первому классу' },
+  { title: 'Актёрское мастерство', slug: 'akterskoe-masterstvo', emoji: '🎭', blurb: 'Раскрепощение, речь и уверенность на публике' },
+  { title: 'Английский для детей', slug: 'english-for-kids', emoji: '🇬🇧', blurb: 'Живая речь без зубрёжки, в мини-группах' },
+  { title: 'Русский язык для детей', slug: 'russkiy-yazyk-dlya-detey', emoji: '✏️', blurb: 'Грамотность через понимание, а не зубрёжку' },
+];
 const SLIDE_INTERVAL = 3000;
 
 export function Directions() {
@@ -171,6 +177,26 @@ export function Directions() {
               </Link>
             </div>
           ))}
+        </div>
+
+        <div className="mt-10">
+          <h3 className="text-center font-display text-2xl font-extrabold text-ink sm:text-3xl">Ещё направления</h3>
+          <div className="mx-auto mt-6 grid max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {moreDirections.map((d) => (
+              <Link
+                key={d.slug}
+                href={`/${d.slug}`}
+                className="group rounded-[8px] border-2 border-ink bg-white p-5 shadow-[6px_6px_0_rgba(19,35,27,0.12)] transition hover:-translate-y-1"
+              >
+                <span className="text-4xl">{d.emoji}</span>
+                <span className="mt-3 block font-display text-lg font-extrabold leading-tight text-ink">{d.title}</span>
+                <span className="mt-1 block text-sm font-semibold leading-6 text-ink/60">{d.blurb}</span>
+                <span className="mt-3 inline-flex items-center gap-1.5 text-sm font-extrabold text-brand-blue">
+                  Подробнее <Icon name="arrow" className="h-4 w-4" />
+                </span>
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     </section>

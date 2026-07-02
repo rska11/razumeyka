@@ -53,8 +53,10 @@ export function LandingPage({ landing }) {
       <Header />
       <main className="mesh-bg min-h-screen">
         {/* Hero */}
-        <section className="px-5 pb-12 pt-28 sm:px-8 sm:pt-32 lg:px-14">
-          <div className="container-pad px-0">
+        <section className="relative overflow-hidden px-5 pb-12 pt-28 sm:px-8 sm:pt-32 lg:px-14">
+          <div className="pointer-events-none absolute -right-16 top-24 h-72 w-72 rounded-full bg-brand-pink/16 blur-3xl" />
+          <div className="pointer-events-none absolute -left-16 top-56 h-64 w-64 rounded-full bg-brand-blue/16 blur-3xl" />
+          <div className="container-pad relative px-0">
             <span className="floating-chip inline-flex">Онлайн-школа «Разумейка»</span>
             <h1 className="display-title mt-5 max-w-4xl text-[2.4rem] leading-[1.02] sm:text-5xl lg:text-[4rem]">
               {landing.h1}
@@ -67,6 +69,13 @@ export function LandingPage({ landing }) {
             <div className="mt-8 flex flex-wrap gap-3">
               <a href="/#form" className="primary-btn">Записаться на пробный урок · 400 ₽</a>
               <Link href="/" className="secondary-btn">Все направления</Link>
+            </div>
+            <div className="mt-6 flex flex-wrap gap-2.5">
+              {['Мини-группы до 6 детей', 'Онлайн из любого города', 'Пробный урок 400 ₽'].map((t) => (
+                <span key={t} className="inline-flex items-center gap-1.5 rounded-full border border-ink/10 bg-white/70 px-3.5 py-1.5 text-xs font-extrabold text-ink/62">
+                  <span className="text-brand-green">✓</span> {t}
+                </span>
+              ))}
             </div>
           </div>
         </section>

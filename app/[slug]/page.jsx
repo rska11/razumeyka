@@ -5,6 +5,7 @@ import { Logo } from '@/components/Logo.jsx';
 import { directionsData, getDirectionBySlug } from '@/data/directions.js';
 import { landingsData, getLandingBySlug } from '@/data/landings.js';
 import { LandingPage } from '@/components/LandingPage.jsx';
+import { DirectionGame } from '@/components/games/DirectionGame.jsx';
 
 const stepIcons = ['spark', 'focus', 'confidence', 'creative', 'logic', 'check'];
 
@@ -169,6 +170,8 @@ export default async function DirectionPage({ params }) {
           </div>
         </div>
       </section>
+
+      <DirectionGame slug={direction.slug} />
 
       <section className="px-5 py-8 sm:px-8 lg:px-14">
         <div className="container-pad grid gap-6 px-0 lg:grid-cols-2">

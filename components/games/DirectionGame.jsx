@@ -1,9 +1,19 @@
 import { FlashCards } from './FlashCards.jsx';
 import { SchulteTable } from './SchulteTable.jsx';
+import { SymmetryDraw } from './SymmetryDraw.jsx';
+import { IntuitionGuess } from './IntuitionGuess.jsx';
+import { SchoolReadinessTest } from './SchoolReadinessTest.jsx';
+import { WordCards } from './WordCards.jsx';
+import { ActingPrompts } from './ActingPrompts.jsx';
 
 const games = {
   'mental-arithmetic': { title: 'Мини-игра: посчитай в уме', Comp: FlashCards },
   'speed-reading': { title: 'Мини-игра: таблица Шульте', Comp: SchulteTable },
+  'right-brain-drawing': { title: 'Порисуем: волшебная симметрия', Comp: SymmetryDraw },
+  'intuition': { title: 'Игра на интуицию', Comp: IntuitionGuess },
+  'podgotovka-k-shkole': { title: 'Тест: готов ли ребёнок к школе?', Comp: SchoolReadinessTest },
+  'english-for-kids': { title: 'Мини-игра: учим английские слова', Comp: WordCards },
+  'akterskoe-masterstvo': { title: 'Актёрский тренажёр: изобрази!', Comp: ActingPrompts },
 };
 
 export function DirectionGame({ slug }) {

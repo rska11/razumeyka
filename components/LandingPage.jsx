@@ -4,6 +4,7 @@ import { Footer } from '@/components/Footer.jsx';
 import { Icon } from '@/components/Icon.jsx';
 import { getDirectionBySlug } from '@/data/directions.js';
 import { getLandingBySlug } from '@/data/landings.js';
+import { DirectionGame } from '@/components/games/DirectionGame.jsx';
 
 export function LandingPage({ landing }) {
   const related = (landing.relatedSlugs ?? [])
@@ -86,6 +87,9 @@ export function LandingPage({ landing }) {
             </div>
           </div>
         </section>
+
+        {/* Мини-игра */}
+        <DirectionGame slug={landing.slug} />
 
         {/* FAQ */}
         <section className="px-5 py-12 sm:px-8 lg:px-14">

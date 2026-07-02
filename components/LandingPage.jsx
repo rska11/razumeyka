@@ -7,19 +7,20 @@ import { getLandingBySlug } from '@/data/landings.js';
 import { DirectionGame } from '@/components/games/DirectionGame.jsx';
 
 const accents = {
-  blue: { soft: 'bg-brand-blue/10', text: 'text-brand-blue' },
-  pink: { soft: 'bg-brand-pink/12', text: 'text-brand-pink' },
-  green: { soft: 'bg-brand-green/14', text: 'text-forest-700' },
-  orange: { soft: 'bg-brand-orange/14', text: 'text-brand-orange' },
+  blue: { soft: 'bg-brand-blue/8', text: 'text-brand-blue', grad: 'from-brand-blue/25 to-brand-purple/20' },
+  pink: { soft: 'bg-brand-pink/8', text: 'text-brand-pink', grad: 'from-brand-pink/25 to-brand-orange/20' },
+  green: { soft: 'bg-brand-green/10', text: 'text-forest-700', grad: 'from-brand-green/25 to-brand-blue/20' },
+  orange: { soft: 'bg-brand-orange/10', text: 'text-brand-orange', grad: 'from-brand-orange/25 to-brand-pink/20' },
 };
 
-const CARD = 'rounded-[8px] border-2 border-ink bg-white shadow-[7px_7px_0_rgba(19,35,27,0.12)]';
+// утончённая «премиум» карточка — мягкая рамка и тень вместо жёсткого комикса
+const PC = 'rounded-[20px] border border-ink/8 bg-white/92 shadow-[0_16px_42px_rgba(16,42,86,0.07)] backdrop-blur-xl';
 
 const whyUs = [
-  { emoji: '👥', t: 'Мини-группы до 6', d: 'Педагог видит каждого и подстраивает темп под ребёнка' },
-  { emoji: '💻', t: 'Онлайн из любого города', d: 'Без дороги — занимайтесь из дома в удобное время' },
-  { emoji: '🎯', t: 'Честный подход', d: 'Не подойдёт — прямо скажем и предложим другое направление' },
-  { emoji: '📈', t: 'Виден прогресс', d: 'Успехи ребёнка отражаются в личном кабинете родителя' },
+  { icon: 'users', t: 'Мини-группы до 6', d: 'Педагог видит каждого и подстраивает темп под ребёнка' },
+  { icon: 'screen', t: 'Онлайн из любого города', d: 'Без дороги — занимайтесь из дома в удобное время' },
+  { icon: 'confidence', t: 'Честный подход', d: 'Не подойдёт — прямо скажем и предложим другое направление' },
+  { icon: 'logic', t: 'Виден прогресс', d: 'Успехи ребёнка отражаются в личном кабинете родителя' },
 ];
 
 export function LandingPage({ landing }) {
@@ -72,97 +73,131 @@ export function LandingPage({ landing }) {
       <Header />
       <main className="mesh-bg min-h-screen">
         {/* Hero */}
-        <section className="px-5 pb-10 pt-28 sm:px-8 sm:pt-32 lg:px-14">
+        <section className="px-5 pb-12 pt-28 sm:px-8 sm:pt-32 lg:px-14">
           <div className="container-pad px-0">
-            <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
+            <div className="grid items-center gap-12 lg:grid-cols-[1.02fr_0.98fr]">
               <div>
-                <span className="comic-label">Онлайн-школа «Разумейка»</span>
-                <h1 className="display-title mt-6 text-[2.3rem] sm:text-5xl lg:text-[3.6rem]">{landing.h1}</h1>
-                <div className="mt-6 space-y-4 text-lg font-medium leading-8 text-ink/66">
-                  {landing.intro.map((p, i) => (
+                <span className={`section-kicker ${a.soft}`}>Онлайн-школа «Разумейка»</span>
+                <h1 className="display-title mt-6 text-[2.4rem] leading-[1.02] sm:text-5xl lg:text-[3.7rem]">{landing.h1}</h1>
+                <p className="mt-6 text-xl font-semibold leading-9 text-ink/72">{landing.intro[0]}</p>
+                <div className="mt-5 space-y-3 text-lg font-medium leading-8 text-ink/62">
+                  {landing.intro.slice(1).map((p, i) => (
                     <p key={i}>{p}</p>
                   ))}
                 </div>
-                <div className="mt-8 flex flex-wrap gap-3">
+                <div className="mt-8 flex flex-wrap gap-4">
                   <a href="/#form" className="primary-btn">Записаться на пробный · 400 ₽</a>
                   <Link href="/" className="secondary-btn">Все направления</Link>
                 </div>
+                <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-bold text-ink/56">
+                  <span className="text-brand-orange">★★★★★</span>
+                  <span>Мини-группы до 6 детей</span>
+                  <span>Онлайн из любого города</span>
+                </div>
               </div>
 
-              <div className="relative mx-auto w-full max-w-sm lg:max-w-md">
-                <div className={`flex aspect-square items-center justify-center rounded-[8px] border-2 border-ink ${a.soft} shadow-[12px_12px_0_rgba(19,35,27,0.14)]`}>
-                  <span className="text-[8rem] sm:text-[9.5rem]">{landing.emoji ?? '✨'}</span>
+              <div className="relative mx-auto w-full max-w-lg">
+                <div className={`absolute -inset-5 rounded-[32px] bg-gradient-to-br ${a.grad} blur-2xl`} />
+                {landing.image ? (
+                  <div className="relative overflow-hidden rounded-[26px] border border-white/80 bg-white/60 shadow-color">
+                    <img src={landing.image} alt={landing.h1} className="h-[360px] w-full object-cover sm:h-[460px]" />
+                    <div className="absolute right-4 top-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/90 text-3xl shadow-luxe backdrop-blur">
+                      {landing.emoji ?? '✨'}
+                    </div>
+                  </div>
+                ) : (
+                  <div className={`relative flex aspect-square items-center justify-center rounded-[26px] border border-white/80 bg-gradient-to-br ${a.grad} shadow-color`}>
+                    <span className="text-[9rem]">{landing.emoji ?? '✨'}</span>
+                  </div>
+                )}
+                <div className="absolute -bottom-5 -left-4 rounded-[18px] border border-ink/8 bg-white px-5 py-3.5 shadow-color">
+                  <p className="font-display text-2xl font-black text-ink">400 ₽</p>
+                  <p className="text-xs font-bold text-ink/56">пробный урок</p>
                 </div>
-                <div className="comic-label absolute -left-3 top-8 rotate-[-3deg] normal-case tracking-normal">Мини-группы до 6</div>
-                <div className="comic-label absolute -right-3 bottom-10 rotate-[2deg] normal-case tracking-normal">Пробный · 400 ₽</div>
               </div>
             </div>
 
-            <div className={`mt-14 grid gap-4 ${stats.length === 4 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3'}`}>
+            {/* Статистика */}
+            <div className={`mt-16 grid gap-4 ${stats.length === 4 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3'}`}>
               {stats.map((s) => (
-                <div key={s.l} className={`${CARD} p-4 text-center`}>
-                  <p className={`font-display text-2xl font-black sm:text-3xl ${a.text}`}>{s.v}</p>
-                  <p className="mt-1 text-xs font-bold leading-5 text-ink/56 sm:text-sm">{s.l}</p>
+                <div key={s.l} className={`${PC} p-5 text-center`}>
+                  <p className={`font-display text-3xl font-black sm:text-4xl ${a.text}`}>{s.v}</p>
+                  <p className="mt-1.5 text-xs font-bold leading-5 text-ink/56 sm:text-sm">{s.l}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* Боли — узнали своего ребёнка? */}
+        {/* Узнали своего ребёнка? */}
         {landing.pains?.length > 0 && (
-          <section className="px-5 py-12 sm:px-8 lg:px-14">
+          <section className="px-5 py-14 sm:px-8 lg:px-14">
             <div className="container-pad px-0">
-              <span className="comic-label">знакомо?</span>
+              <span className={`section-kicker ${a.soft}`}>знакомо?</span>
               <h2 className="section-title mt-6 max-w-3xl">Узнали своего ребёнка?</h2>
-              <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="mt-9 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {landing.pains.map((p, i) => (
-                  <div key={i} className={`flex items-start gap-3 ${CARD} p-5`}>
-                    <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 border-ink bg-brand-red/10 text-lg font-black text-brand-red">
-                      !
-                    </span>
-                    <span className="text-base font-semibold text-ink/76">{p}</span>
+                  <div key={i} className={`flex items-start gap-3.5 ${PC} p-6`}>
+                    <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-red/10 text-lg font-black text-brand-red">!</span>
+                    <span className="text-base font-semibold leading-6 text-ink/78">{p}</span>
                   </div>
                 ))}
               </div>
-              <p className="mt-6 max-w-2xl text-lg font-semibold text-ink/64">
-                Это нормально — и поправимо. Мы работаем именно с этим, мягко и без давления.
-              </p>
+              <p className="mt-7 max-w-2xl text-lg font-semibold text-ink/64">Это поправимо — и мы работаем именно с этим. Мягко, через игру и без давления.</p>
             </div>
           </section>
         )}
 
         {/* Что развиваем */}
-        <section className="px-5 py-12 sm:px-8 lg:px-14">
+        <section className="px-5 py-14 sm:px-8 lg:px-14">
           <div className="container-pad px-0">
-            <span className="comic-label">что развиваем</span>
-            <div className="mt-7 grid gap-4 sm:grid-cols-2">
+            <span className={`section-kicker ${a.soft}`}>что развиваем</span>
+            <h2 className="section-title mt-6 max-w-3xl">Не оценки, а сами способности</h2>
+            <div className="mt-9 grid gap-4 sm:grid-cols-2">
               {landing.bullets.map((b, i) => (
-                <div key={i} className={`flex items-start gap-3 ${CARD} p-5`}>
-                  <span className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 border-ink ${a.soft} ${a.text}`}>
+                <div key={i} className={`flex items-start gap-4 ${PC} p-6`}>
+                  <span className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${a.soft} ${a.text}`}>
                     <Icon name="check" className="h-4 w-4" />
                   </span>
-                  <span className="text-base font-semibold text-ink/78">{b}</span>
+                  <span className="text-base font-semibold leading-6 text-ink/80">{b}</span>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
+        {/* Бесплатная польза — попробуйте прямо сейчас */}
+        {landing.homeTip && (
+          <section className="px-5 py-8 sm:px-8 lg:px-14">
+            <div className="container-pad px-0">
+              <div className="grid items-center gap-6 rounded-[24px] border border-ink/8 bg-white p-8 shadow-[0_22px_54px_rgba(16,42,86,0.09)] sm:p-10 lg:grid-cols-[auto_1fr] lg:gap-10">
+                <div className={`flex h-20 w-20 items-center justify-center rounded-[20px] ${a.soft} text-4xl`}>🎁</div>
+                <div>
+                  <span className={`section-kicker ${a.soft}`}>бесплатно — попробуйте прямо сейчас</span>
+                  <h3 className="section-title mt-4 text-[1.7rem] sm:text-[2.1rem]">{landing.homeTip.title}</h3>
+                  <p className="mt-4 text-lg font-medium leading-8 text-ink/70">{landing.homeTip.text}</p>
+                  <p className={`mt-4 text-base font-extrabold ${a.text}`}>А на занятиях таких приёмов — десятки, и с педагогом, который ведёт ребёнка к результату.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* Как проходит занятие */}
         {landing.steps?.length > 0 && (
-          <section className="px-5 py-12 sm:px-8 lg:px-14">
+          <section className="px-5 py-14 sm:px-8 lg:px-14">
             <div className="container-pad px-0">
-              <span className="comic-label">как проходит занятие</span>
-              <div className="mt-7 grid gap-4 lg:grid-cols-2">
+              <span className={`section-kicker ${a.soft}`}>как проходит занятие</span>
+              <h2 className="section-title mt-6 max-w-3xl">55 минут пользы без перегруза</h2>
+              <div className="mt-9 grid gap-4 lg:grid-cols-2">
                 {landing.steps.map((s, i) => (
-                  <div key={i} className={`flex gap-4 ${CARD} p-6`}>
-                    <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 border-ink ${a.soft} font-display text-lg font-black ${a.text}`}>
+                  <div key={i} className={`flex gap-5 ${PC} p-7`}>
+                    <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ${a.soft} font-display text-xl font-black ${a.text}`}>
                       {i + 1}
                     </span>
                     <div>
                       <p className="font-display text-lg font-extrabold text-ink">{s.title}</p>
-                      <p className="mt-1 text-base font-medium leading-7 text-ink/66">{s.text}</p>
+                      <p className="mt-1.5 text-base font-medium leading-7 text-ink/64">{s.text}</p>
                     </div>
                   </div>
                 ))}
@@ -173,13 +208,14 @@ export function LandingPage({ landing }) {
 
         {/* Результат через месяц */}
         {landing.results?.length > 0 && (
-          <section className="px-5 py-12 sm:px-8 lg:px-14">
+          <section className="px-5 py-14 sm:px-8 lg:px-14">
             <div className="container-pad px-0">
-              <div className="rounded-[8px] border-2 border-ink bg-night p-8 text-porcelain shadow-[12px_12px_0_rgba(19,35,27,0.2)] sm:p-12">
-                <h2 className="font-display text-2xl font-black text-white sm:text-4xl">Что родители замечают уже через месяц</h2>
-                <div className="mt-7 grid gap-3 sm:grid-cols-2">
+              <div className="overflow-hidden rounded-[26px] bg-night p-9 text-porcelain shadow-color sm:p-14">
+                <span className="section-kicker border-white/15 bg-white/10 text-porcelain/80">результат через 1 месяц</span>
+                <h2 className="mt-5 font-display text-2xl font-black text-white sm:text-4xl">Что родители замечают уже через месяц</h2>
+                <div className="mt-8 grid gap-4 sm:grid-cols-2">
                   {landing.results.map((r, i) => (
-                    <div key={i} className="flex items-start gap-3 rounded-[8px] border border-white/12 bg-white/[0.06] p-4">
+                    <div key={i} className="flex items-start gap-3.5 rounded-[16px] border border-white/10 bg-white/[0.05] p-5">
                       <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gold-300 text-night">
                         <Icon name="check" className="h-3.5 w-3.5" />
                       </span>
@@ -193,14 +229,16 @@ export function LandingPage({ landing }) {
         )}
 
         {/* Почему Разумейка */}
-        <section className="px-5 py-12 sm:px-8 lg:px-14">
+        <section className="px-5 py-14 sm:px-8 lg:px-14">
           <div className="container-pad px-0">
-            <span className="comic-label">почему разумейка</span>
-            <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <span className={`section-kicker ${a.soft}`}>почему разумейка</span>
+            <div className="mt-9 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {whyUs.map((w) => (
-                <div key={w.t} className={`${CARD} p-5`}>
-                  <span className="text-4xl">{w.emoji}</span>
-                  <p className="mt-3 font-display text-lg font-extrabold leading-tight text-ink">{w.t}</p>
+                <div key={w.t} className={`${PC} p-6`}>
+                  <span className={`flex h-12 w-12 items-center justify-center rounded-2xl ${a.soft} ${a.text}`}>
+                    <Icon name={w.icon} className="h-6 w-6" />
+                  </span>
+                  <p className="mt-4 font-display text-lg font-extrabold leading-tight text-ink">{w.t}</p>
                   <p className="mt-1.5 text-sm font-medium leading-6 text-ink/60">{w.d}</p>
                 </div>
               ))}
@@ -210,13 +248,13 @@ export function LandingPage({ landing }) {
 
         {/* Отзыв */}
         {landing.testimonial && (
-          <section className="px-5 py-8 sm:px-8 lg:px-14">
+          <section className="px-5 py-10 sm:px-8 lg:px-14">
             <div className="container-pad px-0">
-              <div className={`relative mx-auto max-w-3xl ${CARD} p-8 sm:p-10`}>
-                <span className={`font-display text-7xl leading-none ${a.text}`}>“</span>
-                <p className="-mt-6 text-xl font-semibold leading-9 text-ink/80 sm:text-2xl">{landing.testimonial.text}</p>
-                <div className="mt-5 flex items-center gap-2">
-                  <span className="text-brand-orange">★★★★★</span>
+              <div className={`relative mx-auto max-w-3xl overflow-hidden rounded-[24px] border border-ink/8 bg-white p-9 shadow-[0_20px_50px_rgba(16,42,86,0.08)] sm:p-12`}>
+                <span className={`font-display text-8xl leading-none ${a.text} opacity-25`}>“</span>
+                <p className="-mt-8 text-xl font-semibold leading-9 text-ink/82 sm:text-2xl">{landing.testimonial.text}</p>
+                <div className="mt-6 flex items-center gap-3">
+                  <span className="text-lg text-brand-orange">★★★★★</span>
                   <span className="text-sm font-extrabold text-ink/56">— {landing.testimonial.author}</span>
                 </div>
               </div>
@@ -228,19 +266,20 @@ export function LandingPage({ landing }) {
         <DirectionGame slug={landing.slug} />
 
         {/* Оффер */}
-        <section className="px-5 py-12 sm:px-8 lg:px-14">
+        <section className="px-5 py-14 sm:px-8 lg:px-14">
           <div className="container-pad px-0">
-            <div className={`grid items-center gap-8 rounded-[8px] border-2 border-ink ${a.soft} p-8 shadow-[12px_12px_0_rgba(19,35,27,0.16)] sm:p-12 lg:grid-cols-[1.2fr_0.8fr]`}>
+            <div className={`grid items-center gap-10 rounded-[26px] border border-ink/8 ${a.soft} p-9 shadow-color sm:p-14 lg:grid-cols-[1.15fr_0.85fr]`}>
               <div>
-                <h2 className="section-title">Начните с пробного урока за 400 ₽</h2>
-                <p className="mt-4 text-lg font-medium leading-8 text-ink/70">
+                <span className="section-kicker bg-white/70">старт без риска</span>
+                <h2 className="section-title mt-5">Начните с пробного урока за 400 ₽</h2>
+                <p className="mt-5 text-lg font-medium leading-8 text-ink/70">
                   Это полноценное занятие в мини-группе. Педагог оценит уровень ребёнка, покажет формат и честно скажет,
                   подходит ли направление. Никаких обязательств.
                 </p>
-                <ul className="mt-5 grid gap-2.5">
+                <ul className="mt-6 grid gap-3">
                   {['Пробный урок — 400 ₽', 'Не подойдёт — предложим другое или вернём деньги за пробный', 'Пакет на месяц — от 7900 ₽'].map((t) => (
-                    <li key={t} className="flex items-center gap-2.5 text-base font-semibold text-ink/76">
-                      <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 border-ink bg-white ${a.text}`}>
+                    <li key={t} className="flex items-center gap-3 text-base font-semibold text-ink/78">
+                      <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white ${a.text} shadow-sm`}>
                         <Icon name="check" className="h-3.5 w-3.5" />
                       </span>
                       {t}
@@ -248,13 +287,11 @@ export function LandingPage({ landing }) {
                   ))}
                 </ul>
               </div>
-              <div className="text-center">
-                <div className={`${CARD} p-7`}>
-                  <p className="text-sm font-extrabold uppercase tracking-[0.14em] text-ink/44">Пробный урок</p>
-                  <p className="mt-2 font-display text-5xl font-black text-ink">400 ₽</p>
-                  <a href="/#form" className="primary-btn mt-6 w-full">Записаться</a>
-                  <p className="mt-3 text-xs font-semibold text-ink/48">Место бронируем на 30 минут</p>
-                </div>
+              <div className={`${PC} p-8 text-center`}>
+                <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-ink/44">Пробный урок</p>
+                <p className="mt-2 font-display text-6xl font-black text-ink">400₽</p>
+                <a href="/#form" className="primary-btn mt-6 w-full">Записаться</a>
+                <p className="mt-3.5 text-xs font-semibold text-ink/48">Место бронируем на 30 минут</p>
               </div>
             </div>
           </div>
@@ -263,10 +300,10 @@ export function LandingPage({ landing }) {
         {/* FAQ */}
         <section className="px-5 py-12 sm:px-8 lg:px-14">
           <div className="container-pad mx-auto max-w-3xl px-0">
-            <span className="comic-label">частые вопросы</span>
-            <div className="mt-7 grid gap-3">
+            <span className={`section-kicker ${a.soft}`}>частые вопросы</span>
+            <div className="mt-8 grid gap-3">
               {landing.faq.map((f, i) => (
-                <details key={i} className={`group ${CARD} p-5`}>
+                <details key={i} className={`group ${PC} p-6`}>
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-extrabold text-ink">
                     {f.q}
                     <span className={`${a.text} transition group-open:rotate-45`}>
@@ -284,10 +321,10 @@ export function LandingPage({ landing }) {
         {related.length > 0 && (
           <section className="px-5 py-8 sm:px-8 lg:px-14">
             <div className="container-pad px-0">
-              <span className="comic-label">другие направления</span>
+              <span className={`section-kicker ${a.soft}`}>другие направления</span>
               <div className="mt-7 flex flex-wrap gap-3">
                 {related.map((d) => (
-                  <Link key={d.slug} href={`/${d.slug}`} className="rounded-full border-2 border-ink bg-white px-5 py-3 text-base font-extrabold text-ink shadow-[4px_4px_0_rgba(19,35,27,0.12)] transition hover:-translate-y-0.5">
+                  <Link key={d.slug} href={`/${d.slug}`} className={`${PC} px-5 py-3 text-base font-extrabold text-ink transition hover:-translate-y-0.5`}>
                     {d.title}
                   </Link>
                 ))}
@@ -297,12 +334,12 @@ export function LandingPage({ landing }) {
         )}
 
         {/* Финальный CTA */}
-        <section className="px-5 py-14 sm:px-8 lg:px-14">
+        <section className="px-5 py-16 sm:px-8 lg:px-14">
           <div className="container-pad px-0">
-            <div className="rounded-[8px] border-2 border-ink bg-night p-8 text-center text-porcelain shadow-[12px_12px_0_rgba(19,35,27,0.2)] sm:p-12">
-              <h2 className="font-display text-3xl font-black text-white sm:text-4xl">Попробуйте — это ни к чему не обязывает</h2>
-              <p className="mx-auto mt-3 max-w-xl text-lg font-medium text-porcelain/80">На пробном уроке за 400 ₽ педагог познакомится с ребёнком и покажет формат.</p>
-              <a href="/#form" className="mt-7 inline-flex rounded-full bg-gold-300 px-8 py-3.5 text-base font-extrabold text-night transition hover:-translate-y-0.5 hover:bg-white">Записаться на пробный урок</a>
+            <div className="overflow-hidden rounded-[26px] bg-night p-10 text-center text-porcelain shadow-color sm:p-16">
+              <h2 className="font-display text-3xl font-black text-white sm:text-5xl">Попробуйте — это ни к чему не обязывает</h2>
+              <p className="mx-auto mt-4 max-w-xl text-lg font-medium text-porcelain/80">На пробном уроке за 400 ₽ педагог познакомится с ребёнком, покажет формат и ответит на все вопросы.</p>
+              <a href="/#form" className="mt-8 inline-flex rounded-full bg-gold-300 px-9 py-4 text-base font-extrabold text-night transition hover:-translate-y-0.5 hover:bg-white">Записаться на пробный урок</a>
             </div>
           </div>
         </section>

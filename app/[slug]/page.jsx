@@ -10,6 +10,14 @@ import { LanguagesHub } from '@/components/LanguagesHub.jsx';
 
 const stepIcons = ['spark', 'focus', 'confidence', 'creative', 'logic', 'check'];
 
+const CARD = 'rounded-[8px] border-2 border-ink bg-white shadow-[7px_7px_0_rgba(19,35,27,0.12)]';
+const whyUsItems = [
+  { emoji: '👥', t: 'Мини-группы до 6', d: 'Педагог видит каждого и подстраивает темп под ребёнка' },
+  { emoji: '💻', t: 'Онлайн из любого города', d: 'Без дороги — занимайтесь из дома в удобное время' },
+  { emoji: '🎯', t: 'Честный подход', d: 'Не подойдёт — прямо скажем и предложим другое направление' },
+  { emoji: '📈', t: 'Виден прогресс', d: 'Успехи ребёнка отражаются в личном кабинете родителя' },
+];
+
 export function generateStaticParams() {
   return [
     ...directionsData.map((d) => ({ slug: d.slug })),

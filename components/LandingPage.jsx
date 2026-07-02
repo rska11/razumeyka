@@ -15,6 +15,13 @@ const accents = {
 
 const CARD = 'rounded-[8px] border-2 border-ink bg-white shadow-[7px_7px_0_rgba(19,35,27,0.12)]';
 
+const whyUs = [
+  { emoji: '👥', t: 'Мини-группы до 6', d: 'Педагог видит каждого и подстраивает темп под ребёнка' },
+  { emoji: '💻', t: 'Онлайн из любого города', d: 'Без дороги — занимайтесь из дома в удобное время' },
+  { emoji: '🎯', t: 'Честный подход', d: 'Не подойдёт — прямо скажем и предложим другое направление' },
+  { emoji: '📈', t: 'Виден прогресс', d: 'Успехи ребёнка отражаются в личном кабинете родителя' },
+];
+
 export function LandingPage({ landing }) {
   const related = (landing.relatedSlugs ?? [])
     .map((s) => {
@@ -91,7 +98,6 @@ export function LandingPage({ landing }) {
               </div>
             </div>
 
-            {/* Статистика */}
             <div className={`mt-14 grid gap-4 ${stats.length === 4 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3'}`}>
               {stats.map((s) => (
                 <div key={s.l} className={`${CARD} p-4 text-center`}>
@@ -102,6 +108,29 @@ export function LandingPage({ landing }) {
             </div>
           </div>
         </section>
+
+        {/* Боли — узнали своего ребёнка? */}
+        {landing.pains?.length > 0 && (
+          <section className="px-5 py-12 sm:px-8 lg:px-14">
+            <div className="container-pad px-0">
+              <span className="comic-label">знакомо?</span>
+              <h2 className="section-title mt-6 max-w-3xl">Узнали своего ребёнка?</h2>
+              <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {landing.pains.map((p, i) => (
+                  <div key={i} className={`flex items-start gap-3 ${CARD} p-5`}>
+                    <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 border-ink bg-brand-red/10 text-lg font-black text-brand-red">
+                      !
+                    </span>
+                    <span className="text-base font-semibold text-ink/76">{p}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-6 max-w-2xl text-lg font-semibold text-ink/64">
+                Это нормально — и поправимо. Мы работаем именно с этим, мягко и без давления.
+              </p>
+            </div>
+          </section>
+        )}
 
         {/* Что развиваем */}
         <section className="px-5 py-12 sm:px-8 lg:px-14">
@@ -163,8 +192,73 @@ export function LandingPage({ landing }) {
           </section>
         )}
 
+        {/* Почему Разумейка */}
+        <section className="px-5 py-12 sm:px-8 lg:px-14">
+          <div className="container-pad px-0">
+            <span className="comic-label">почему разумейка</span>
+            <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {whyUs.map((w) => (
+                <div key={w.t} className={`${CARD} p-5`}>
+                  <span className="text-4xl">{w.emoji}</span>
+                  <p className="mt-3 font-display text-lg font-extrabold leading-tight text-ink">{w.t}</p>
+                  <p className="mt-1.5 text-sm font-medium leading-6 text-ink/60">{w.d}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Отзыв */}
+        {landing.testimonial && (
+          <section className="px-5 py-8 sm:px-8 lg:px-14">
+            <div className="container-pad px-0">
+              <div className={`relative mx-auto max-w-3xl ${CARD} p-8 sm:p-10`}>
+                <span className={`font-display text-7xl leading-none ${a.text}`}>“</span>
+                <p className="-mt-6 text-xl font-semibold leading-9 text-ink/80 sm:text-2xl">{landing.testimonial.text}</p>
+                <div className="mt-5 flex items-center gap-2">
+                  <span className="text-brand-orange">★★★★★</span>
+                  <span className="text-sm font-extrabold text-ink/56">— {landing.testimonial.author}</span>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* Мини-игра */}
         <DirectionGame slug={landing.slug} />
+
+        {/* Оффер */}
+        <section className="px-5 py-12 sm:px-8 lg:px-14">
+          <div className="container-pad px-0">
+            <div className={`grid items-center gap-8 rounded-[8px] border-2 border-ink ${a.soft} p-8 shadow-[12px_12px_0_rgba(19,35,27,0.16)] sm:p-12 lg:grid-cols-[1.2fr_0.8fr]`}>
+              <div>
+                <h2 className="section-title">Начните с пробного урока за 400 ₽</h2>
+                <p className="mt-4 text-lg font-medium leading-8 text-ink/70">
+                  Это полноценное занятие в мини-группе. Педагог оценит уровень ребёнка, покажет формат и честно скажет,
+                  подходит ли направление. Никаких обязательств.
+                </p>
+                <ul className="mt-5 grid gap-2.5">
+                  {['Пробный урок — 400 ₽', 'Не подойдёт — предложим другое или вернём деньги за пробный', 'Пакет на месяц — от 7900 ₽'].map((t) => (
+                    <li key={t} className="flex items-center gap-2.5 text-base font-semibold text-ink/76">
+                      <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 border-ink bg-white ${a.text}`}>
+                        <Icon name="check" className="h-3.5 w-3.5" />
+                      </span>
+                      {t}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="text-center">
+                <div className={`${CARD} p-7`}>
+                  <p className="text-sm font-extrabold uppercase tracking-[0.14em] text-ink/44">Пробный урок</p>
+                  <p className="mt-2 font-display text-5xl font-black text-ink">400 ₽</p>
+                  <a href="/#form" className="primary-btn mt-6 w-full">Записаться</a>
+                  <p className="mt-3 text-xs font-semibold text-ink/48">Место бронируем на 30 минут</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* FAQ */}
         <section className="px-5 py-12 sm:px-8 lg:px-14">
@@ -202,13 +296,13 @@ export function LandingPage({ landing }) {
           </section>
         )}
 
-        {/* CTA */}
+        {/* Финальный CTA */}
         <section className="px-5 py-14 sm:px-8 lg:px-14">
           <div className="container-pad px-0">
             <div className="rounded-[8px] border-2 border-ink bg-night p-8 text-center text-porcelain shadow-[12px_12px_0_rgba(19,35,27,0.2)] sm:p-12">
-              <h2 className="font-display text-3xl font-black text-white sm:text-4xl">Попробуйте — пробный урок 400 ₽</h2>
-              <p className="mx-auto mt-3 max-w-xl text-lg font-medium text-porcelain/80">Педагог оценит уровень ребёнка, ответит на вопросы и покажет формат. Без обязательств.</p>
-              <a href="/#form" className="mt-7 inline-flex rounded-full bg-gold-300 px-7 py-3.5 text-base font-extrabold text-night transition hover:-translate-y-0.5 hover:bg-white">Записаться</a>
+              <h2 className="font-display text-3xl font-black text-white sm:text-4xl">Попробуйте — это ни к чему не обязывает</h2>
+              <p className="mx-auto mt-3 max-w-xl text-lg font-medium text-porcelain/80">На пробном уроке за 400 ₽ педагог познакомится с ребёнком и покажет формат.</p>
+              <a href="/#form" className="mt-7 inline-flex rounded-full bg-gold-300 px-8 py-3.5 text-base font-extrabold text-night transition hover:-translate-y-0.5 hover:bg-white">Записаться на пробный урок</a>
             </div>
           </div>
         </section>

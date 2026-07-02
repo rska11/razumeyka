@@ -4,9 +4,10 @@ import { landingsData } from "@/data/landings.js";
 
 export const dynamic = "force-dynamic";
 
-const MODEL = process.env.ANTHROPIC_MODEL || "claude-haiku-4-5-20251001";
-// базовый URL Anthropic-совместимого API (можно указать прокси вне РФ через ANTHROPIC_BASE_URL)
-const BASE_URL = (process.env.ANTHROPIC_BASE_URL || "https://api.anthropic.com").replace(/\/+$/, "");
+const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";
+// Базовый URL. На проде указывает на relay (mod.genpic.ai) — РФ-IP блокируется Anthropic (403).
+// Relay пересылает запрос и сам подставляет ключ. Переменные совместимы с genpic.
+const BASE_URL = (process.env.ANTHROPIC_API_BASE || process.env.ANTHROPIC_BASE_URL || "https://api.anthropic.com").replace(/\/+$/, "");
 
 function catalog() {
   const dirs = (directionsData as { slug: string; title: string; offer: string }[]).map((d) => ({
@@ -24,8 +25,9 @@ function catalog() {
 }
 
 export async function POST(req: Request) {
-  const key = process.env.ANTHROPIC_API_KEY;
-  if (!key) return NextResponse.json({ error: "AI_DISABLED" }, { status: 503 });
+  const apiKey = process.env.ANTHROPIC_API_KEY || "";
+  const relayToken = process.env.ANTHROPIC_RELAY_TOKEN || "";
+  if (!apiKey && !relayToken) return NextResponse.json({ error: "AI_DISABLED" }, { status: 503 });
 
   let body: Record<string, unknown>;
   try {
@@ -49,8 +51,11 @@ ${list.map((c) => `- ${c.slug} — ${c.name}: ${c.about}`).join("\n")}
     const r = await fetch(`${BASE_URL}/v1/messages`, {
       method: "POST",
       headers: {
-        "x-api-key": key,
+        // relay сам подставит ключ Anthropic (x-relay-token); при прямом доступе — x-api-key
+        ...(relayToken ? { "x-relay-token": relayToken } : {}),
+        ...(apiKey ? { "x-api-key": apiKey } : {}),
         "anthropic-version": "2023-06-01",
+        "anthropic-beta": "extended-cache-ttl-2025-04-11",
         "content-type": "application/json",
       },
       body: JSON.stringify({

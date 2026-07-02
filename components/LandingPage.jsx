@@ -13,8 +13,17 @@ const accents = {
   orange: { soft: 'bg-brand-orange/10', text: 'text-brand-orange', grad: 'from-brand-orange/25 to-brand-pink/20' },
 };
 
-// утончённая «премиум» карточка — мягкая рамка и тень вместо жёсткого комикса
-const PC = 'rounded-[20px] border border-ink/8 bg-white/92 shadow-[0_16px_42px_rgba(16,42,86,0.07)] backdrop-blur-xl';
+// утончённая «премиум» карточка — мягкая рамка и тень + живой ховер (приподнимается)
+const PC = 'rounded-[20px] border border-ink/8 bg-white/92 shadow-[0_16px_42px_rgba(16,42,86,0.07)] backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:shadow-color';
+const PC_STATIC = 'rounded-[20px] border border-ink/8 bg-white/92 shadow-[0_16px_42px_rgba(16,42,86,0.07)] backdrop-blur-xl';
+
+// градиент для заголовка — эффект как на главной, свой на каждое направление
+const h1grad = {
+  blue: 'from-brand-blue via-brand-purple to-brand-pink',
+  pink: 'from-brand-pink via-brand-purple to-brand-blue',
+  green: 'from-forest-700 via-brand-blue to-brand-cyan',
+  orange: 'from-brand-orange via-brand-pink to-brand-purple',
+};
 
 const whyUs = [
   { icon: 'users', t: 'Мини-группы до 6', d: 'Педагог видит каждого и подстраивает темп под ребёнка' },
@@ -35,6 +44,7 @@ export function LandingPage({ landing }) {
     .filter(Boolean);
 
   const a = accents[landing.theme] ?? accents.blue;
+  const hg = h1grad[landing.theme] ?? h1grad.blue;
   const stats = landing.stats ?? [
     { v: 'до 6', l: 'детей в группе' },
     { v: 'онлайн', l: 'из любого города' },
@@ -78,7 +88,10 @@ export function LandingPage({ landing }) {
             <div className="grid items-center gap-12 lg:grid-cols-[1.02fr_0.98fr]">
               <div>
                 <span className={`section-kicker ${a.soft}`}>Онлайн-школа «Разумейка»</span>
-                <h1 className="display-title mt-6 text-[2.4rem] leading-[1.02] sm:text-5xl lg:text-[3.7rem]">{landing.h1}</h1>
+                <h1 className={`mt-6 bg-gradient-to-r font-display text-[2.4rem] font-black leading-[1.06] tracking-[-0.01em] text-transparent sm:text-5xl lg:text-[3.7rem] ${hg} bg-clip-text [-webkit-background-clip:text] [text-shadow:0_16px_38px_rgba(59,130,246,0.10)]`}>
+                  {landing.h1}
+                </h1>
+                <div className={`mt-5 h-[6px] w-28 rounded-full bg-gradient-to-r ${hg}`} />
                 <p className="mt-6 text-xl font-semibold leading-9 text-ink/72">{landing.intro[0]}</p>
                 <div className="mt-5 space-y-3 text-lg font-medium leading-8 text-ink/62">
                   {landing.intro.slice(1).map((p, i) => (
@@ -205,6 +218,40 @@ export function LandingPage({ landing }) {
             </div>
           </section>
         )}
+
+        {/* Что ещё входит — раскрытие-сюрприз */}
+        <section className="px-5 py-8 sm:px-8 lg:px-14">
+          <div className="container-pad px-0">
+            <details className={`group ${PC_STATIC}`}>
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-7">
+                <span className="flex items-center gap-3.5">
+                  <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ${a.soft} text-2xl`}>🎁</span>
+                  <span className="font-display text-lg font-extrabold text-ink sm:text-2xl">Что ещё входит — нажмите, чтобы открыть</span>
+                </span>
+                <span className={`shrink-0 ${a.text} transition group-open:rotate-45`}>
+                  <Icon name="spark" className="h-6 w-6" />
+                </span>
+              </summary>
+              <div className="grid gap-3.5 px-7 pb-7 sm:grid-cols-2">
+                {[
+                  'Запись каждого занятия — можно пересмотреть',
+                  'Личный кабинет с прогрессом ребёнка',
+                  'Гибкое расписание — подстроим под вас',
+                  'Поддержка родителей между занятиями',
+                  'Пропустили урок — компенсируем',
+                  'Педагог даёт обратную связь после занятий',
+                ].map((x) => (
+                  <div key={x} className="flex items-start gap-3">
+                    <span className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${a.soft} ${a.text}`}>
+                      <Icon name="check" className="h-3.5 w-3.5" />
+                    </span>
+                    <span className="text-base font-semibold text-ink/76">{x}</span>
+                  </div>
+                ))}
+              </div>
+            </details>
+          </div>
+        </section>
 
         {/* Результат через месяц */}
         {landing.results?.length > 0 && (

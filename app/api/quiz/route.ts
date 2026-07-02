@@ -4,7 +4,9 @@ import { landingsData } from "@/data/landings.js";
 
 export const dynamic = "force-dynamic";
 
-const MODEL = "claude-haiku-4-5-20251001";
+const MODEL = process.env.ANTHROPIC_MODEL || "claude-haiku-4-5-20251001";
+// базовый URL Anthropic-совместимого API (можно указать прокси вне РФ через ANTHROPIC_BASE_URL)
+const BASE_URL = (process.env.ANTHROPIC_BASE_URL || "https://api.anthropic.com").replace(/\/+$/, "");
 
 function catalog() {
   const dirs = (directionsData as { slug: string; title: string; offer: string }[]).map((d) => ({
@@ -44,7 +46,7 @@ ${list.map((c) => `- ${c.slug} — ${c.name}: ${c.about}`).join("\n")}
 {"slug":"<slug из списка>","title":"<название направления>","reason":"<почему подходит именно этому ребёнку, 2-3 предложения>"}`;
 
   try {
-    const r = await fetch("https://api.anthropic.com/v1/messages", {
+    const r = await fetch(`${BASE_URL}/v1/messages`, {
       method: "POST",
       headers: {
         "x-api-key": key,

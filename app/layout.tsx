@@ -21,7 +21,6 @@ export const metadata: Metadata = {
     "Разумейка",
   ],
   applicationName: "Разумейка",
-  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     locale: "ru_RU",
@@ -45,7 +44,7 @@ export default function RootLayout({
       <body>
         <Providers>{children}</Providers>
         <CookieConsent />
-        <YandexMetrika />
+        {process.env.NODE_ENV === "production" && <YandexMetrika />}
       </body>
     </html>
   );

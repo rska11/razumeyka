@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { getYooKassaPayment, isYooKassaConfigured } from "@/lib/yookassa";
 import { rub } from "@/lib/pricing";
+import { GoalOnMount } from "@/components/analytics/GoalOnMount.jsx";
 
 export const dynamic = "force-dynamic";
 export const metadata = { robots: { index: false } };
@@ -41,6 +42,9 @@ export default async function SpasiboPage({
 
   return (
     <main className="mesh-bg flex min-h-screen items-center justify-center px-5 py-16 sm:px-8">
+      {paid && p && (
+        <GoalOnMount goal="payment_success" params={{ order_price: amount, currency: "RUB" }} onceKey={`payment_${p}`} />
+      )}
       <div className="w-full max-w-lg rounded-[28px] border border-white/80 bg-white/85 p-8 text-center shadow-color backdrop-blur-xl sm:p-10">
         <div className={`mx-auto flex h-16 w-16 items-center justify-center rounded-full text-white ${paid ? "bg-brand-green" : "bg-brand-blue"}`}>
           <svg className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

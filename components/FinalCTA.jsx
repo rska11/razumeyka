@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Icon } from './Icon.jsx';
+import { reachGoal } from '@/lib/metrika';
 
 const MAX_DIRECTIONS = 3;
 
@@ -156,6 +157,7 @@ export function FinalCTA() {
   function handleFormatSelect(f) {
     setFormat(f);
     setDuration(null);
+    if (f === 'trial') reachGoal('trial_intent');
     if (f === 'trial' && selectedDirs.length > 1) setSelectedDirs([selectedDirs[0]]);
     setPausedDirs([]);
     setActiveStep(f === 'trial' ? 4 : 3);
@@ -189,6 +191,7 @@ export function FinalCTA() {
       setActiveStep(5);
       return;
     }
+    reachGoal('begin_checkout');
     setPayLoading(true);
     try {
       const res = await fetch('/api/checkout', {
@@ -227,6 +230,7 @@ export function FinalCTA() {
   // Плашка «Записаться на пробный урок — 400 ₽» из Hero открывает мастер сразу на сценарии пробного урока
   useEffect(() => {
     function onTrialIntent() {
+      reachGoal('trial_intent');
       setFormat('trial');
       setDuration(null);
       setSelectedDirs((cur) => (cur.length > 1 ? [cur[0]] : cur));
@@ -689,21 +693,21 @@ export function FinalCTA() {
                     <div className="grid gap-3 sm:grid-cols-2">
                       <Field label="Имя родителя" icon="mentor">
                         <input type="text" value={name} onChange={(e) => setName(e.target.value)}
-                          className="field-input mt-0 h-[52px] bg-white" placeholder="Анна" />
+                          className="ym-disable-keys field-input mt-0 h-[52px] bg-white" placeholder="Анна" />
                       </Field>
                       <Field label="Телефон" icon="phone">
                         <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)}
-                          className="field-input mt-0 h-[52px] bg-white" placeholder="+7 (___) ___-__-__" />
+                          className="ym-disable-keys field-input mt-0 h-[52px] bg-white" placeholder="+7 (___) ___-__-__" />
                       </Field>
                     </div>
                     <div className="grid gap-3 sm:grid-cols-2">
                       <Field label="Email" icon="screen">
                         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                          className="field-input mt-0 h-[52px] bg-white" placeholder="anna@yandex.ru" />
+                          className="ym-disable-keys field-input mt-0 h-[52px] bg-white" placeholder="anna@yandex.ru" />
                       </Field>
                       <Field label="Имя ребёнка" icon="users">
                         <input type="text" value={childName} onChange={(e) => setChildName(e.target.value)}
-                          className="field-input mt-0 h-[52px] bg-white" placeholder="Имя ребёнка" />
+                          className="ym-disable-keys field-input mt-0 h-[52px] bg-white" placeholder="Имя ребёнка" />
                       </Field>
                     </div>
                     <button type="submit" className="secondary-btn min-h-[52px] w-full">Перейти к проверке</button>

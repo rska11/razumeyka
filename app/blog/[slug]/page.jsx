@@ -26,6 +26,11 @@ export async function generateMetadata({ params }) {
       url: `https://razumeyka-school.ru/blog/${slug}`,
       title: `${post.title} — Разумейка`,
       description: post.description,
+      images: [
+        post.cover?.image
+          ? { url: post.cover.image, alt: post.title }
+          : { url: '/images/og.png', width: 1200, height: 630, alt: post.title },
+      ],
     },
   };
 }
@@ -60,6 +65,12 @@ export default async function BlogPost({ params }) {
     .filter(Boolean);
 
   const minutes = readingMinutes(post.body);
+
+  // перелинковка статей между собой — свежие, кроме текущей
+  const morePosts = [...blogPosts]
+    .filter((p) => p.slug !== slug)
+    .sort((a, b) => (a.date < b.date ? 1 : -1))
+    .slice(0, 3);
 
   // Оглавление из заголовков H2
   const toc = post.body
@@ -260,6 +271,30 @@ export default async function BlogPost({ params }) {
                   {related.map((r) => (
                     <Link key={r.slug} href={`/${r.slug}`} className="rounded-full border border-ink/12 bg-white/80 px-5 py-3 text-base font-extrabold text-ink transition hover:-translate-y-0.5 hover:bg-white">
                       {r.title}
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Ещё из блога */}
+            {morePosts.length > 0 && (
+              <section className="mt-14">
+                <h2 className="font-display text-[1.6rem] font-extrabold text-ink sm:text-[1.9rem]">Ещё из блога</h2>
+                <div className="mt-5 grid gap-3">
+                  {morePosts.map((p) => (
+                    <Link
+                      key={p.slug}
+                      href={`/blog/${p.slug}`}
+                      className="group flex items-center justify-between gap-4 rounded-[18px] border border-white/80 bg-white/85 p-5 shadow-card backdrop-blur-xl transition hover:-translate-y-0.5"
+                    >
+                      <div>
+                        <p className="font-display text-lg font-extrabold leading-tight text-ink transition group-hover:text-brand-blue">{p.title}</p>
+                        <p className="mt-1 text-sm font-medium text-ink/56">{p.excerpt}</p>
+                      </div>
+                      <span className="shrink-0 text-brand-blue">
+                        <Icon name="arrow" className="h-5 w-5" />
+                      </span>
                     </Link>
                   ))}
                 </div>

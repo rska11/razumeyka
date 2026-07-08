@@ -28,7 +28,9 @@ export async function generateMetadata({ params }) {
         url: `https://razumeyka-school.ru/${slug}`,
         title: `${metaTitle} — Разумейка`,
         description: metaDesc,
-        images: direction.image ? [{ url: direction.image, width: 1200, height: 630, alt: direction.title }] : undefined,
+        images: direction.image
+          ? [{ url: direction.image, width: 1200, height: 630, alt: direction.title }]
+          : [{ url: '/images/og.png', width: 1200, height: 630, alt: direction.title }],
       },
     };
   }
@@ -46,6 +48,7 @@ export async function generateMetadata({ params }) {
         url: `https://razumeyka-school.ru/${slug}`,
         title: `${landing.h1} — Разумейка`,
         description: landing.description,
+        images: [{ url: '/images/og.png', width: 1200, height: 630, alt: landing.h1 }],
       },
     };
   }

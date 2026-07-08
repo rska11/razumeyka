@@ -4,12 +4,12 @@ import { Icon } from './Icon.jsx';
 import { Logo } from './Logo.jsx';
 
 const navLinks = [
-  ['Возраст', '#age'],
-  ['Направления', '#programs'],
-  ['Результаты', '#results'],
-  ['Отзывы', '#reviews'],
+  ['Возраст', '/#age'],
+  ['Направления', '/#programs'],
+  ['Результаты', '/#results'],
+  ['Отзывы', '/#reviews'],
   ['Блог', '/blog'],
-  ['Запись', '#form'],
+  ['Запись', '/#form'],
 ];
 
 const directions = [
@@ -43,7 +43,7 @@ export function Footer() {
               Онлайн школа развития детей 4–12 лет. Ментальная арифметика, скорочтение, рисование, интуиция и языки.
             </p>
             <a
-              href="#form"
+              href="/#form"
               className="mt-6 inline-flex items-center gap-2 rounded-full bg-gold-300 px-5 py-3 text-sm font-extrabold text-forest-900 shadow-luxe transition hover:-translate-y-0.5 hover:bg-white"
             >
               Записаться на урок
@@ -93,13 +93,13 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="mailto:hello@razumeyka.ru"
+                  href="mailto:info@razumeyka-school.ru"
                   className="flex items-center gap-3 text-sm font-bold text-white/62 transition hover:text-white"
                 >
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10 text-gold-300">
                     <Icon name="mail" className="h-4 w-4" />
                   </span>
-                  hello@razumeyka.ru
+                  info@razumeyka-school.ru
                 </a>
               </li>
             </ul>

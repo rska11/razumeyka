@@ -120,7 +120,7 @@ function LoginForm() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="parent@yandex.ru"
-                className="field-input"
+                className="ym-disable-keys field-input"
               />
               <p className="mt-1.5 text-xs font-medium text-ink/46">
                 Только российская почта (Яндекс, Mail.ru и др.) — требование закона РФ.
@@ -164,7 +164,7 @@ function LoginForm() {
                 value={code}
                 onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
                 placeholder="______"
-                className="field-input text-center text-2xl font-extrabold tracking-[0.5em]"
+                className="ym-disable-keys field-input text-center text-2xl font-extrabold tracking-[0.5em]"
               />
             </div>
             <button type="submit" disabled={loading || code.length < 6} className="primary-btn w-full disabled:opacity-50">

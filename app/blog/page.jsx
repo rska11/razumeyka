@@ -15,6 +15,7 @@ export const metadata = {
     url: 'https://razumeyka-school.ru/blog',
     title: 'Блог о развитии детей — Разумейка',
     description: 'Понятные статьи для родителей: развитие, чтение, счёт и подготовка к школе.',
+    images: [{ url: '/images/og.png', width: 1200, height: 630, alt: 'Разумейка — онлайн-школа развития детей' }],
   },
 };
 

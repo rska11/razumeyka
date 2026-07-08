@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { reachGoal } from '@/lib/metrika';
 
 const questions = [
   { key: 'age', q: 'Сколько лет ребёнку?', opts: ['4–5 лет', '6–7 лет', '8–9 лет', '10–12 лет'] },
@@ -67,6 +68,7 @@ export function QuizAI() {
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.slug) {
         setResult(data);
+        reachGoal('quiz_complete');
       } else {
         setError(data.detail ? `${data.error || 'Ошибка'}: ${data.detail}` : 'Не удалось получить ответ ИИ.');
       }

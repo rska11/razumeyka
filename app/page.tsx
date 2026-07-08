@@ -19,6 +19,11 @@ import { StickyMobileCTA } from '@/components/StickyMobileCTA.jsx';
 import { Teachers } from '@/components/Teachers.jsx';
 import { Testimonials } from '@/components/Testimonials.jsx';
 
+// canonical только здесь: в layout он наследовался бы всеми страницами без своего canonical
+export const metadata = {
+  alternates: { canonical: '/' },
+};
+
 export default function HomePage() {
   return (
     <>
@@ -33,7 +38,7 @@ export default function HomePage() {
             url: "https://razumeyka-school.ru",
             description:
               "Онлайн-школа развития детей 4–12 лет: ментальная арифметика, скорочтение, правополушарное рисование и другие направления.",
-            logo: "https://razumeyka-school.ru/images/course-arithmetic.webp",
+            logo: "https://razumeyka-school.ru/images/logo.png",
             areaServed: "RU",
             audience: { "@type": "EducationalAudience", educationalRole: "student" },
           }),

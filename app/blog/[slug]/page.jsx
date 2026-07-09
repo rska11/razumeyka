@@ -42,7 +42,7 @@ function fmtDate(iso) {
 function readingMinutes(body) {
   const words = body.reduce((n, b) => {
     if (b.text) n += b.text.split(/\s+/).length;
-    if (b.items) n += b.items.join(' ').split(/\s+/).length;
+    if (b.items) n += b.items.map((x) => (typeof x === 'string' ? x : Object.values(x).join(' '))).join(' ').split(/\s+/).length;
     if (b.steps) n += b.steps.map((s) => `${s.title} ${s.text}`).join(' ').split(/\s+/).length;
     return n;
   }, 0);
@@ -221,6 +221,66 @@ export default async function BlogPost({ params }) {
                         </li>
                       ))}
                     </ol>
+                  );
+                }
+
+                // инфографика: карточки «понятие + объяснение» (2 колонки)
+                if (b.type === 'cards') {
+                  return (
+                    <div key={i} className="grid gap-3 sm:grid-cols-2">
+                      {b.items.map((c, j) => (
+                        <div key={j} className="rounded-[20px] border border-white/80 bg-white/85 p-5 shadow-card backdrop-blur-xl">
+                          <div className="flex items-center gap-3">
+                            {c.emoji && (
+                              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-brand-blue/10 text-xl">{c.emoji}</span>
+                            )}
+                            <p className="font-display text-lg font-extrabold leading-tight text-ink">{c.t}</p>
+                          </div>
+                          <p className="mt-2.5 text-[15px] font-medium leading-7 text-ink/68">{c.d}</p>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                }
+
+                // инфографика: горизонтальные бары (нормы, сравнения)
+                if (b.type === 'bars') {
+                  const max = Math.max(...b.items.map((x) => x.value));
+                  return (
+                    <div key={i} className="rounded-[22px] border border-white/80 bg-white/85 p-6 shadow-card backdrop-blur-xl sm:p-7">
+                      {b.title && <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-ink/44">{b.title}</p>}
+                      <div className="mt-4 grid gap-4">
+                        {b.items.map((it, j) => (
+                          <div key={j}>
+                            <div className="flex items-baseline justify-between gap-3">
+                              <span className="text-sm font-extrabold text-ink">{it.label}</span>
+                              <span className="shrink-0 text-sm font-extrabold text-brand-blue">{it.note}</span>
+                            </div>
+                            <div className="mt-1.5 h-3 overflow-hidden rounded-full bg-ink/6">
+                              <div
+                                className="h-full rounded-full bg-gradient-to-r from-brand-blue to-brand-purple"
+                                style={{ width: `${Math.round((it.value / max) * 100)}%` }}
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      {b.footnote && <p className="mt-4 text-xs font-medium leading-5 text-ink/48">{b.footnote}</p>}
+                    </div>
+                  );
+                }
+
+                // инфографика: плитки с большими цифрами
+                if (b.type === 'stats') {
+                  return (
+                    <div key={i} className={`grid grid-cols-2 gap-3 ${b.items.length >= 4 ? 'sm:grid-cols-4' : 'sm:grid-cols-3'}`}>
+                      {b.items.map((s, j) => (
+                        <div key={j} className="rounded-[18px] border border-white/80 bg-white/85 p-4 text-center shadow-card backdrop-blur-xl">
+                          <p className="font-display text-2xl font-black text-brand-blue sm:text-[1.7rem]">{s.v}</p>
+                          <p className="mt-1 text-xs font-bold leading-4 text-ink/56">{s.l}</p>
+                        </div>
+                      ))}
+                    </div>
                   );
                 }
 

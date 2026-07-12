@@ -412,10 +412,10 @@ export function LessonPlayer({ lesson, nextLesson, onComplete, onNext, onClose }
 
               {nextLesson ? (
                 <button onClick={onNext} className="primary-btn mt-5 w-full">
-                  Следующий урок: {nextLesson.title} →
+                  Следующая картинка: {nextLesson.title} →
                 </button>
               ) : (
-                <p className="mt-5 text-sm font-semibold text-ink/54">Это последний открытый урок в этой ступени.</p>
+                <p className="mt-5 text-sm font-semibold text-ink/54">Это последняя открытая картинка в этой ступени.</p>
               )}
               <button onClick={onClose} className="mt-3 w-full text-sm font-extrabold text-ink/50 transition hover:text-ink">Вернуться к урокам</button>
             </div>

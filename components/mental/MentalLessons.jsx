@@ -194,15 +194,15 @@ export function MentalLessons({ hasSubscription = false }) {
   const days = useMemo(() => mentalLessonsByDay(), []);
   const daysByN = useMemo(() => new Map(days.map((d) => [d.n, d])), [days]);
   const activeBand = mentalAgeBands.find((b) => b.key === band) ?? mentalAgeBands[1];
-  // Бесплатный тизер (без подписки): день 0 — только 1-й урок; день 2 — 1-й и 2-й.
-  // Остальное (в т.ч. весь день 1) — по подписке. Позиция важнее флага free в данных.
+  // Бесплатный тизер (без подписки): день 0 — только 1-й урок; день 1 — 1-й и 2-й.
+  // Остальное (в т.ч. день 2 и дальше) — по подписке. Позиция важнее флага free в данных.
   const freeSlugs = useMemo(() => {
     const s = new Set();
     const d0 = daysByN.get(0);
     if (d0?.lessons[0]) s.add(d0.lessons[0].slug);
-    const d2 = daysByN.get(2);
-    if (d2?.lessons[0]) s.add(d2.lessons[0].slug);
-    if (d2?.lessons[1]) s.add(d2.lessons[1].slug);
+    const d1 = daysByN.get(1);
+    if (d1?.lessons[0]) s.add(d1.lessons[0].slug);
+    if (d1?.lessons[1]) s.add(d1.lessons[1].slug);
     return s;
   }, [daysByN]);
   const unlocked = (l) => freeSlugs.has(l.slug) || hasSubscription;

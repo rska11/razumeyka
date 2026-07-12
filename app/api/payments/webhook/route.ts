@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getYooKassaPayment } from "@/lib/yookassa";
-import { extendAccess } from "@/lib/subscription";
+import { extendAccess, isDirectionSlug } from "@/lib/subscription";
 
 export const dynamic = "force-dynamic";
 
@@ -27,8 +27,8 @@ export async function POST(req: Request) {
           where: { id: payment.id },
           data: { status: "paid", externalId: yk.id },
         });
-        if (payment.purpose === "subscription") {
-          await extendAccess(payment.userId, payment.periodMonths ?? 1);
+        if (payment.purpose === "subscription" && isDirectionSlug(payment.directionSlug)) {
+          await extendAccess(payment.userId, payment.directionSlug, payment.periodMonths ?? 1);
         } else if (payment.enrollmentId) {
           await prisma.enrollment.updateMany({
             where: { id: payment.enrollmentId },

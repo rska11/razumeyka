@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getAuthSession } from "@/lib/auth";
 import { getCabinetData } from "@/lib/cabinet";
+import { DIRECTIONS, SUBSCRIPTION_PRICE, type DirectionSlug } from "@/lib/subscription";
 
 function rub(n: number) {
   return n.toLocaleString("ru-RU") + " ₽";
@@ -21,7 +22,12 @@ export default async function CabinetOverview() {
   const session = await getAuthSession();
   if (!session?.user?.id) redirect("/login?callbackUrl=/cabinet");
   const userId = session.user.id;
-  const { children, payments, upcomingLessons, activeEnrollments, achievementsCount } = await getCabinetData(userId);
+  const { children, payments, upcomingLessons, activeEnrollments, achievementsCount, accessMap } = await getCabinetData(userId);
+  const now = new Date();
+  const directionAccess = (Object.keys(DIRECTIONS) as DirectionSlug[]).map((slug) => {
+    const until = accessMap[slug];
+    return { slug, meta: DIRECTIONS[slug], until, active: Boolean(until && until.getTime() > now.getTime()) };
+  });
 
   const nextLesson = upcomingLessons[0];
   const paidTotal = payments.filter((p) => p.status === "paid").reduce((s, p) => s + p.amount, 0);
@@ -48,6 +54,33 @@ export default async function CabinetOverview() {
           </div>
         ))}
       </div>
+
+      {/* Доступ к урокам-играм (self-study, раздельно по направлениям) */}
+      <section className="rounded-[24px] border border-white/80 bg-white/85 p-5 shadow-card backdrop-blur-xl sm:p-6">
+        <h2 className="font-display text-xl font-extrabold text-ink">Доступ к урокам-играм</h2>
+        <p className="mt-1 text-xs font-bold text-ink/52">Доступ открывается по каждому направлению отдельно.</p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          {directionAccess.map(({ slug, meta, until, active }) => (
+            <div key={slug} className="flex flex-col gap-3 rounded-[16px] border border-ink/6 bg-white px-4 py-4">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-sm font-extrabold text-ink">{meta.title}</p>
+                <span className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-extrabold ${active ? "bg-brand-green/12 text-brand-green" : "bg-ink/8 text-ink/55"}`}>
+                  {active ? "Оплачен" : "Не открыт"}
+                </span>
+              </div>
+              {active ? (
+                <p className="text-xs font-bold text-ink/56">
+                  Открыт до {until ? new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "long", year: "numeric" }).format(until) : "—"}
+                </p>
+              ) : (
+                <Link href={`${meta.path}#podpiska`} className="inline-flex w-fit items-center gap-1 rounded-full bg-brand-blue px-3 py-1.5 text-xs font-extrabold text-white transition hover:-translate-y-0.5 hover:bg-brand-blue/90">
+                  Открыть за {SUBSCRIPTION_PRICE} ₽ →
+                </Link>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
 
       <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
         {/* Ближайшие занятия */}

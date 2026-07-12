@@ -17,13 +17,29 @@ model User {
   provider  String    @default("email-code")
   role      String    @default("parent") // parent | teacher
   isBlocked Boolean   @default(false)
-  accessUntil     DateTime? // доступ к self-study библиотеке активен до этой даты (подписка на рисование и др.)
+  accessUntil     DateTime? // LEGACY: единый доступ (до перехода на доступ по направлениям). Гейтинг теперь через Access.
   paymentMethodId String?   // сохранённый способ оплаты YooKassa — задел под автопродление
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   children  Child[]
   payments  Payment[]
+  accesses  Access[]
   taughtEnrollments Enrollment[] @relation("TeacherEnrollments")
+}
+
+/// Оплаченный доступ к конкретному направлению (self-study). Раздельно по направлениям:
+/// одно направление = одна запись. Продлевается оплатой (см. lib/subscription.extendAccess).
+model Access {
+  id        String   @id @default(cuid())
+  userId    String
+  direction String   // risovanie | mentalnaya-arifmetika
+  until     DateTime // доступ активен до этой даты
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, direction])
+  @@index([userId])
 }
 
 /// Одноразовый код входа на email (как в genpic)
@@ -123,6 +139,8 @@ model Payment {
   enrollmentId String?
   purpose      String      @default("enrollment") // enrollment | subscription
   periodMonths Int?        // для подписки: на сколько месяцев продлить доступ
+  directionSlug   String?   // для подписки: какое направление оплачено (risovanie | mentalnaya-arifmetika)
+  offerAcceptedAt DateTime? // когда пользователь принял оферту при оформлении оплаты
   amount       Int         // в рублях
   currency     String      @default("RUB")
   status       String      @default("pending") // pending | paid | failed | refunded

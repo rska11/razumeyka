@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { isAuthDisabled } from "@/lib/settings";
-import { toggleAuth } from "./actions";
+import { getAuthSession } from "@/lib/auth";
+import { DIRECTIONS, getAccessMap, type DirectionSlug } from "@/lib/subscription";
+import { toggleAuth, unlockAllForMe, lockAllForMe } from "./actions";
 
 function rub(n: number) {
   return n.toLocaleString("ru-RU") + " ₽";
@@ -15,6 +17,17 @@ const STATUS: Record<string, string> = {
 };
 
 export default async function AdminPage() {
+  const session = await getAuthSession();
+  const myAccess = session?.user?.id ? await getAccessMap(session.user.id) : null;
+  const now = Date.now();
+  const myUnlocked = myAccess
+    ? (Object.keys(DIRECTIONS) as DirectionSlug[]).map((slug) => ({
+        title: DIRECTIONS[slug].title,
+        active: Boolean(myAccess[slug] && myAccess[slug]!.getTime() > now),
+      }))
+    : [];
+  const allMineUnlocked = myUnlocked.length > 0 && myUnlocked.every((d) => d.active);
+
   const [authDisabled, users, payments] = await Promise.all([
     isAuthDisabled(),
     prisma.user.findMany({
@@ -65,6 +78,44 @@ export default async function AdminPage() {
               {authDisabled ? "Включить вход" : "Выключить вход (режим доработки)"}
             </button>
           </form>
+        </div>
+      </section>
+
+      {/* Тестовый доступ ко всем урокам — только для текущего админа */}
+      <section className="rounded-[24px] border border-brand-blue/25 bg-brand-blue/[0.05] p-5 shadow-card backdrop-blur-xl sm:p-6">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3">
+              <h2 className="font-display text-xl font-extrabold text-ink">Мой доступ к урокам (проверка)</h2>
+              <span className={`rounded-full px-3 py-1 text-xs font-extrabold uppercase tracking-[0.12em] ${allMineUnlocked ? "bg-brand-green/15 text-brand-green" : "bg-ink/8 text-ink/55"}`}>
+                {allMineUnlocked ? "Разблокировано" : "Freemium"}
+              </span>
+            </div>
+            <p className="mt-2 max-w-2xl text-sm font-medium leading-6 text-ink/64">
+              Открывает все уроки всех направлений <b>только вам</b> (на год), чтобы проверить контент без оплаты. На других пользователей не влияет.
+            </p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {myUnlocked.map((d) => (
+                <span key={d.title} className={`rounded-full px-3 py-1 text-xs font-extrabold ${d.active ? "bg-brand-green/12 text-brand-green" : "bg-ink/8 text-ink/55"}`}>
+                  {d.title}: {d.active ? "открыт" : "замок"}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <form action={unlockAllForMe}>
+              <button type="submit" className="inline-flex min-h-[52px] items-center gap-2 rounded-full bg-brand-blue px-6 py-3 text-base font-extrabold text-white shadow-color transition hover:-translate-y-0.5 hover:bg-brand-blue/90">
+                Разблокировать всё мне
+              </button>
+            </form>
+            {allMineUnlocked && (
+              <form action={lockAllForMe}>
+                <button type="submit" className="inline-flex min-h-[52px] items-center gap-2 rounded-full border border-ink/12 bg-white/78 px-6 py-3 text-base font-extrabold text-ink transition hover:bg-white">
+                  Вернуть замки
+                </button>
+              </form>
+            )}
+          </div>
         </div>
       </section>
 

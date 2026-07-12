@@ -34,6 +34,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     { url: BASE, lastModified: now, changeFrequency: "weekly", priority: 1 },
     { url: `${BASE}/risovanie`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${BASE}/mentalnaya-arifmetika`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${BASE}/blog`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
     ...directions,
     ...landings,

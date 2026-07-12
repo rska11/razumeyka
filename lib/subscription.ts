@@ -1,33 +1,71 @@
 import { prisma } from "@/lib/prisma";
 
-// Подписка на self-study библиотеку (доступ ко всем урокам-играм).
-// Пилот: оплаченный период доступа (без автосписания). Продлевается вручную.
-// Автопродление добавим позже через сохранённый способ оплаты (User.paymentMethodId).
+// Доступ к self-study библиотеке — РАЗДЕЛЬНО ПО НАПРАВЛЕНИЯМ.
+// Оплата открывает конкретное направление; чтобы открыть второе — отдельная оплата.
+// Пилот: оплаченный период доступа без автосписания (продлевается вручную/новой оплатой).
 
 export const SUBSCRIPTION_PRICE = 490; // ₽ за период
 export const SUBSCRIPTION_MONTHS = 1;
 
-export async function getAccessUntil(userId: string): Promise<Date | null> {
-  const u = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { accessUntil: true },
-  });
-  return u?.accessUntil ?? null;
+// Направления, которые продаются как self-study доступ.
+export const DIRECTIONS = {
+  risovanie: { path: "/risovanie", title: "Рисование" },
+  "mentalnaya-arifmetika": { path: "/mentalnaya-arifmetika", title: "Ментальная арифметика" },
+} as const;
+
+export type DirectionSlug = keyof typeof DIRECTIONS;
+
+export function isDirectionSlug(v: unknown): v is DirectionSlug {
+  return typeof v === "string" && Object.prototype.hasOwnProperty.call(DIRECTIONS, v);
 }
 
-export async function hasActiveAccess(userId: string): Promise<boolean> {
-  const until = await getAccessUntil(userId);
+/** Слаг направления по пути возврата (returnTo). null — если путь не относится к направлению. */
+export function directionFromReturnTo(returnTo: string): DirectionSlug | null {
+  for (const [slug, meta] of Object.entries(DIRECTIONS)) {
+    if (meta.path === returnTo) return slug as DirectionSlug;
+  }
+  return null;
+}
+
+export async function getAccessUntil(userId: string, direction: DirectionSlug): Promise<Date | null> {
+  const access = await prisma.access.findUnique({
+    where: { userId_direction: { userId, direction } },
+    select: { until: true },
+  });
+  return access?.until ?? null;
+}
+
+export async function hasActiveAccess(userId: string, direction: DirectionSlug): Promise<boolean> {
+  const until = await getAccessUntil(userId, direction);
   return Boolean(until && until.getTime() > Date.now());
 }
 
-/** Продлить доступ на N месяцев от текущей даты окончания (или от сегодня, если истёк). */
-export async function extendAccess(userId: string, months: number): Promise<void> {
-  const u = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { accessUntil: true },
+/** Карта доступа по всем направлениям: { slug: Date|null }. Для кабинета. */
+export async function getAccessMap(userId: string): Promise<Record<DirectionSlug, Date | null>> {
+  const rows = await prisma.access.findMany({ where: { userId }, select: { direction: true, until: true } });
+  const byDir = new Map(rows.map((r) => [r.direction, r.until]));
+  const map = {} as Record<DirectionSlug, Date | null>;
+  for (const slug of Object.keys(DIRECTIONS) as DirectionSlug[]) {
+    map[slug] = byDir.get(slug) ?? null;
+  }
+  return map;
+}
+
+/**
+ * Продлить доступ к направлению на N месяцев от текущей даты окончания
+ * (или от сегодня, если истёк/не было). Upsert одной записи Access.
+ */
+export async function extendAccess(userId: string, direction: DirectionSlug, months: number): Promise<void> {
+  const existing = await prisma.access.findUnique({
+    where: { userId_direction: { userId, direction } },
+    select: { until: true },
   });
   const now = Date.now();
-  const base = u?.accessUntil && u.accessUntil.getTime() > now ? new Date(u.accessUntil) : new Date();
+  const base = existing?.until && existing.until.getTime() > now ? new Date(existing.until) : new Date();
   base.setMonth(base.getMonth() + Math.max(1, months));
-  await prisma.user.update({ where: { id: userId }, data: { accessUntil: base } });
+  await prisma.access.upsert({
+    where: { userId_direction: { userId, direction } },
+    create: { userId, direction, until: base },
+    update: { until: base },
+  });
 }

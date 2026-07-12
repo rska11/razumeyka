@@ -63,6 +63,19 @@ function lessonProgressOrder(a, b) {
   return a.level - b.level || lessonOrder(a) - lessonOrder(b);
 }
 
+function LessonArtwork({ lesson }) {
+  if (!lesson?.coloredPreview) return <span className="text-3xl">{lesson?.cover?.emoji ?? '🎨'}</span>;
+  return (
+    <svg
+      className="h-full w-full"
+      viewBox={lesson.coloredViewBox ?? lesson.viewBox ?? '0 0 300 210'}
+      role="img"
+      aria-label={lesson.title}
+      dangerouslySetInnerHTML={{ __html: lesson.coloredPreview }}
+    />
+  );
+}
+
 function storyPromptFor(lesson, index, chapter) {
   const title = lesson.title.toLowerCase();
   if (index < 3) {
@@ -190,10 +203,19 @@ function MonthRoadmap({ readyDays, doneCount, totalLessons }) {
 }
 
 function WeekendPause({ week }) {
+  const final = week === 4;
   return (
-    <div className="rounded-2xl border border-dashed border-brand-green/25 bg-brand-green/7 px-4 py-3 text-center">
-      <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-brand-green">Выходные после недели {week}</p>
-      <p className="mt-1 text-xs font-semibold text-ink/52">2 дня отдыха: можно раскрасить любимый рисунок, показать родным или повторить лёгкий урок.</p>
+    <div className="drawing-weekend-quest">
+      <div>
+        <p className="drawing-weekend-kicker">{final ? 'Финальная работа месяца' : `Выходные после недели ${week}`}</p>
+        <h4>{final ? 'Нарисуйте главный рисунок месяца' : `Нарисуйте свободную работу: итоги недели ${week}`}</h4>
+        <p>
+          {final
+            ? 'Ребёнок выбирает любимую тему месяца и рисует законченную картинку. Родитель фотографирует работу и отправляет её в раздел «Финальный рисунок месяца».'
+            : 'Пусть ребёнок сам выберет, что запомнилось за неделю, и нарисует свою картинку без пошаговой подсказки. Родитель фотографирует работу и отправляет её в нужный раздел галереи.'}
+        </p>
+      </div>
+      <a href="/risovanie/galereya#upload-artwork">{final ? 'Отправить финальный рисунок' : `Отправить итоги недели ${week}`}</a>
     </div>
   );
 }
@@ -218,11 +240,11 @@ function LockedDay({ dayNumber, title }) {
 function DaySection({ chapter, dayNumber, doneSet, unlocked, onOpen, onLocked }) {
   const chapterDone = chapter.lessons.filter((l) => doneSet.has(l.slug)).length;
   return (
-    <section className="border-t border-ink/8 pt-5 first:border-t-0 first:pt-0">
-      <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+    <section className="drawing-day-section">
+      <div className="drawing-day-head">
         <div>
-          <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-brand-purple">День {dayNumber}</p>
-          <h4 className="font-display text-2xl font-extrabold text-ink">{chapter.name}</h4>
+          <p className="drawing-day-number">День {String(dayNumber).padStart(2, '0')}</p>
+          <h4 className="drawing-day-title">{chapter.name}</h4>
           <p className="mt-1 text-xs font-bold text-ink/46">1–3 один объект · 4–7 детали · 8–10 сюжет</p>
         </div>
         <p className="text-sm font-extrabold text-ink/50">{chapterDone}/{chapter.lessons.length} готово</p>
@@ -241,7 +263,7 @@ function DaySection({ chapter, dayNumber, doneSet, unlocked, onOpen, onLocked })
         ) : null;
       })()}
 
-      <div className="grid gap-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
+      <div className="drawing-lesson-grid">
         {chapter.lessons.map((l, index) => {
           const open = unlocked(l);
           const isDone = doneSet.has(l.slug);
@@ -251,31 +273,23 @@ function DaySection({ chapter, dayNumber, doneSet, unlocked, onOpen, onLocked })
             <button
               key={l.slug}
               onClick={() => (open ? onOpen(l) : onLocked())}
-              className={(open ? 'border-white/80 bg-white/85 shadow-card backdrop-blur-xl hover:-translate-y-0.5 hover:shadow-color' : 'border-white/60 bg-white/50 shadow-sm') + ' group relative flex min-h-[118px] flex-col items-start overflow-hidden rounded-2xl border p-3 text-left transition'}
+              className={'drawing-lesson-card ' + (open ? 'drawing-lesson-card-open' : 'drawing-lesson-card-locked')}
             >
-              <div className="flex w-full items-center justify-between gap-2">
-                <span className={(open ? '' : 'opacity-50 grayscale') + ' grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand-pink/10 text-xl'}>
-                  {l.cover?.emoji ?? '🎨'}
-                </span>
-                {isDone ? (
-                  <span className="grid h-6 w-6 place-items-center rounded-full bg-brand-green/15 text-xs text-brand-green">✓</span>
-                ) : open ? (
-                  <span className="rounded-full bg-brand-pink/10 px-2 py-0.5 text-[9px] font-extrabold text-brand-pink">№{index + 1}</span>
-                ) : (
-                  <span className="grid h-6 w-6 place-items-center rounded-full bg-ink/8 text-xs text-ink/40">🔒</span>
-                )}
+              <div className={'drawing-lesson-art ' + (open ? '' : 'drawing-lesson-art-locked')}>
+                <LessonArtwork lesson={l} />
+                <span className="drawing-lesson-index">{String(index + 1).padStart(2, '0')}</span>
+                {isDone && <span className="drawing-lesson-done">✓</span>}
+                {!open && <span className="drawing-lesson-lock">🔒</span>}
               </div>
-
-              <p className={(open ? 'text-ink' : 'text-ink/50') + ' mt-2 min-h-[32px] font-display text-sm font-extrabold leading-4'}>{l.title}</p>
-              <div className="mt-1.5 flex flex-wrap gap-1">
-                <span className={'rounded-full px-1.5 py-0.5 text-[9px] font-extrabold ' + kind.tone}>{kind.label}</span>
-                <span className={'rounded-full px-1.5 py-0.5 text-[9px] font-bold ' + stage.tone}>{stage.label}</span>
+              <div className="drawing-lesson-body">
+                <div className="flex flex-wrap gap-1.5">
+                  <span className={'drawing-lesson-pill ' + kind.tone}>{kind.label}</span>
+                  <span className={'drawing-lesson-pill ' + stage.tone}>{stage.label}</span>
+                </div>
+                <h5 className={open ? 'text-ink' : 'text-ink/48'}>{l.title}</h5>
+                <p>{l.skill ?? l.theme}</p>
+                <span className={open ? 'text-brand-pink' : 'text-ink/40'}>{open ? (isDone ? 'Повторить урок ↗' : 'Открыть урок ↗') : 'Доступ по подписке'}</span>
               </div>
-              <p className="mt-1.5 min-h-[28px] text-[10px] font-semibold leading-4 text-ink/56">{l.skill ?? l.theme}</p>
-
-              <span className={(open ? 'text-brand-pink' : 'text-ink/40') + ' mt-auto pt-2 text-[10px] font-extrabold'}>
-                {open ? (isDone ? 'Снова →' : 'Начать →') : 'Подписка →'}
-              </span>
             </button>
           );
         })}
@@ -285,7 +299,7 @@ function DaySection({ chapter, dayNumber, doneSet, unlocked, onOpen, onLocked })
 }
 
 export function DrawingLessons({ hasSubscription = false }) {
-  const [band, setBand] = useState('5-7');
+  const [band, setBand] = useState('3-4');
   const [doneSet, setDoneSet] = useState(() => new Set());
   const [active, setActive] = useState(null);
 
@@ -317,8 +331,15 @@ export function DrawingLessons({ hasSubscription = false }) {
   }
 
   const lessons = useMemo(() => lessonsByBand(band), [band]);
-  const unlocked = (l) => l.free || hasSubscription;
   const chapters = useMemo(() => groupByChapter(lessons), [lessons]);
+  // Бесплатный тизер (без подписки): первый урок каждого из первых 3 учебных дней.
+  // Остальная библиотека — по подписке. Позиция важнее флага free в данных.
+  const freeSlugs = useMemo(() => {
+    const s = new Set();
+    chapters.slice(0, 3).forEach((ch) => { if (ch.lessons[0]) s.add(ch.lessons[0].slug); });
+    return s;
+  }, [chapters]);
+  const unlocked = (l) => freeSlugs.has(l.slug) || hasSubscription;
   const orderedLessons = useMemo(() => chapters.flatMap((chapter) => chapter.lessons), [chapters]);
   const playable = useMemo(() => orderedLessons.filter(unlocked), [orderedLessons, hasSubscription]);
   const doneCount = lessons.filter((l) => doneSet.has(l.slug)).length;
@@ -336,21 +357,17 @@ export function DrawingLessons({ hasSubscription = false }) {
 
   return (
     <div>
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="drawing-age-tabs">
         {ageBands.map((b) => {
           const on = b.key === band;
           return (
             <button
               key={b.key}
               onClick={() => selectBand(b.key)}
-              className={`rounded-[20px] border-2 px-5 py-4 text-left transition ${
-                on
-                  ? 'border-brand-pink/50 bg-white shadow-color'
-                  : 'border-white/70 bg-white/70 shadow-card hover:-translate-y-0.5 hover:bg-white'
-              }`}
+              className={'drawing-age-tab ' + (on ? 'drawing-age-tab-active' : '')}
             >
-              <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-brand-pink">{b.tag}</p>
-              <p className="mt-1 font-display text-xl font-extrabold text-ink">{b.label}</p>
+              <p className="drawing-age-tag">{b.tag}</p>
+              <p className="drawing-age-label">{b.label}</p>
               <p className="mt-1 text-sm font-semibold leading-5 text-ink/56">{b.note}</p>
             </button>
           );
@@ -359,7 +376,7 @@ export function DrawingLessons({ hasSubscription = false }) {
 
       <MonthRoadmap readyDays={chapters.length} doneCount={doneCount} totalLessons={lessons.length} />
 
-      <div className="mt-6 overflow-hidden rounded-[24px] border border-white/80 bg-white/80 p-5 shadow-card backdrop-blur-xl">
+      <div className="drawing-course-overview">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="section-kicker">Путь художника · {activeBand?.label}</p>
@@ -378,7 +395,7 @@ export function DrawingLessons({ hasSubscription = false }) {
         </div>
       </div>
 
-      <div className="mt-7 space-y-8">
+      <div className="drawing-days-list">
         {Array.from({ length: MONTH_DAYS }).map((_, dayIndex) => {
           const dayNumber = dayIndex + 1;
           const chapter = chapters[dayIndex];
@@ -396,7 +413,7 @@ export function DrawingLessons({ hasSubscription = false }) {
               ) : (
                 <LockedDay dayNumber={dayNumber} title={FUTURE_DAY_TITLES[dayIndex - chapters.length] ?? 'Новый день рисования'} />
               )}
-              {dayNumber % 5 === 0 && dayNumber < MONTH_DAYS && <WeekendPause week={dayNumber / 5} />}
+              {dayNumber % 5 === 0 && <WeekendPause week={dayNumber / 5} />}
             </div>
           );
         })}

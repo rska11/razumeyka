@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getYooKassaPayment, isYooKassaConfigured } from "@/lib/yookassa";
-import { extendAccess } from "@/lib/subscription";
+import { extendAccess, isDirectionSlug } from "@/lib/subscription";
 
 /**
  * Сверка незавершённых платежей родителя со статусом в ЮKassa.
@@ -20,8 +20,8 @@ export async function reconcileUserPayments(userId: string): Promise<void> {
       const yk = await getYooKassaPayment(p.externalId);
       if (yk.status === "succeeded") {
         await prisma.payment.update({ where: { id: p.id }, data: { status: "paid" } });
-        if (p.purpose === "subscription") {
-          await extendAccess(p.userId, p.periodMonths ?? 1);
+        if (p.purpose === "subscription" && isDirectionSlug(p.directionSlug)) {
+          await extendAccess(p.userId, p.directionSlug, p.periodMonths ?? 1);
         } else if (p.enrollmentId) {
           await prisma.enrollment.updateMany({
             where: { id: p.enrollmentId },

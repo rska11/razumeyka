@@ -2,11 +2,19 @@ import { NextResponse } from "next/server";
 import { getAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createYooKassaPayment, isYooKassaConfigured } from "@/lib/yookassa";
-import { SUBSCRIPTION_MONTHS, SUBSCRIPTION_PRICE } from "@/lib/subscription";
+import {
+  DIRECTIONS,
+  SUBSCRIPTION_MONTHS,
+  SUBSCRIPTION_PRICE,
+  directionFromReturnTo,
+} from "@/lib/subscription";
 
-// Оформление подписки на self-study библиотеку. Создаёт платёж purpose="subscription";
-// доступ (User.accessUntil) продлевается в вебхуке/reconcile после успешной оплаты.
-export async function POST() {
+// Оформление доступа к направлению self-study. Создаёт платёж purpose="subscription"
+// с directionSlug; доступ (Access.until) продлевается по направлению в вебхуке/reconcile.
+// Доступ раздельный: returnTo определяет направление (по allow-списку, без open redirect).
+// Требуется акцепт оферты (acceptedOffer=true) — фиксируем offerAcceptedAt.
+
+export async function POST(req: Request) {
   const session = await getAuthSession();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
@@ -15,8 +23,22 @@ export async function POST() {
     return NextResponse.json({ error: "PAYMENTS_DISABLED" }, { status: 503 });
   }
 
+  let returnTo = "/risovanie";
+  let acceptedOffer = false;
+  try {
+    const body = await req.json();
+    const direction = typeof body?.returnTo === "string" ? directionFromReturnTo(body.returnTo) : null;
+    if (direction) returnTo = DIRECTIONS[direction].path;
+    acceptedOffer = body?.acceptedOffer === true;
+  } catch {}
+
+  const direction = directionFromReturnTo(returnTo)!; // returnTo всегда валиден выше
+  if (!acceptedOffer) {
+    return NextResponse.json({ error: "OFFER_NOT_ACCEPTED" }, { status: 400 });
+  }
+
   const amount = SUBSCRIPTION_PRICE;
-  const description = `Подписка «Разумейка» · доступ к урокам рисования · ${SUBSCRIPTION_MONTHS} мес`;
+  const description = `«Разумейка» · доступ · ${DIRECTIONS[direction].title} · ${SUBSCRIPTION_MONTHS} мес`;
 
   const payment = await prisma.payment.create({
     data: {
@@ -26,6 +48,8 @@ export async function POST() {
       provider: "yookassa",
       purpose: "subscription",
       periodMonths: SUBSCRIPTION_MONTHS,
+      directionSlug: direction,
+      offerAcceptedAt: new Date(),
       description,
     },
   });
@@ -36,7 +60,7 @@ export async function POST() {
     const yk = await createYooKassaPayment({
       amountRub: amount,
       description,
-      returnUrl: `${site}/risovanie`,
+      returnUrl: `${site}${returnTo}`,
       metadata: { paymentId: payment.id },
       customerEmail: session.user.email || undefined,
     });

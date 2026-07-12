@@ -13,7 +13,7 @@ const navLinks = [
 ];
 
 const directions = [
-  ['Ментальная арифметика', '/mental-arithmetic'],
+  ['Ментальная арифметика', '/mentalnaya-arifmetika'],
   ['Скорочтение', '/speed-reading'],
   ['Правополушарное рисование', '/risovanie'],
   ['Интуиция', '/intuition'],

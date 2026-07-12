@@ -52,8 +52,8 @@ export function ArtworkShowcase() {
 
           <aside className="drawing-rating-note">
             <span>Топ-3 {ageBandLabel(activeAge)}</span>
-            <h3>Сейчас показываем только призёров</h3>
-            <p>После запуска и первых реальных загрузок расширим рейтинг до топ-10. Пока так честнее и визуально чище.</p>
+            <h3>Тройка лучших работ недели</h3>
+            <p>Здесь — самые яркие рисунки наших учеников за неделю. Хотите увидеть больше? Вся галерея детских работ ждёт по ссылке ниже.</p>
             <a className="drawing-gallery-more-link" href="/risovanie/galereya">Смотреть всю галерею</a>
           </aside>
         </div>

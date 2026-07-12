@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { reachGoal } from '@/lib/metrika';
+import { getDirectionBySlug } from '@/data/directions.js';
 
 const questions = [
   { key: 'age', q: 'Сколько лет ребёнку?', opts: ['4–5 лет', '6–7 лет', '8–9 лет', '10–12 лет'] },
@@ -131,8 +132,8 @@ export function QuizAI() {
                   {reasonShown.length < (result.reason?.length ?? 0) && <span className="animate-pulse">▋</span>}
                 </p>
                 <div className="mt-7 flex flex-wrap justify-center gap-3">
-                  <Link href={`/${result.slug}`} className="primary-btn">Смотреть направление</Link>
-                  <a href="/#form" className="secondary-btn">Записаться на пробный</a>
+                  <Link href={getDirectionBySlug(result.slug)?.href ?? `/${result.slug}`} className="primary-btn">Смотреть направление</Link>
+                  <a href="/risovanie" className="secondary-btn">Начать бесплатно</a>
                 </div>
                 <button onClick={restart} className="mx-auto mt-5 block text-sm font-extrabold text-ink/50 transition hover:text-ink">Пройти заново</button>
               </div>

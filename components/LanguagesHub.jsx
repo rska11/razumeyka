@@ -29,7 +29,7 @@ export function LanguagesHub() {
         <span className="comic-label">выберите язык</span>
         <h2 className="section-title mt-6 max-w-3xl">Английский или русский — с чего начнём?</h2>
         <p className="mt-4 max-w-2xl text-lg font-medium leading-8 text-ink/64">
-          В «Разумейке» два языковых направления. Выберите нужное — на каждой странице подробная программа, формат и пробный урок.
+          В «Разумейке» два языковых направления. Выберите нужное — на каждой странице подробная программа и формат уроков-игр.
         </p>
 
         <div className="mt-9 grid gap-6 lg:grid-cols-2">

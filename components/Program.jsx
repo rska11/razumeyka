@@ -28,10 +28,10 @@ const steps = [
   },
   {
     number: '03',
-    title: 'Занятия 2-3 раза в неделю',
-    text: 'Короткие онлайн-уроки с практикой, игровыми механиками и живой обратной связью.',
+    title: 'Занятия в своём темпе',
+    text: 'Короткие уроки-игры: ребёнок занимается сам, с практикой и понятными шагами — без расписания.',
     icon: 'screen',
-    image: '/images/teacher-session.webp',
+    image: '/images/course-drawing.webp',
     color: 'brand-pink',
     gradient: 'from-brand-pink/20 via-white to-brand-purple/18',
     ring: 'bg-brand-pink',

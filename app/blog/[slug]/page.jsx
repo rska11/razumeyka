@@ -57,9 +57,9 @@ export default async function BlogPost({ params }) {
   const related = (post.relatedSlugs ?? [])
     .map((s) => {
       const d = getDirectionBySlug(s);
-      if (d) return { slug: d.slug, title: d.title };
+      if (d) return { slug: d.slug, title: d.title, href: d.href ?? `/${d.slug}` };
       const l = getLandingBySlug(s);
-      if (l) return { slug: l.slug, title: l.h1 };
+      if (l) return { slug: l.slug, title: l.h1, href: `/${l.slug}` };
       return null;
     })
     .filter(Boolean);
@@ -329,7 +329,7 @@ export default async function BlogPost({ params }) {
                 <h2 className="font-display text-[1.6rem] font-extrabold text-ink sm:text-[1.9rem]">По теме</h2>
                 <div className="mt-5 flex flex-wrap gap-3">
                   {related.map((r) => (
-                    <Link key={r.slug} href={`/${r.slug}`} className="rounded-full border border-ink/12 bg-white/80 px-5 py-3 text-base font-extrabold text-ink transition hover:-translate-y-0.5 hover:bg-white">
+                    <Link key={r.slug} href={r.href} className="rounded-full border border-ink/12 bg-white/80 px-5 py-3 text-base font-extrabold text-ink transition hover:-translate-y-0.5 hover:bg-white">
                       {r.title}
                     </Link>
                   ))}
@@ -363,9 +363,9 @@ export default async function BlogPost({ params }) {
 
             {/* CTA */}
             <div className="mt-14 overflow-hidden rounded-[28px] bg-gradient-to-br from-brand-blue to-brand-purple p-8 text-center text-white shadow-color sm:p-12">
-              <h2 className="font-display text-2xl font-extrabold sm:text-3xl">Попробуйте — пробный урок 400 ₽</h2>
-              <p className="mx-auto mt-3 max-w-md text-base font-medium text-white/85">Педагог оценит уровень ребёнка, ответит на вопросы и покажет формат. Без обязательств.</p>
-              <a href="/#form" className="mt-7 inline-flex rounded-full bg-white px-8 py-3.5 text-base font-extrabold text-brand-blue transition hover:-translate-y-0.5">Записаться</a>
+              <h2 className="font-display text-2xl font-extrabold sm:text-3xl">Попробуйте — первые уроки бесплатно</h2>
+              <p className="mx-auto mt-3 max-w-md text-base font-medium text-white/85">Самостоятельные уроки-игры: ребёнок занимается сам, а результат оценивает родитель. Без карты и обязательств.</p>
+              <a href="/risovanie" className="mt-7 inline-flex rounded-full bg-white px-8 py-3.5 text-base font-extrabold text-brand-blue transition hover:-translate-y-0.5">Начать бесплатно</a>
             </div>
           </div>
         </article>

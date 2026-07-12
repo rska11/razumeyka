@@ -29,13 +29,13 @@ export function DirectionGame({ slug }) {
           <p className="text-center text-xs font-extrabold uppercase tracking-[0.16em] text-brand-blue">Поиграем?</p>
           <h2 className="section-title mt-2 text-center">{g.title}</h2>
           <p className="mx-auto mt-3 max-w-lg text-center text-base font-medium text-ink/64">
-            Попробуйте вместе с ребёнком — это бесплатно и весело. А на пробном уроке начнётся настоящее.
+            Попробуйте вместе с ребёнком — это бесплатно и весело. А в уроках-играх начнётся настоящее.
           </p>
           <div className="mt-7">
             <Comp />
           </div>
           <div className="mt-6 text-center">
-            <a href="/#form" className="primary-btn">Записаться на пробный урок · 400 ₽</a>
+            <a href="/risovanie" className="primary-btn">Начать бесплатно</a>
           </div>
         </div>
       </div>

@@ -4,9 +4,9 @@ import { useRef, useState } from 'react';
 import { Icon } from './Icon.jsx';
 
 const stats = [
-  ['5', 'направлений'],
+  ['бесплатно', 'первые уроки'],
   ['4-12', 'лет'],
-  ['7900 ₽', 'пакет на месяц'],
+  ['490 ₽', 'полный доступ/мес'],
 ];
 
 const benefits = ['интеллект', 'уверенность', 'креативность'];
@@ -81,12 +81,8 @@ export function Hero() {
           </p>
 
           <div className="mt-11 flex flex-col gap-4 sm:flex-row">
-            <a
-              href="#form"
-              onClick={() => window.dispatchEvent(new CustomEvent('razumeika:trial'))}
-              className="primary-btn"
-            >
-              <span className="relative">Записаться на пробный урок — 400 ₽</span>
+            <a href="/risovanie" className="primary-btn">
+              <span className="relative">Начать бесплатно</span>
               <Icon name="arrow" className="relative h-5 w-5" />
             </a>
             <a href="#programs" className="secondary-btn">

@@ -204,6 +204,22 @@
   }
 }
 
+@keyframes rzdraw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes rzfade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
 @layer utilities {
   .font-display {
     font-family: 'Plus Jakarta Sans', Manrope, Arial, sans-serif;

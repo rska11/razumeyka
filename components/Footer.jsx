@@ -9,17 +9,16 @@ const navLinks = [
   ['Результаты', '/#results'],
   ['Отзывы', '/#reviews'],
   ['Блог', '/blog'],
-  ['Запись', '/#form'],
+  ['Начать', '/risovanie'],
 ];
 
 const directions = [
   ['Ментальная арифметика', '/mental-arithmetic'],
   ['Скорочтение', '/speed-reading'],
-  ['Правополушарное рисование', '/right-brain-drawing'],
+  ['Правополушарное рисование', '/risovanie'],
   ['Интуиция', '/intuition'],
   ['Языки', '/languages'],
   ['Подготовка к школе', '/podgotovka-k-shkole'],
-  ['Актёрское мастерство', '/akterskoe-masterstvo'],
   ['Английский для детей', '/english-for-kids'],
   ['Русский язык для детей', '/russkiy-yazyk-dlya-detey'],
 ];
@@ -43,10 +42,10 @@ export function Footer() {
               Онлайн школа развития детей 4–12 лет. Ментальная арифметика, скорочтение, рисование, интуиция и языки.
             </p>
             <a
-              href="/#form"
+              href="/risovanie"
               className="mt-6 inline-flex items-center gap-2 rounded-full bg-gold-300 px-5 py-3 text-sm font-extrabold text-forest-900 shadow-luxe transition hover:-translate-y-0.5 hover:bg-white"
             >
-              Записаться на урок
+              Начать бесплатно
               <Icon name="arrow" className="h-4 w-4" />
             </a>
           </div>

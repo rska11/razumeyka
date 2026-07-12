@@ -8,7 +8,7 @@ import { directionsData } from '../data/directions.js';
 const programCards = directionsData;
 const moreDirections = [
   { title: 'Подготовка к школе', slug: 'podgotovka-k-shkole', emoji: '🎒', blurb: 'Чтение, счёт, внимание и усидчивость к первому классу' },
-  { title: 'Актёрское мастерство', slug: 'akterskoe-masterstvo', emoji: '🎭', blurb: 'Раскрепощение, речь и уверенность на публике' },
+  { title: 'Английский для детей', slug: 'english-for-kids', emoji: '🇬🇧', blurb: 'Разговорная речь и словарный запас без зубрёжки' },
 ];
 const SLIDE_INTERVAL = 3000;
 
@@ -118,7 +118,7 @@ export function Directions() {
                     />
                   ))}
                 </div>
-                <Link href={`/${active.slug}`} className="secondary-btn min-h-[54px] px-6 py-3">
+                <Link href={active.href ?? `/${active.slug}`} className="secondary-btn min-h-[54px] px-6 py-3">
                   Подробнее о направлении
                 </Link>
               </div>
@@ -165,7 +165,7 @@ export function Directions() {
                 <span className="mt-3 block text-sm font-extrabold leading-5">{item.title}</span>
               </button>
               <Link
-                href={`/${item.slug}`}
+                href={item.href ?? `/${item.slug}`}
                 className={`mt-4 inline-flex items-center gap-2 text-sm font-extrabold ${
                   index === activeIndex ? 'text-white/88' : item.accentText
                 }`}

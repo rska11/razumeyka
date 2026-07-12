@@ -32,9 +32,9 @@ const methodCards = [
     line: 'bg-brand-pink',
   },
   {
-    title: 'Педагог под ребенка',
-    text: 'Сложность, темп и формат объяснения адаптируются под уровень и реакцию.',
-    icon: 'mentor',
+    title: 'Свой темп',
+    text: 'Ребёнок идёт в своём ритме: экран-наставник показывает каждый шаг, без спешки и оценок.',
+    icon: 'confidence',
     number: '04',
     accent: 'from-brand-green to-brand-blue',
     glow: 'bg-brand-green/20',
@@ -86,7 +86,7 @@ export function BetterThanSchool() {
             }`}
           >
             <p className="text-lg font-bold leading-8 text-ink/68">
-              У ребенка получается не потому, что “было интересно один раз”, а потому что есть система: маршрут, контроль прогресса, фокус на навыке и педагог, который адаптирует объяснение под ребенка.
+              У ребенка получается не потому, что “было интересно один раз”, а потому что есть система: маршрут, контроль прогресса, фокус на навыке и понятные шаги, которые ведут ребёнка к результату в своём темпе.
             </p>
           </div>
         </div>
@@ -140,10 +140,10 @@ export function BetterThanSchool() {
             <Icon name="check" className="h-7 w-7" />
           </div>
           <p className="text-lg font-bold leading-8 text-white/78">
-            Игровые элементы остаются инструментом вовлечения. Основа результата — методика, последовательность и внимание педагога к уровню ребенка.
+            Игровые элементы остаются инструментом вовлечения. Основа результата — методика, последовательность и понятные шаги в своём темпе.
           </p>
-          <a href="#form" className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-white px-5 text-sm font-extrabold text-ink transition hover:-translate-y-1">
-            Узнать маршрут
+          <a href="/risovanie" className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-white px-5 text-sm font-extrabold text-ink transition hover:-translate-y-1">
+            Начать бесплатно
           </a>
         </div>
       </div>

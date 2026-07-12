@@ -220,11 +220,12 @@ function resolveDirection(program, ageId) {
 }
 
 function DirectionChip({ direction, pathname }) {
-  const isActive = pathname === `/${direction.slug}`;
+  const targetHref = direction.href ?? `/${direction.slug}`;
+  const isActive = pathname === targetHref;
 
   return (
     <Link
-      href={`/${direction.slug}`}
+      href={targetHref}
       className={`direction-chip ${isActive ? 'direction-chip-active' : ''}`}
       aria-current={isActive ? 'page' : undefined}
       aria-label={`${direction.title}. Подробнее о направлении`}

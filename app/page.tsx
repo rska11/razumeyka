@@ -16,7 +16,6 @@ import { QuizAI } from '@/components/QuizAI.jsx';
 import { Results } from '@/components/Results.jsx';
 import { Scarcity } from '@/components/Scarcity.jsx';
 import { StickyMobileCTA } from '@/components/StickyMobileCTA.jsx';
-import { Teachers } from '@/components/Teachers.jsx';
 import { Testimonials } from '@/components/Testimonials.jsx';
 
 // canonical только здесь: в layout он наследовался бы всеми страницами без своего canonical
@@ -71,7 +70,6 @@ export default function HomePage() {
         <Results />
         <Process />
         <Program />
-        <Teachers />
         <Testimonials />
         <Scarcity />
         <FAQ />

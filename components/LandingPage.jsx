@@ -6,6 +6,7 @@ import { getDirectionBySlug } from '@/data/directions.js';
 import { getLandingBySlug } from '@/data/landings.js';
 import { DirectionGame } from '@/components/games/DirectionGame.jsx';
 import { LanguagesHub } from '@/components/LanguagesHub.jsx';
+import { LaunchBadge } from '@/components/LaunchBadge.jsx';
 
 const accents = {
   blue: { soft: 'bg-brand-blue/8', text: 'text-brand-blue', grad: 'from-brand-blue/25 to-brand-purple/20' },
@@ -29,9 +30,9 @@ const h1grad = {
 };
 
 const whyUs = [
-  { icon: 'users', t: 'Мини-группы до 6', d: 'Педагог видит каждого и подстраивает темп под ребёнка' },
+  { icon: 'gamepad', t: 'Занимается сам', d: 'Экран-наставник ведёт ребёнка по шагам — в своём темпе, без педагога и групп' },
   { icon: 'screen', t: 'Онлайн из любого города', d: 'Без дороги — занимайтесь из дома в удобное время' },
-  { icon: 'confidence', t: 'Честный подход', d: 'Не подойдёт — прямо скажем и предложим другое направление' },
+  { icon: 'confidence', t: 'Первые уроки бесплатно', d: 'Попробуйте формат без карты — оцените, подходит ли ребёнку' },
   { icon: 'logic', t: 'Виден прогресс', d: 'Успехи ребёнка отражаются в личном кабинете родителя' },
 ];
 
@@ -39,9 +40,9 @@ export function LandingPage({ landing }) {
   const related = (landing.relatedSlugs ?? [])
     .map((s) => {
       const d = getDirectionBySlug(s);
-      if (d) return { slug: d.slug, title: d.title };
+      if (d) return { slug: d.slug, title: d.title, href: d.href ?? `/${d.slug}` };
       const l = getLandingBySlug(s);
-      if (l) return { slug: l.slug, title: l.h1 };
+      if (l) return { slug: l.slug, title: l.h1, href: `/${l.slug}` };
       return null;
     })
     .filter(Boolean);
@@ -49,9 +50,9 @@ export function LandingPage({ landing }) {
   const a = accents[landing.theme] ?? accents.blue;
   const hg = h1grad[landing.theme] ?? h1grad.blue;
   const stats = landing.stats ?? [
-    { v: 'до 6', l: 'детей в группе' },
+    { v: 'бесплатно', l: 'первые уроки' },
     { v: 'онлайн', l: 'из любого города' },
-    { v: '400 ₽', l: 'пробный урок' },
+    { v: '490 ₽', l: 'доступ в месяц' },
   ];
 
   const faqSchema = {
@@ -90,7 +91,10 @@ export function LandingPage({ landing }) {
           <div className="container-pad px-0">
             <div className="grid items-center gap-12 lg:grid-cols-[1.02fr_0.98fr]">
               <div>
-                <span className={`section-kicker ${a.soft}`}>Онлайн-школа «Разумейка»</span>
+                <div className="flex flex-wrap items-center gap-3">
+                  <LaunchBadge />
+                  <span className={`section-kicker ${a.soft}`}>Онлайн-школа «Разумейка»</span>
+                </div>
                 <h1 className={`mt-6 bg-gradient-to-r font-display text-[2.4rem] font-black leading-[1.06] tracking-[-0.01em] text-transparent sm:text-5xl lg:text-[3.7rem] ${hg} bg-clip-text [-webkit-background-clip:text] [text-shadow:0_16px_38px_rgba(59,130,246,0.10)]`}>
                   {landing.h1}
                 </h1>
@@ -102,14 +106,18 @@ export function LandingPage({ landing }) {
                   ))}
                 </div>
                 <div className="mt-8 flex flex-wrap gap-4">
-                  <a href="/#form" className="primary-btn">Записаться на пробный · 400 ₽</a>
+                  <a href="/risovanie" className="primary-btn">Начать бесплатно</a>
                   <Link href="/" className="secondary-btn">Все направления</Link>
                 </div>
                 <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-bold text-ink/56">
                   <span className="text-brand-orange">★★★★★</span>
-                  <span>Мини-группы до 6 детей</span>
-                  <span>Онлайн из любого города</span>
+                  <span>Самостоятельные уроки-игры</span>
+                  <span>Первые уроки бесплатно</span>
                 </div>
+                <p className="mt-4 text-sm font-semibold leading-6 text-ink/56">
+                  Это направление открываем <span className="font-extrabold text-ink/80">17 июля</span>. А формат уроков-игр уже можно попробовать бесплатно на{' '}
+                  <Link href="/risovanie" className={`font-extrabold ${a.text} underline underline-offset-2`}>правополушарном рисовании</Link>.
+                </p>
               </div>
 
               <div className="relative mx-auto w-full max-w-lg">
@@ -127,8 +135,8 @@ export function LandingPage({ landing }) {
                   </div>
                 )}
                 <div className="absolute -bottom-5 -left-4 rounded-[18px] border border-ink/8 bg-white px-5 py-3.5 shadow-color">
-                  <p className="font-display text-2xl font-black text-ink">400 ₽</p>
-                  <p className="text-xs font-bold text-ink/56">пробный урок</p>
+                  <p className="font-display text-2xl font-black text-ink">Бесплатно</p>
+                  <p className="text-xs font-bold text-ink/56">первые уроки</p>
                 </div>
               </div>
             </div>
@@ -194,7 +202,7 @@ export function LandingPage({ landing }) {
                   <span className={`section-kicker ${a.soft}`}>бесплатно — попробуйте прямо сейчас</span>
                   <h3 className="section-title mt-4 text-[1.7rem] sm:text-[2.1rem]">{landing.homeTip.title}</h3>
                   <p className="mt-4 text-lg font-medium leading-8 text-ink/70">{landing.homeTip.text}</p>
-                  <p className={`mt-4 text-base font-extrabold ${a.text}`}>А на занятиях таких приёмов — десятки, и с педагогом, который ведёт ребёнка к результату.</p>
+                  <p className={`mt-4 text-base font-extrabold ${a.text}`}>А в уроках-играх таких приёмов — десятки, и ребёнок осваивает их сам, шаг за шагом.</p>
                 </div>
               </div>
             </div>
@@ -205,8 +213,8 @@ export function LandingPage({ landing }) {
         {landing.steps?.length > 0 && (
           <section className="px-5 py-14 sm:px-8 lg:px-14">
             <div className="container-pad px-0">
-              <span className={`section-kicker ${a.soft}`}>как проходит занятие</span>
-              <h2 className="section-title mt-6 max-w-3xl">55 минут пользы без перегруза</h2>
+              <span className={`section-kicker ${a.soft}`}>как устроен урок-игра</span>
+              <h2 className="section-title mt-6 max-w-3xl">Понятные шаги без перегруза</h2>
               <div className="mt-9 grid gap-4 lg:grid-cols-2">
                 {landing.steps.map((s, i) => (
                   <div key={i} className={`flex gap-5 ${PC} p-7`}>
@@ -239,12 +247,12 @@ export function LandingPage({ landing }) {
               </summary>
               <div className="grid gap-3.5 px-7 pb-7 sm:grid-cols-2">
                 {[
-                  'Запись каждого занятия — можно пересмотреть',
+                  'Уроки-игры доступны в любое время — проходите когда удобно',
                   'Личный кабинет с прогрессом ребёнка',
-                  'Гибкое расписание — подстроим под вас',
-                  'Поддержка родителей между занятиями',
-                  'Пропустили урок — компенсируем',
-                  'Педагог даёт обратную связь после занятий',
+                  'Занимайтесь в своём темпе — без расписания',
+                  'Новые уроки добавляем регулярно',
+                  'Первые уроки — бесплатно, без карты',
+                  'Результат оценивает родитель — живая похвала',
                 ].map((x) => (
                   <div key={x} className="flex items-start gap-3">
                     <span className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${a.soft} ${a.text}`}>
@@ -323,13 +331,13 @@ export function LandingPage({ landing }) {
             <div className={`grid items-center gap-10 rounded-[26px] border border-ink/8 ${a.soft} p-9 shadow-color sm:p-14 lg:grid-cols-[1.15fr_0.85fr]`}>
               <div>
                 <span className="section-kicker bg-white/70">старт без риска</span>
-                <h2 className="section-title mt-5">Начните с пробного урока за 400 ₽</h2>
+                <h2 className="section-title mt-5">Начните бесплатно — без карты</h2>
                 <p className="mt-5 text-lg font-medium leading-8 text-ink/70">
-                  Это полноценное занятие в мини-группе. Педагог оценит уровень ребёнка, покажет формат и честно скажет,
-                  подходит ли направление. Никаких обязательств.
+                  Самостоятельные уроки-игры: ребёнок занимается сам, а результат оценивает родитель.
+                  Первые уроки бесплатны — попробуйте формат, а понравится, откройте полный доступ по подписке.
                 </p>
                 <ul className="mt-6 grid gap-3">
-                  {['Пробный урок — 400 ₽', 'Не подойдёт — предложим другое или вернём деньги за пробный', 'Пакет на месяц — от 7900 ₽'].map((t) => (
+                  {['Первые уроки — бесплатно, без карты', 'Ребёнок рисует и решает сам, по шагам с экраном-наставником', 'Полный доступ — 490 ₽/мес, отмена в один клик'].map((t) => (
                     <li key={t} className="flex items-center gap-3 text-base font-semibold text-ink/78">
                       <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white ${a.text} shadow-sm`}>
                         <Icon name="check" className="h-3.5 w-3.5" />
@@ -340,10 +348,11 @@ export function LandingPage({ landing }) {
                 </ul>
               </div>
               <div className={`${PC} p-8 text-center`}>
-                <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-ink/44">Пробный урок</p>
-                <p className="mt-2 font-display text-6xl font-black text-ink">400₽</p>
-                <a href="/#form" className="primary-btn mt-6 w-full">Записаться</a>
-                <p className="mt-3.5 text-xs font-semibold text-ink/48">Место бронируем на 30 минут</p>
+                <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-ink/44">Полный доступ</p>
+                <p className="mt-2 font-display text-6xl font-black text-ink">490₽<span className="text-2xl text-ink/50">/мес</span></p>
+                <p className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-brand-blue/10 px-3 py-1 text-xs font-extrabold text-brand-blue">🚀 Запуск направления — 17 июля</p>
+                <a href="/risovanie" className="primary-btn mt-5 w-full">Попробовать бесплатно на рисовании</a>
+                <p className="mt-3.5 text-xs font-semibold text-ink/48">Первые уроки бесплатно · доступ на 30 дней</p>
               </div>
             </div>
           </div>
@@ -376,7 +385,7 @@ export function LandingPage({ landing }) {
               <span className={`section-kicker ${a.soft}`}>другие направления</span>
               <div className="mt-7 flex flex-wrap gap-3">
                 {related.map((d) => (
-                  <Link key={d.slug} href={`/${d.slug}`} className={`${PC} px-5 py-3 text-base font-extrabold text-ink transition hover:-translate-y-0.5`}>
+                  <Link key={d.slug} href={d.href} className={`${PC} px-5 py-3 text-base font-extrabold text-ink transition hover:-translate-y-0.5`}>
                     {d.title}
                   </Link>
                 ))}
@@ -390,8 +399,8 @@ export function LandingPage({ landing }) {
           <div className="container-pad px-0">
             <div className="overflow-hidden rounded-[26px] bg-night p-10 text-center text-porcelain shadow-color sm:p-16">
               <h2 className="font-display text-3xl font-black text-white sm:text-5xl">Попробуйте — это ни к чему не обязывает</h2>
-              <p className="mx-auto mt-4 max-w-xl text-lg font-medium text-porcelain/80">На пробном уроке за 400 ₽ педагог познакомится с ребёнком, покажет формат и ответит на все вопросы.</p>
-              <a href="/#form" className="mt-8 inline-flex rounded-full bg-gold-300 px-9 py-4 text-base font-extrabold text-night transition hover:-translate-y-0.5 hover:bg-white">Записаться на пробный урок</a>
+              <p className="mx-auto mt-4 max-w-xl text-lg font-medium text-porcelain/80">Первые уроки бесплатны и без карты: ребёнок занимается сам, а вы смотрите результат. Понравится — откроете полный доступ.</p>
+              <a href="/risovanie" className="mt-8 inline-flex rounded-full bg-gold-300 px-9 py-4 text-base font-extrabold text-night transition hover:-translate-y-0.5 hover:bg-white">Начать бесплатно</a>
             </div>
           </div>
         </section>

@@ -7,12 +7,16 @@ const BASE = "https://razumeyka-school.ru";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
-  const directions = (directionsData as { slug: string }[]).map((d) => ({
-    url: `${BASE}/${d.slug}`,
-    lastModified: now,
-    changeFrequency: "monthly" as const,
-    priority: 0.8,
-  }));
+  // Направления с href (напр. рисование → /risovanie) — это не [slug]-лендинги,
+  // их канонический URL добавляется отдельно, поэтому здесь их пропускаем.
+  const directions = (directionsData as { slug: string; href?: string }[])
+    .filter((d) => !d.href)
+    .map((d) => ({
+      url: `${BASE}/${d.slug}`,
+      lastModified: now,
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+    }));
   const landings = (landingsData as { slug: string }[]).map((l) => ({
     url: `${BASE}/${l.slug}`,
     lastModified: now,
@@ -29,6 +33,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     { url: BASE, lastModified: now, changeFrequency: "weekly", priority: 1 },
+    { url: `${BASE}/risovanie`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${BASE}/blog`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
     ...directions,
     ...landings,

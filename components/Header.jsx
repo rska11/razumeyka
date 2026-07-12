@@ -41,8 +41,8 @@ export function Header() {
 
         <div className="flex items-center gap-3">
           <AccountButton className="hidden lg:inline-flex" />
-          <a href="/#form" className="primary-btn hidden min-h-[54px] px-7 py-3 text-base shadow-color hover:scale-105 md:inline-flex">
-            Урок
+          <a href="/risovanie" className="primary-btn hidden min-h-[54px] px-7 py-3 text-base shadow-color hover:scale-105 md:inline-flex">
+            Начать бесплатно
             <Icon name="arrow" className="relative h-5 w-5" />
           </a>
           <button
@@ -79,11 +79,11 @@ export function Header() {
               </a>
             ))}
             <a
-              href="/#form"
+              href="/risovanie"
               onClick={closeMenu}
               className="primary-btn mt-3 justify-center"
             >
-              Записаться на занятие
+              Начать бесплатно
               <Icon name="arrow" className="relative h-5 w-5" />
             </a>
             <AccountButton className="mt-2 justify-center" />

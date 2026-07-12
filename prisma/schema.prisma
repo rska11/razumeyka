@@ -17,6 +17,8 @@ model User {
   provider  String    @default("email-code")
   role      String    @default("parent") // parent | teacher
   isBlocked Boolean   @default(false)
+  accessUntil     DateTime? // доступ к self-study библиотеке активен до этой даты (подписка на рисование и др.)
+  paymentMethodId String?   // сохранённый способ оплаты YooKassa — задел под автопродление
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   children  Child[]
@@ -119,6 +121,8 @@ model Payment {
   id           String      @id @default(cuid())
   userId       String
   enrollmentId String?
+  purpose      String      @default("enrollment") // enrollment | subscription
+  periodMonths Int?        // для подписки: на сколько месяцев продлить доступ
   amount       Int         // в рублях
   currency     String      @default("RUB")
   status       String      @default("pending") // pending | paid | failed | refunded

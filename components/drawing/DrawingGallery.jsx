@@ -20,12 +20,306 @@ export const WEEK_OPTIONS = [
 ];
 
 export const fallbackWorks = [
-  { id: 'demo-3-4-1', child: 'Саша М.', city: 'Краснодар', title: 'Солнечный сад', week: 'week-1', ageBand: '3-4', likes: 128, imageUrl: '/images/drawing-gallery/age-3-4-sunny-garden.png' },
-  { id: 'demo-3-4-2', child: 'Мира К.', city: 'Казань', title: 'Добрый робот', week: 'week-2', ageBand: '3-4', likes: 117, imageUrl: '/images/drawing-gallery/age-3-4-kind-robot.png' },
-  { id: 'demo-5-7-1', child: 'Тимур А.', city: 'Москва', title: 'Городской парк', week: 'week-1', ageBand: '5-7', likes: 104, imageUrl: '/images/drawing-gallery/age-5-7-city-park.png' },
-  { id: 'demo-5-7-2', child: 'Алиса Р.', city: 'Екатеринбург', title: 'Дракон и фея', week: 'week-3', ageBand: '5-7', likes: 98, imageUrl: '/images/drawing-gallery/age-5-7-dragon-fairy.png' },
-  { id: 'demo-8-10-1', child: 'Никита С.', city: 'Ростов-на-Дону', title: 'Выставка месяца', week: 'final', ageBand: '8-10', likes: 91, imageUrl: '/images/drawing-gallery/age-8-10-exhibition.png' },
-  { id: 'demo-8-10-2', child: 'Вера Л.', city: 'Пермь', title: 'Музей динозавров', week: 'week-4', ageBand: '8-10', likes: 86, imageUrl: '/images/drawing-gallery/age-8-10-dino-museum.png' },
+  {
+    "id": "demo-3-4-1",
+    "child": "Саша М.",
+    "city": "Краснодар",
+    "title": "Солнечный сад",
+    "week": "week-1",
+    "ageBand": "3-4",
+    "likes": 128,
+    "imageUrl": "/images/drawing-gallery/age-3-4-sunny-garden.png"
+  },
+  {
+    "id": "demo-3-4-2",
+    "child": "Мира К.",
+    "city": "Казань",
+    "title": "Добрый робот",
+    "week": "week-2",
+    "ageBand": "3-4",
+    "likes": 117,
+    "imageUrl": "/images/drawing-gallery/age-3-4-kind-robot.png"
+  },
+  {
+    "id": "demo-3-4-3",
+    "child": "Лёва П.",
+    "city": "Самара",
+    "title": "Домик с солнышком",
+    "week": "week-1",
+    "ageBand": "3-4",
+    "likes": 109,
+    "imageUrl": "/images/drawing-gallery/age-3-4-sunny-house.png"
+  },
+  {
+    "id": "demo-3-4-4",
+    "child": "Варя Н.",
+    "city": "Тула",
+    "title": "Рыжий котёнок",
+    "week": "week-2",
+    "ageBand": "3-4",
+    "likes": 101,
+    "imageUrl": "/images/drawing-gallery/age-3-4-orange-cat.png"
+  },
+  {
+    "id": "demo-3-4-5",
+    "child": "Марк С.",
+    "city": "Воронеж",
+    "title": "Красный автобус",
+    "week": "week-3",
+    "ageBand": "3-4",
+    "likes": 96,
+    "imageUrl": "/images/drawing-gallery/age-3-4-red-bus.png"
+  },
+  {
+    "id": "demo-3-4-6",
+    "child": "Аня Д.",
+    "city": "Пермь",
+    "title": "Мишка с шариком",
+    "week": "week-3",
+    "ageBand": "3-4",
+    "likes": 91,
+    "imageUrl": "/images/drawing-gallery/age-3-4-teddy-balloon.png"
+  },
+  {
+    "id": "demo-3-4-7",
+    "child": "Тёма В.",
+    "city": "Ярославль",
+    "title": "Рыбка под водой",
+    "week": "week-4",
+    "ageBand": "3-4",
+    "likes": 86,
+    "imageUrl": "/images/drawing-gallery/age-3-4-rainbow-fish.png"
+  },
+  {
+    "id": "demo-3-4-8",
+    "child": "Лиза Б.",
+    "city": "Омск",
+    "title": "Бабочка на лугу",
+    "week": "week-4",
+    "ageBand": "3-4",
+    "likes": 82,
+    "imageUrl": "/images/drawing-gallery/age-3-4-butterfly.png"
+  },
+  {
+    "id": "demo-3-4-9",
+    "child": "Кира Ф.",
+    "city": "Уфа",
+    "title": "Праздничный торт",
+    "week": "final",
+    "ageBand": "3-4",
+    "likes": 77,
+    "imageUrl": "/images/drawing-gallery/age-3-4-birthday-cake.png"
+  },
+  {
+    "id": "demo-3-4-10",
+    "child": "Платон Г.",
+    "city": "Ижевск",
+    "title": "Яблоня и корзинка",
+    "week": "final",
+    "ageBand": "3-4",
+    "likes": 72,
+    "imageUrl": "/images/drawing-gallery/age-3-4-apple-tree.png"
+  },
+  {
+    "id": "demo-5-7-1",
+    "child": "Тимур А.",
+    "city": "Москва",
+    "title": "Городской парк",
+    "week": "week-1",
+    "ageBand": "5-7",
+    "likes": 132,
+    "imageUrl": "/images/drawing-gallery/age-5-7-city-park.png"
+  },
+  {
+    "id": "demo-5-7-2",
+    "child": "Алиса Р.",
+    "city": "Екатеринбург",
+    "title": "Дракон и фея",
+    "week": "week-3",
+    "ageBand": "5-7",
+    "likes": 123,
+    "imageUrl": "/images/drawing-gallery/age-5-7-dragon-fairy.png"
+  },
+  {
+    "id": "demo-5-7-3",
+    "child": "София З.",
+    "city": "Нижний Новгород",
+    "title": "Пикник зверят",
+    "week": "week-1",
+    "ageBand": "5-7",
+    "likes": 115,
+    "imageUrl": "/images/drawing-gallery/age-5-7-animal-picnic.png"
+  },
+  {
+    "id": "demo-5-7-4",
+    "child": "Егор Л.",
+    "city": "Новосибирск",
+    "title": "Завтрак на столе",
+    "week": "week-2",
+    "ageBand": "5-7",
+    "likes": 108,
+    "imageUrl": "/images/drawing-gallery/age-5-7-breakfast-table.png"
+  },
+  {
+    "id": "demo-5-7-5",
+    "child": "Полина Ч.",
+    "city": "Ростов-на-Дону",
+    "title": "Скворечник в саду",
+    "week": "week-2",
+    "ageBand": "5-7",
+    "likes": 101,
+    "imageUrl": "/images/drawing-gallery/age-5-7-birdhouse-garden.png"
+  },
+  {
+    "id": "demo-5-7-6",
+    "child": "Матвей О.",
+    "city": "Калининград",
+    "title": "Замок у ручья",
+    "week": "week-3",
+    "ageBand": "5-7",
+    "likes": 96,
+    "imageUrl": "/images/drawing-gallery/age-5-7-castle-bridge.png"
+  },
+  {
+    "id": "demo-5-7-7",
+    "child": "Маша Т.",
+    "city": "Сочи",
+    "title": "Дождик и зонтик",
+    "week": "week-4",
+    "ageBand": "5-7",
+    "likes": 90,
+    "imageUrl": "/images/drawing-gallery/age-5-7-rainy-umbrella.png"
+  },
+  {
+    "id": "demo-5-7-8",
+    "child": "Рома И.",
+    "city": "Киров",
+    "title": "Ферма с подсолнухами",
+    "week": "week-4",
+    "ageBand": "5-7",
+    "likes": 86,
+    "imageUrl": "/images/drawing-gallery/age-5-7-farm-sunflowers.png"
+  },
+  {
+    "id": "demo-5-7-9",
+    "child": "Элина Ж.",
+    "city": "Тюмень",
+    "title": "Комната перед сном",
+    "week": "final",
+    "ageBand": "5-7",
+    "likes": 81,
+    "imageUrl": "/images/drawing-gallery/age-5-7-cozy-bedroom.png"
+  },
+  {
+    "id": "demo-5-7-10",
+    "child": "Глеб Ю.",
+    "city": "Саратов",
+    "title": "Цирк на лугу",
+    "week": "final",
+    "ageBand": "5-7",
+    "likes": 77,
+    "imageUrl": "/images/drawing-gallery/age-5-7-circus-seal.png"
+  },
+  {
+    "id": "demo-8-10-1",
+    "child": "Никита С.",
+    "city": "Ростов-на-Дону",
+    "title": "Выставка месяца",
+    "week": "final",
+    "ageBand": "8-10",
+    "likes": 140,
+    "imageUrl": "/images/drawing-gallery/age-8-10-exhibition.png"
+  },
+  {
+    "id": "demo-8-10-2",
+    "child": "Вера Л.",
+    "city": "Пермь",
+    "title": "Музей динозавров",
+    "week": "week-4",
+    "ageBand": "8-10",
+    "likes": 129,
+    "imageUrl": "/images/drawing-gallery/age-8-10-dino-museum.png"
+  },
+  {
+    "id": "demo-8-10-3",
+    "child": "Даня К.",
+    "city": "Санкт-Петербург",
+    "title": "Вечерний город",
+    "week": "week-1",
+    "ageBand": "8-10",
+    "likes": 121,
+    "imageUrl": "/images/drawing-gallery/age-8-10-city-evening.png"
+  },
+  {
+    "id": "demo-8-10-4",
+    "child": "Милана П.",
+    "city": "Казань",
+    "title": "Карта сказочной страны",
+    "week": "week-1",
+    "ageBand": "8-10",
+    "likes": 114,
+    "imageUrl": "/images/drawing-gallery/age-8-10-fantasy-map.png"
+  },
+  {
+    "id": "demo-8-10-5",
+    "child": "Илья Б.",
+    "city": "Красноярск",
+    "title": "Уголок библиотеки",
+    "week": "week-2",
+    "ageBand": "8-10",
+    "likes": 107,
+    "imageUrl": "/images/drawing-gallery/age-8-10-library-cat.png"
+  },
+  {
+    "id": "demo-8-10-6",
+    "child": "Арина Г.",
+    "city": "Владимир",
+    "title": "Мастерская робота",
+    "week": "week-2",
+    "ageBand": "8-10",
+    "likes": 100,
+    "imageUrl": "/images/drawing-gallery/age-8-10-robot-workshop.png"
+  },
+  {
+    "id": "demo-8-10-7",
+    "child": "Фёдор Е.",
+    "city": "Барнаул",
+    "title": "Осенний парк",
+    "week": "week-3",
+    "ageBand": "8-10",
+    "likes": 94,
+    "imageUrl": "/images/drawing-gallery/age-8-10-autumn-park.png"
+  },
+  {
+    "id": "demo-8-10-8",
+    "child": "Ксюша А.",
+    "city": "Самара",
+    "title": "Тёплая оранжерея",
+    "week": "week-3",
+    "ageBand": "8-10",
+    "likes": 89,
+    "imageUrl": "/images/drawing-gallery/age-8-10-greenhouse.png"
+  },
+  {
+    "id": "demo-8-10-9",
+    "child": "Степан М.",
+    "city": "Челябинск",
+    "title": "Сцена театра",
+    "week": "week-4",
+    "ageBand": "8-10",
+    "likes": 83,
+    "imageUrl": "/images/drawing-gallery/age-8-10-theater-stage.png"
+  },
+  {
+    "id": "demo-8-10-10",
+    "child": "Лада Ш.",
+    "city": "Иркутск",
+    "title": "Горы на рассвете",
+    "week": "final",
+    "ageBand": "8-10",
+    "likes": 78,
+    "imageUrl": "/images/drawing-gallery/age-8-10-mountain-river.png"
+  }
 ];
 
 export function ArtworkPreview({ item, className = '' }) {

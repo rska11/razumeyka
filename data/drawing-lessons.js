@@ -1,4 +1,7 @@
 import { applyPremiumPreschoolMonth } from './preschool-premium-lessons.js';
+import { applyFiveSevenWeek1 } from './drawing-five-seven-week1.js';
+import { applyEightTenWeek1 } from './drawing-eight-ten-week1.js';
+import { applyEightTenArtPilot } from './drawing-eight-ten-art-pilot.js';
 
 // Самостоятельные уроки правополушарного рисования (self-study).
 // Оценивает результат родитель — не педагог и не ИИ. Часть уроков бесплатна,
@@ -5944,6 +5947,9 @@ for (const [ageBand, days] of Object.entries(monthAutoPlans)) {
   });
 }
 
+applyFiveSevenWeek1(drawingLessons, drawingChapterGuides);
+applyEightTenWeek1(drawingLessons, drawingChapterGuides);
+applyEightTenArtPilot(drawingLessons, drawingChapterGuides);
 applyPremiumPreschoolMonth(drawingLessons, drawingChapterGuides);
 
 export const drawingSubscription = {

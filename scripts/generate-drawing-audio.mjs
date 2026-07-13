@@ -1,6 +1,30 @@
 import fs from 'node:fs/promises';
+import fsSync from 'node:fs';
 import path from 'node:path';
+import dns from 'node:dns';
 import { drawingLessons } from '../data/drawing-lessons.js';
+
+// Из среды Bash-песочницы сеть недоступна и IPv6 к Yandex часто виснет —
+// форсим IPv4, чтобы не ловить ConnectTimeout. Запускать через PowerShell.
+dns.setDefaultResultOrder('ipv4first');
+
+// Подхватываем school-next/.env, чтобы не задавать YANDEX_* руками каждый раз.
+// Существующие переменные окружения приоритетнее файла.
+(() => {
+  try {
+    const envPath = new URL('../.env', import.meta.url);
+    const raw = fsSync.readFileSync(envPath, 'utf8');
+    for (const line of raw.split(/\r?\n/)) {
+      const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/);
+      if (!m || line.trim().startsWith('#')) continue;
+      const key = m[1];
+      const val = m[2].replace(/^["']|["']$/g, '');
+      if (process.env[key] === undefined) process.env[key] = val;
+    }
+  } catch {
+    // .env нет — значит переменные передают вручную
+  }
+})();
 
 const outRoot = path.join(process.cwd(), 'public', 'audio', 'drawing');
 
@@ -47,12 +71,20 @@ function voiceText(text) {
   return normalized.replace(/^(Шаг \d+\. )([а-яё])/, (_, prefix, letter) => prefix + letter.toUpperCase());
 }
 
+// Для озвучки шагов убираем повтор названия картинки в конце («…: „солнышко“.»).
+// Название звучит один раз в интро — иначе голос дублирует его в каждом шаге
+// и это сразу выдаёт робота. На экране (hint) название остаётся.
+function stepVoiceText(text) {
+  const withoutName = String(text || '').replace(/\s*:\s*«[^»]*»\s*\.?\s*$/u, '.');
+  return voiceText(withoutName);
+}
+
 function lessonItems(lesson) {
   const items = [];
   const intro = lesson.sayIntro ?? lesson.intro ?? lesson.handHint;
   if (intro) items.push({ name: 'intro.mp3', text: voiceText(intro) });
   for (const [i, step] of (lesson.steps ?? []).entries()) {
-    items.push({ name: `step-${i + 1}.mp3`, text: voiceText(step.say ?? step.hint) });
+    items.push({ name: `step-${i + 1}.mp3`, text: stepVoiceText(step.say ?? step.hint) });
   }
   const parent = lesson.sayParent ?? lesson.parentNote;
   if (parent) items.push({ name: 'parent.mp3', text: voiceText(parent) });
@@ -83,14 +115,29 @@ async function synthesizeYandex(text) {
     format: 'mp3',
   });
 
-  const res = await fetch('https://tts.api.cloud.yandex.net/speech/v1/tts:synthesize', {
-    method: 'POST',
-    headers: { Authorization: `Api-Key ${apiKey}` },
-    body,
-  });
-
-  if (!res.ok) throw new Error(`Yandex TTS ${res.status}: ${await res.text()}`);
-  return Buffer.from(await res.arrayBuffer());
+  // Первые коннекты к Yandex часто виснут (happy-eyeballs), потом соединение
+  // «прогревается» — поэтому ретраим сетевые сбои несколько раз.
+  const maxAttempts = 6;
+  let lastErr;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const res = await fetch('https://tts.api.cloud.yandex.net/speech/v1/tts:synthesize', {
+        method: 'POST',
+        headers: { Authorization: `Api-Key ${apiKey}` },
+        body,
+      });
+      if (!res.ok) throw new Error(`Yandex TTS ${res.status}: ${await res.text()}`);
+      return Buffer.from(await res.arrayBuffer());
+    } catch (err) {
+      // 4xx/5xx от API (текст ошибки) не ретраим — это не сетевой сбой
+      if (String(err.message).startsWith('Yandex TTS')) throw err;
+      lastErr = err;
+      if (attempt < maxAttempts) {
+        await new Promise((r) => setTimeout(r, 800 * attempt));
+      }
+    }
+  }
+  throw lastErr;
 }
 
 

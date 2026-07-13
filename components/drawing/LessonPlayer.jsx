@@ -75,16 +75,23 @@ export function LessonPlayer({ lesson, nextLesson, onComplete, onNext, onClose }
 
   // Озвучка только готовым mp3 (Yandex SpeechKit). Робо-голос браузера НЕ используем —
   // если mp3 для урока ещё нет, просто тишина (лучше, чем «параллельный робот»).
-  function speak(kind, index = step) {
+  function speak(kind, index = step, onEnd) {
     const text = sayTextFor(lesson, kind, index);
-    if (typeof window === 'undefined' || !text) return;
+    if (typeof window === 'undefined' || !text) {
+      onEnd?.();
+      return;
+    }
     stopVoice();
 
     const src = audioSrcFor(lesson, kind, index);
-    if (!src) return;
+    if (!src) {
+      onEnd?.();
+      return;
+    }
 
     const audio = new Audio(src);
     audioRef.current = audio;
+    if (onEnd) audio.onended = onEnd;
     audio.play().catch(() => {});
   }
 
@@ -115,21 +122,36 @@ export function LessonPlayer({ lesson, nextLesson, onComplete, onNext, onClose }
   }, [step, replay, isGame, done]);
 
   // Первый раз урок открыт — голос идёт автоматом. Дальше — только по кнопке «Озвучить».
+  // Старт откладываем через setTimeout и снимаем его в cleanup: так переживаем
+  // двойной mount React StrictMode (dev), который иначе глушит уже начатую озвучку
+  // и не перезапускает её. Флаг «уже озвучен» пишем только когда реально стартуем.
   useEffect(() => {
     let firstEver = false;
     try {
       const set = new Set(JSON.parse(localStorage.getItem('razumeyka_drawing_voiced') || '[]'));
-      if (!set.has(lesson.slug)) {
-        firstEver = true;
+      firstEver = !set.has(lesson.slug);
+    } catch {}
+    if (!firstEver) return;
+
+    const timer = setTimeout(() => {
+      try {
+        const set = new Set(JSON.parse(localStorage.getItem('razumeyka_drawing_voiced') || '[]'));
         set.add(lesson.slug);
         localStorage.setItem('razumeyka_drawing_voiced', JSON.stringify([...set]));
-      }
-    } catch {}
-    if (firstEver) {
+      } catch {}
       setVoiceOn(true);
       voiceOnRef.current = true;
-      speak(isGame ? 'intro' : 'step', 0);
-    }
+      if (isGame) {
+        speak('intro');
+      } else {
+        // Сначала интро (один раз называет картинку), затем — первый шаг.
+        speak('intro', 0, () => {
+          if (voiceOnRef.current) speak('step', 0);
+        });
+      }
+    }, 80);
+
+    return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

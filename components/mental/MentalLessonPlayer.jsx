@@ -19,8 +19,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Soroban, columnsFor } from './Soroban.jsx';
 
-const VOICED_KEY = 'razumeyka_mental_voiced';
-
 function chainSum(chain) {
   return chain.reduce((a, b) => a + b, 0);
 }
@@ -292,36 +290,42 @@ export function MentalLessonPlayer({ lesson, nextLesson, onComplete, onNext, onC
 
   // Озвучка только готовым mp3 (Yandex SpeechKit), как в рисовании:
   // нет файла — тишина, браузерный робо-голос не используем.
-  function speak(kind, index = step) {
-    const text = kind === 'parent' ? lesson.parentNote : steps[index]?.say ?? steps[index]?.text;
+  function speak(kind, index = step, onEnd) {
+    const text =
+      kind === 'intro'
+        ? lesson.intro
+        : kind === 'parent'
+          ? lesson.parentNote
+          : steps[index]?.say ?? steps[index]?.text;
     if (typeof window === 'undefined' || !text) return;
     stopVoice();
     const src =
-      kind === 'parent'
+      kind === 'intro'
+        ? `/audio/mental/${lesson.slug}/intro.mp3`
+        : kind === 'parent'
         ? `/audio/mental/${lesson.slug}/parent.mp3`
         : `/audio/mental/${lesson.slug}/step-${index + 1}.mp3`;
     const audio = new Audio(src);
     audioRef.current = audio;
+    if (onEnd) audio.onended = onEnd;
     audio.play().catch(() => {});
   }
 
-  // Первое открытие урока — голос автоматом, дальше по кнопке (метка в localStorage).
+  // Урок открыт — голос идёт автоматом: интро урока, затем первый шаг.
+  // Запуск откладываем на тик, чтобы пережить двойной mount React StrictMode в dev.
   useEffect(() => {
-    let firstEver = false;
-    try {
-      const set = new Set(JSON.parse(localStorage.getItem(VOICED_KEY) || '[]'));
-      if (!set.has(lesson.slug)) {
-        firstEver = true;
-        set.add(lesson.slug);
-        localStorage.setItem(VOICED_KEY, JSON.stringify([...set]));
-      }
-    } catch {}
-    if (firstEver) {
+    const timer = setTimeout(() => {
       setVoiceOn(true);
       voiceOnRef.current = true;
-      speak('step', 0);
-    }
-    return stopVoice;
+      speak('intro', 0, () => {
+        if (voiceOnRef.current) speak('step', 0);
+      });
+    }, 80);
+
+    return () => {
+      clearTimeout(timer);
+      stopVoice();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

@@ -45,6 +45,63 @@ function materialsFor(lesson) {
   return ['Лист бумаги', 'Карандаш или фломастер'];
 }
 
+
+function methodAudioSrcFor(lesson) {
+  const version = '?v=3';
+  if (lesson.hand === 'both') return '/audio/drawing/method/lesson-both.mp3' + version;
+  if (lesson.ageBand === '3-4') return '/audio/drawing/method/lesson-3-4.mp3' + version;
+  if (lesson.ageBand === '5-7') return '/audio/drawing/method/lesson-5-7.mp3' + version;
+  if (lesson.ageBand === '8-10') return '/audio/drawing/method/lesson-8-10.mp3' + version;
+  return '/audio/drawing/method/lesson-general.mp3' + version;
+}
+function methodTipFor(lesson) {
+  if (lesson.hand === 'both') {
+    return {
+      icon: '🤲',
+      title: 'Двумя руками.',
+      text: lesson.handHint ?? 'Возьми два карандаша и попробуй вести линии зеркально. Красота здесь рождается из синхронного движения, а не из идеальной ровности.',
+    };
+  }
+
+  if (lesson.hand && lesson.hand !== 'any' && lesson.handHint) {
+    return {
+      icon: '🖐️',
+      title: `${HAND_LABEL[lesson.hand]}.`,
+      text: lesson.handHint,
+    };
+  }
+
+  if (lesson.ageBand === '3-4') {
+    return {
+      icon: '✨',
+      title: 'Как рисуем сегодня.',
+      text: 'Главный рисунок делаем удобной рукой. Если ребёнок не устал, 2–3 точки, лучика или травинки можно попробовать второй рукой — просто как игру.',
+    };
+  }
+
+  if (lesson.ageBand === '5-7') {
+    return {
+      icon: '🖐️',
+      title: 'Как рисуем сегодня.',
+      text: 'Форму рисуем удобной рукой, а маленькие детали — точки, травку, узоры, капли — можно доверить непишущей руке. Ровность не важна.',
+    };
+  }
+
+  if (lesson.ageBand === '8-10') {
+    return {
+      icon: '✍️',
+      title: 'Как рисуем сегодня.',
+      text: 'Контур и важные формы ведём привычной рукой. Фактуру, штрихи, крапинки, блики или фон можно попробовать второй рукой — так линия становится живее.',
+    };
+  }
+
+  return {
+    icon: '🎨',
+    title: 'Как рисуем сегодня.',
+    text: 'Сначала наблюдаем форму, потом рисуем. Небольшую деталь можно сделать второй рукой, если хочется отпустить контроль и добавить живости.',
+  };
+}
+
 export function LessonPlayer({ lesson, nextLesson, onComplete, onNext, onClose }) {
   const isGame = lesson.game === 'symmetry';
   const steps = lesson.steps ?? [];
@@ -73,6 +130,30 @@ export function LessonPlayer({ lesson, nextLesson, onComplete, onNext, onClose }
     if (typeof window !== 'undefined') window.speechSynthesis?.cancel();
   }
 
+  function playAudioSrc(src, onEnd) {
+    if (typeof window === 'undefined' || !src) {
+      onEnd?.();
+      return;
+    }
+    stopVoice();
+
+    const audio = new Audio(src);
+    let finished = false;
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      onEnd?.();
+    };
+    audioRef.current = audio;
+    if (onEnd) audio.onended = finish;
+    audio.onerror = finish;
+    audio.play().catch(finish);
+  }
+
+  function speakMethod(onEnd) {
+    playAudioSrc(methodAudioSrcFor(lesson), onEnd);
+  }
+
   // Озвучка только готовым mp3 (Yandex SpeechKit). Робо-голос браузера НЕ используем —
   // если mp3 для урока ещё нет, просто тишина (лучше, чем «параллельный робот»).
   function speak(kind, index = step, onEnd) {
@@ -81,18 +162,9 @@ export function LessonPlayer({ lesson, nextLesson, onComplete, onNext, onClose }
       onEnd?.();
       return;
     }
-    stopVoice();
 
     const src = audioSrcFor(lesson, kind, index);
-    if (!src) {
-      onEnd?.();
-      return;
-    }
-
-    const audio = new Audio(src);
-    audioRef.current = audio;
-    if (onEnd) audio.onended = onEnd;
-    audio.play().catch(() => {});
+    playAudioSrc(src, onEnd);
   }
 
   // Анимация прорисовки текущего шага (для пошаговых уроков).
@@ -121,34 +193,25 @@ export function LessonPlayer({ lesson, nextLesson, onComplete, onNext, onClose }
     if (voiceOnRef.current) speak('step', step);
   }, [step, replay, isGame, done]);
 
-  // Первый раз урок открыт — голос идёт автоматом. Дальше — только по кнопке «Озвучить».
-  // Старт откладываем через setTimeout и снимаем его в cleanup: так переживаем
-  // двойной mount React StrictMode (dev), который иначе глушит уже начатую озвучку
-  // и не перезапускает её. Флаг «уже озвучен» пишем только когда реально стартуем.
+  // Урок открыт — голос идёт автоматом: сначала короткая методическая подсказка,
+  // затем интро урока и первый шаг. Старт откладываем через setTimeout и снимаем
+  // его в cleanup: так переживаем двойной mount React StrictMode (dev).
   useEffect(() => {
-    let firstEver = false;
-    try {
-      const set = new Set(JSON.parse(localStorage.getItem('razumeyka_drawing_voiced') || '[]'));
-      firstEver = !set.has(lesson.slug);
-    } catch {}
-    if (!firstEver) return;
-
     const timer = setTimeout(() => {
-      try {
-        const set = new Set(JSON.parse(localStorage.getItem('razumeyka_drawing_voiced') || '[]'));
-        set.add(lesson.slug);
-        localStorage.setItem('razumeyka_drawing_voiced', JSON.stringify([...set]));
-      } catch {}
       setVoiceOn(true);
       voiceOnRef.current = true;
-      if (isGame) {
-        speak('intro');
-      } else {
-        // Сначала интро (один раз называет картинку), затем — первый шаг.
-        speak('intro', 0, () => {
-          if (voiceOnRef.current) speak('step', 0);
-        });
-      }
+
+      const playLessonIntro = () => {
+        if (isGame) {
+          speak('intro');
+        } else {
+          speak('intro', 0, () => {
+            if (voiceOnRef.current) speak('step', 0);
+          });
+        }
+      };
+
+      speakMethod(playLessonIntro);
     }, 80);
 
     return () => clearTimeout(timer);
@@ -162,6 +225,7 @@ export function LessonPlayer({ lesson, nextLesson, onComplete, onNext, onClose }
   const finalLayers = isGame ? '' : steps.map((s) => s.layer).join('');
   const lastStep = step >= total - 1;
   const materials = materialsFor(lesson);
+  const methodTip = methodTipFor(lesson);
   const palette = lesson.palette ?? ['#fb7185', '#60a5fa', '#facc15'];
   const viewBox = lesson.viewBox ?? '0 0 200 200';
   const coloredViewBox = lesson.coloredViewBox ?? viewBox;
@@ -218,12 +282,12 @@ export function LessonPlayer({ lesson, nextLesson, onComplete, onNext, onClose }
                 <span>Понадобится: {materials.join(', ')}</span>
               </div>
 
-              {lesson.hand && lesson.hand !== 'any' && lesson.handHint && (
+              {methodTip && (
                 <div className="mb-4 flex items-start gap-2 rounded-2xl bg-brand-purple/8 px-4 py-3">
-                  <span className="text-lg leading-none">🖐️</span>
+                  <span className="text-lg leading-none">{methodTip.icon}</span>
                   <p className="text-sm font-semibold leading-6 text-ink/74">
-                    <span className="font-extrabold text-brand-purple">{HAND_LABEL[lesson.hand]}.</span>{' '}
-                    {lesson.handHint}
+                    <span className="font-extrabold text-brand-purple">{methodTip.title}</span>{' '}
+                    {methodTip.text}
                   </p>
                 </div>
               )}

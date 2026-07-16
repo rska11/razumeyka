@@ -8,33 +8,23 @@ function rub(n: number) {
   return n.toLocaleString("ru-RU") + " ₽";
 }
 
-function fmtDateTime(d: Date) {
-  return new Intl.DateTimeFormat("ru-RU", {
-    weekday: "short",
-    day: "numeric",
-    month: "long",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(d);
-}
-
 export default async function CabinetOverview() {
   const session = await getAuthSession();
   if (!session?.user?.id) redirect("/login?callbackUrl=/cabinet");
   const userId = session.user.id;
-  const { children, payments, upcomingLessons, activeEnrollments, achievementsCount, accessMap } = await getCabinetData(userId);
+  const { children, payments, achievementsCount, accessMap } = await getCabinetData(userId);
   const now = new Date();
   const directionAccess = (Object.keys(DIRECTIONS) as DirectionSlug[]).map((slug) => {
     const until = accessMap[slug];
     return { slug, meta: DIRECTIONS[slug], until, active: Boolean(until && until.getTime() > now.getTime()) };
   });
 
-  const nextLesson = upcomingLessons[0];
+  const openDirections = directionAccess.filter((d) => d.active).length;
   const paidTotal = payments.filter((p) => p.status === "paid").reduce((s, p) => s + p.amount, 0);
 
   const stats = [
     { label: "Детей", value: String(children.length), accent: "text-brand-blue" },
-    { label: "Активных направлений", value: String(activeEnrollments.length), accent: "text-brand-pink" },
+    { label: "Открытых направлений", value: String(openDirections), accent: "text-brand-pink" },
     { label: "Достижений", value: String(achievementsCount), accent: "text-brand-orange" },
     { label: "Оплачено", value: rub(paidTotal), accent: "text-brand-green" },
   ];
@@ -82,89 +72,37 @@ export default async function CabinetOverview() {
         </div>
       </section>
 
-      <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        {/* Ближайшие занятия */}
-        <section className="rounded-[24px] border border-white/80 bg-white/85 p-5 shadow-card backdrop-blur-xl sm:p-6">
-          <div className="flex items-center justify-between">
-            <h2 className="font-display text-xl font-extrabold text-ink">Ближайшие занятия</h2>
-            <Link href="/cabinet/schedule" className="text-sm font-extrabold text-brand-blue hover:text-brand-blue/70">
-              Всё расписание →
-            </Link>
-          </div>
-          <div className="mt-4 grid gap-3">
-            {upcomingLessons.length === 0 && (
-              <p className="rounded-[16px] bg-ink/[0.02] px-4 py-6 text-center text-sm font-bold text-ink/50">
-                Пока нет запланированных занятий.
-              </p>
-            )}
-            {upcomingLessons.slice(0, 4).map(({ lesson, child, enrollment }) => {
-              const join = lesson.joinUrl || enrollment.zoomUrl;
-              return (
-                <div key={lesson.id} className="flex items-center gap-3 rounded-[16px] border border-ink/6 bg-white px-4 py-3">
-                  <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-black text-white ${child.avatarColor ?? "bg-brand-blue"}`}>
-                    {child.name.slice(0, 1)}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-extrabold text-ink">{enrollment.directionTitle}</p>
-                    <p className="truncate text-xs font-bold text-ink/52">{child.name} · {lesson.topic ?? "Занятие"}</p>
-                  </div>
-                  <div className="flex shrink-0 flex-col items-end gap-1.5">
-                    <span className="text-right text-xs font-extrabold text-ink/64">{fmtDateTime(lesson.startsAt)}</span>
-                    {join && (
-                      <a href={join} target="_blank" rel="noopener" className="inline-flex items-center gap-1 rounded-full bg-brand-blue px-3 py-1.5 text-xs font-extrabold text-white transition hover:-translate-y-0.5 hover:bg-brand-blue/90">
-                        Подключиться
-                      </a>
-                    )}
-                  </div>
+      {/* Дети */}
+      <section className="rounded-[24px] border border-white/80 bg-white/85 p-5 shadow-card backdrop-blur-xl sm:p-6">
+        <div className="flex items-center justify-between">
+          <h2 className="font-display text-xl font-extrabold text-ink">Дети</h2>
+          <Link href="/cabinet/children" className="text-sm font-extrabold text-brand-blue hover:text-brand-blue/70">
+            Управлять →
+          </Link>
+        </div>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          {children.length === 0 && (
+            <p className="rounded-[16px] bg-ink/[0.02] px-4 py-6 text-center text-sm font-bold text-ink/50">
+              Добавьте профиль ребёнка в разделе «Дети».
+            </p>
+          )}
+          {children.map((child) => (
+            <div key={child.id} className="rounded-[16px] border border-ink/6 bg-white px-4 py-3">
+              <div className="flex items-center gap-3">
+                <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-black text-white ${child.avatarColor ?? "bg-brand-blue"}`}>
+                  {child.name.slice(0, 1)}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-extrabold text-ink">{child.name}</p>
+                  <p className="text-xs font-bold text-ink/52">
+                    {child.achievements.length} {child.achievements.length === 1 ? "достижение" : "достижений"}
+                  </p>
                 </div>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* Дети */}
-        <section className="rounded-[24px] border border-white/80 bg-white/85 p-5 shadow-card backdrop-blur-xl sm:p-6">
-          <div className="flex items-center justify-between">
-            <h2 className="font-display text-xl font-extrabold text-ink">Дети</h2>
-            <Link href="/cabinet/children" className="text-sm font-extrabold text-brand-blue hover:text-brand-blue/70">
-              Управлять →
-            </Link>
-          </div>
-          <div className="mt-4 grid gap-3">
-            {children.length === 0 && (
-              <p className="rounded-[16px] bg-ink/[0.02] px-4 py-6 text-center text-sm font-bold text-ink/50">
-                Добавьте профиль ребёнка в разделе «Дети».
-              </p>
-            )}
-            {children.map((child) => (
-              <div key={child.id} className="rounded-[16px] border border-ink/6 bg-white px-4 py-3">
-                <div className="flex items-center gap-3">
-                  <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-black text-white ${child.avatarColor ?? "bg-brand-blue"}`}>
-                    {child.name.slice(0, 1)}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-extrabold text-ink">{child.name}</p>
-                    <p className="text-xs font-bold text-ink/52">
-                      {child.enrollments.length} {child.enrollments.length === 1 ? "направление" : "направления"}
-                    </p>
-                  </div>
-                </div>
-                {child.enrollments.map((e) => (
-                  <div key={e.id} className="mt-3">
-                    <div className="flex items-center justify-between text-xs font-extrabold text-ink/64">
-                      <span className="truncate">{e.directionTitle}</span>
-                      <span>{e.progress}%</span>
-                    </div>
-                    <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-ink/8">
-                      <div className="h-full rounded-full bg-brand-blue" style={{ width: `${e.progress}%` }} />
-                    </div>
-                  </div>
-                ))}
               </div>
-            ))}
-          </div>
-        </section>
-      </div>
+            </div>
+          ))}
+        </div>
+      </section>
 
       {/* Оплаты */}
       <section className="rounded-[24px] border border-white/80 bg-white/85 p-5 shadow-card backdrop-blur-xl sm:p-6">

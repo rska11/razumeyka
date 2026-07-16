@@ -7,7 +7,6 @@ import { signOut } from 'next-auth/react';
 const links = [
   ['/cabinet', 'Обзор', 'M3 12l9-9 9 9M5 10v10h14V10'],
   ['/cabinet/children', 'Дети', 'M12 11a4 4 0 100-8 4 4 0 000 8zM4 21a8 8 0 0116 0'],
-  ['/cabinet/schedule', 'Расписание', 'M8 2v4M16 2v4M3 10h18M5 6h14v14H5z'],
   ['/cabinet/payments', 'Оплаты', 'M3 7h18v10H3zM3 11h18'],
 ];
 

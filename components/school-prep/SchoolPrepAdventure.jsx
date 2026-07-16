@@ -356,13 +356,18 @@ function MissionCard({ mission, index, done, onComplete }) {
 
 export function SchoolPrepAdventure({ week }) {
   const [selectedDay, setSelectedDay] = useState(0);
+  const [missionIndex, setMissionIndex] = useState(0);
   const [completed, setCompleted] = useState([]);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     try {
       const saved = JSON.parse(window.localStorage.getItem(STORAGE_KEY) || "[]");
-      if (Array.isArray(saved)) setCompleted(saved);
+      if (Array.isArray(saved)) {
+        setCompleted(saved);
+        const firstOpen = week.days[0].missions.findIndex((mission) => !saved.includes(mission.id));
+        setMissionIndex(firstOpen === -1 ? week.days[0].missions.length - 1 : firstOpen);
+      }
     } catch {
       setCompleted([]);
     } finally {
@@ -382,6 +387,9 @@ export function SchoolPrepAdventure({ week }) {
   const dayComplete = (day) => day.missions.every((mission) => completed.includes(mission.id));
   const unlocked = (index) => index === 0 || dayComplete(week.days[index - 1]);
   const currentDay = week.days[selectedDay];
+  const currentMission = currentDay.missions[missionIndex] ?? currentDay.missions[0];
+  const currentMissionDone = completed.includes(currentMission.id);
+  const completedToday = currentDay.missions.filter((mission) => completed.includes(mission.id)).length;
   const currentComplete = dayComplete(currentDay);
   const weekComplete = allMissionIds.every((id) => completed.includes(id));
   const progress = Math.round((completed.filter((id) => allMissionIds.includes(id)).length / allMissionIds.length) * 100);
@@ -392,14 +400,35 @@ export function SchoolPrepAdventure({ week }) {
 
   function selectDay(index) {
     if (!unlocked(index)) return;
+    const nextDay = week.days[index];
+    const firstOpen = nextDay.missions.findIndex((mission) => !completed.includes(mission.id));
     setSelectedDay(index);
+    setMissionIndex(firstOpen === -1 ? nextDay.missions.length - 1 : firstOpen);
     window.setTimeout(() => document.getElementById("school-prep-day")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+  }
+
+  function missionIsUnlocked(index) {
+    if (index === 0) return true;
+    return completed.includes(currentDay.missions[index - 1].id);
+  }
+
+  function selectMission(index) {
+    if (!missionIsUnlocked(index)) return;
+    setMissionIndex(index);
+    window.setTimeout(() => document.getElementById("school-prep-mission")?.scrollIntoView({ behavior: "smooth", block: "center" }), 40);
+  }
+
+  function nextMission() {
+    if (missionIndex >= currentDay.missions.length - 1) return;
+    setMissionIndex((current) => current + 1);
+    window.setTimeout(() => document.getElementById("school-prep-mission")?.scrollIntoView({ behavior: "smooth", block: "center" }), 40);
   }
 
   function resetWeek() {
     if (!window.confirm("Начать первую неделю заново? Все полученные звёзды будут сброшены.")) return;
     setCompleted([]);
     setSelectedDay(0);
+    setMissionIndex(0);
   }
 
   return (
@@ -443,12 +472,24 @@ export function SchoolPrepAdventure({ week }) {
                       : "border-white/5 bg-white/[0.025] opacity-38"
                 }`}
               >
-                <div className="flex items-center justify-between">
-                  <span className="text-2xl">{isUnlocked ? day.emoji : "🔒"}</span>
+                <div className="flex items-center justify-between gap-2">
+                  {isUnlocked && day.image ? (
+                    <span className="h-11 w-14 overflow-hidden rounded-[13px] border border-white/14 bg-white/8">
+                      <img
+                        src={day.image}
+                        alt=""
+                        className="h-full w-full object-cover"
+                        style={{ objectPosition: day.imagePosition }}
+                      />
+                    </span>
+                  ) : (
+                    <span className="flex h-11 w-14 items-center justify-center rounded-[13px] bg-white/7 text-2xl">{isUnlocked ? day.emoji : "🔒"}</span>
+                  )}
                   {isDone && <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-green text-xs font-black">✓</span>}
                 </div>
                 <p className="mt-3 text-[10px] font-extrabold uppercase tracking-[0.13em] text-white/42">День {day.number}</p>
                 <p className="mt-1 text-xs font-extrabold leading-5 text-white/88 sm:text-sm">{day.title}</p>
+                <p className="mt-1 text-[10px] font-bold text-white/38">{day.missions.length} шагов</p>
               </button>
             );
           })}
@@ -457,32 +498,103 @@ export function SchoolPrepAdventure({ week }) {
 
       <section id="school-prep-day" className="scroll-mt-28 mt-6">
         <div className={`relative overflow-hidden rounded-[32px] bg-gradient-to-br ${currentDay.color} p-6 text-white shadow-color sm:p-8`}>
-          <div className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full bg-white/14 blur-3xl" />
+          {currentDay.image && (
+            <img
+              src={currentDay.image}
+              alt=""
+              className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+              style={{ objectPosition: currentDay.imagePosition }}
+            />
+          )}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#0c1930]/95 via-[#11284a]/82 to-[#11284a]/36" />
           <div className="relative grid gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
             <div>
               <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-white/68">День {currentDay.number} · {currentDay.zone}</p>
               <h3 className="mt-2 font-display text-3xl font-extrabold tracking-[-0.035em] sm:text-4xl">{currentDay.title}</h3>
               <p className="mt-3 max-w-2xl text-base font-semibold leading-7 text-white/78">{currentDay.lead}</p>
             </div>
-            <span className="flex h-24 w-24 items-center justify-center rounded-[28px] border border-white/18 bg-white/16 text-5xl shadow-insetline backdrop-blur-xl">
-              {currentDay.emoji}
-            </span>
+            <div className="min-w-[150px] rounded-[24px] border border-white/18 bg-[#0b1930]/48 p-4 shadow-insetline backdrop-blur-xl">
+              <p className="text-[10px] font-extrabold uppercase tracking-[0.15em] text-white/52">Маршрут дня</p>
+              <p className="mt-1 font-display text-2xl font-extrabold">{currentDay.missions.length} шагов</p>
+              <p className="mt-1 text-xs font-bold text-white/62">{currentDay.number === 1 ? '20–25 минут' : 'развиваем дальше'}</p>
+            </div>
           </div>
           <div className="relative mt-6 rounded-[20px] border border-white/14 bg-white/12 px-4 py-3.5 text-sm font-bold leading-6 text-white/86 backdrop-blur-xl">
             <span className="mr-2">⚡</span>{currentDay.warmup}
           </div>
         </div>
 
-        <div className="mt-5 grid gap-5">
-          {currentDay.missions.map((mission, index) => (
-            <MissionCard
-              key={mission.id}
-              mission={mission}
-              index={index}
-              done={completed.includes(mission.id)}
-              onComplete={() => completeMission(mission.id)}
-            />
-          ))}
+        <div className="mt-5 rounded-[28px] border border-white/80 bg-white/82 p-5 shadow-card backdrop-blur-xl sm:p-7">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-brand-blue">
+                {currentMission.chapter ?? "Миссия дня " + (selectedDay + 1)}
+              </p>
+              <h4 className="mt-2 font-display text-2xl font-extrabold tracking-[-0.025em] text-ink">
+                Шаг {missionIndex + 1} из {currentDay.missions.length}
+              </h4>
+              <p className="mt-1 text-sm font-semibold text-ink/48">
+                {completedToday} выполнено · {currentDay.missions.length - completedToday} осталось
+              </p>
+            </div>
+            <div className="w-full max-w-[300px]">
+              <div className="h-2.5 overflow-hidden rounded-full bg-ink/7">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-brand-blue via-brand-purple to-brand-pink transition-all duration-500"
+                  style={{ width: Math.round((completedToday / currentDay.missions.length) * 100) + "%" }}
+                />
+              </div>
+              <p className="mt-2 text-right text-[10px] font-extrabold uppercase tracking-[0.12em] text-ink/36">
+                прогресс дня
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-5 grid grid-cols-8 gap-1.5 sm:grid-cols-12 lg:grid-cols-[repeat(25,minmax(0,1fr))]">
+            {currentDay.missions.map((mission, index) => {
+              const done = completed.includes(mission.id);
+              const available = missionIsUnlocked(index);
+              const active = index === missionIndex;
+              return (
+                <button
+                  key={mission.id}
+                  type="button"
+                  disabled={!available}
+                  onClick={() => selectMission(index)}
+                  aria-label={"Открыть шаг " + (index + 1)}
+                  className={"flex aspect-square min-h-8 items-center justify-center rounded-[10px] text-[10px] font-black transition " + (
+                    active
+                      ? "bg-ink text-white shadow-sm"
+                      : done
+                        ? "bg-brand-green/14 text-brand-green"
+                        : available
+                          ? "bg-brand-blue/10 text-brand-blue hover:bg-brand-blue/18"
+                          : "bg-ink/[0.035] text-ink/20"
+                  )}
+                >
+                  {done ? "✓" : index + 1}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div id="school-prep-mission" className="scroll-mt-32 mt-5">
+          <MissionCard
+            key={currentMission.id}
+            mission={currentMission}
+            index={missionIndex}
+            done={currentMissionDone}
+            onComplete={() => completeMission(currentMission.id)}
+          />
+
+          {currentMissionDone && missionIndex < currentDay.missions.length - 1 && (
+            <div className="mt-4 flex justify-end">
+              <button type="button" onClick={nextMission} className="primary-btn">
+                Следующий шаг <span aria-hidden="true">→</span>
+              </button>
+            </div>
+          )}
         </div>
 
         {currentComplete && (
@@ -490,7 +602,7 @@ export function SchoolPrepAdventure({ week }) {
             <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-brand-green">Печать дня получена</p>
-                <h4 className="mt-2 font-display text-2xl font-extrabold text-ink">Все три миссии выполнены!</h4>
+                <h4 className="mt-2 font-display text-2xl font-extrabold text-ink">Все {currentDay.missions.length} шагов выполнены!</h4>
                 <p className="mt-2 max-w-xl text-sm font-medium leading-6 text-ink/58">
                   {selectedDay < week.days.length - 1 ? "Открыт следующий район Города знаний." : "Все районы пройдены — золотой ключ собран."}
                 </p>

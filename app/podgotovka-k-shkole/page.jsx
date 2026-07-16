@@ -64,44 +64,26 @@ const courseSchema = {
 };
 
 function CityMap() {
-  const stops = [
-    { icon: '🎒', label: 'Ворота порядка', className: 'left-[5%] top-[9%] border-brand-blue/20' },
-    { icon: '🔤', label: 'Площадь слов', className: 'right-[3%] top-[22%] border-brand-pink/20' },
-    { icon: '🔢', label: 'Числовой мост', className: 'left-[1%] top-[53%] border-brand-orange/20' },
-    { icon: '🧠', label: 'Лаборатория', className: 'right-[4%] top-[64%] border-brand-purple/20' },
-  ];
-
   return (
-    <div className="relative mx-auto aspect-[1.02] w-full max-w-[580px]" aria-label="Карта первой недели курса">
-      <div className="absolute inset-[8%] rounded-[42%_58%_50%_50%] border border-white/70 bg-white/54 shadow-luxe backdrop-blur-xl" />
-      <svg className="absolute inset-[13%] h-[74%] w-[74%] translate-x-[8%]" viewBox="0 0 440 420" fill="none" aria-hidden="true">
-        <path d="M40 76C115 20 177 110 232 91C308 65 351 80 382 143C412 203 322 229 323 287C324 343 250 381 183 349C112 315 116 263 62 231C12 201 1 112 40 76Z" fill="url(#mapFill)" />
-        <path d="M63 91C114 45 161 124 231 105C302 86 347 101 358 155C368 207 293 225 296 280C300 332 237 352 185 326C131 299 132 249 76 217C30 191 25 126 63 91Z" stroke="white" strokeWidth="4" strokeDasharray="8 13" strokeLinecap="round" />
-        <path d="M109 171C139 139 173 173 204 155C237 135 277 151 280 189C284 226 243 234 231 260C216 291 166 277 160 243C155 215 82 201 109 171Z" fill="white" fillOpacity=".7" />
-        <defs>
-          <linearGradient id="mapFill" x1="40" y1="55" x2="355" y2="355" gradientUnits="userSpaceOnUse">
-            <stop stopColor="#DDEBFF" />
-            <stop offset=".45" stopColor="#F3E6FF" />
-            <stop offset="1" stopColor="#DDF8E8" />
-          </linearGradient>
-        </defs>
-      </svg>
-
-      {stops.map((stop) => (
-        <div key={stop.label} className={`absolute ${stop.className} z-10 flex items-center gap-2 rounded-2xl border bg-white/90 px-3 py-2 shadow-card backdrop-blur-xl sm:px-4 sm:py-3`}>
-          <span className="text-xl sm:text-2xl">{stop.icon}</span>
-          <span className="hidden text-xs font-extrabold text-ink/70 sm:block">{stop.label}</span>
+    <div className="relative mx-auto w-full max-w-[680px]" aria-label="Иллюстрированная карта Города знаний">
+      <div className="pointer-events-none absolute -inset-8 rounded-full bg-gradient-to-br from-brand-blue/16 via-brand-purple/12 to-brand-pink/14 blur-3xl" />
+      <div className="relative aspect-[3/2] overflow-hidden rounded-[34px] border border-white/80 bg-white shadow-luxe sm:rounded-[42px]">
+        <img
+          src="/images/school-prep/city-of-knowledge-hero.webp"
+          alt="Лисёнок Искра приглашает ребёнка в Город знаний"
+          className="h-full w-full object-cover"
+        />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0c1930]/46 via-transparent to-white/5" />
+        <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between gap-3 sm:bottom-6 sm:left-6 sm:right-6">
+          <div className="rounded-[18px] border border-white/28 bg-[#0b1930]/68 px-4 py-3 text-white shadow-card backdrop-blur-xl">
+            <p className="text-[9px] font-extrabold uppercase tracking-[0.16em] text-white/58">Проводник экспедиции</p>
+            <p className="mt-1 font-display text-lg font-extrabold">Лисёнок Искра</p>
+          </div>
+          <div className="rounded-[18px] border border-white/38 bg-[#FFF6CF]/92 px-3 py-2 text-center shadow-card backdrop-blur-xl">
+            <span className="text-2xl" aria-hidden="true">🔑</span>
+            <p className="text-[8px] font-extrabold uppercase tracking-[0.12em] text-ink/56">Награда недели</p>
+          </div>
         </div>
-      ))}
-
-      <div className="absolute left-1/2 top-1/2 z-20 flex h-32 w-32 -translate-x-1/2 -translate-y-1/2 animate-floaty items-center justify-center rounded-[38px] border border-white/80 bg-white shadow-luxe sm:h-40 sm:w-40">
-        <span className="text-7xl sm:text-8xl" role="img" aria-label="Лисёнок Искра">🦊</span>
-        <span className="absolute -bottom-3 rounded-full bg-ink px-4 py-2 text-[10px] font-extrabold uppercase tracking-[0.13em] text-white">Проводник Искра</span>
-      </div>
-
-      <div className="absolute bottom-[2%] right-[16%] z-20 rotate-6 rounded-[22px] border border-brand-yellow/25 bg-[#FFF8D8] px-4 py-3 shadow-card">
-        <span className="text-3xl">🔑</span>
-        <p className="mt-1 text-[10px] font-extrabold uppercase tracking-[0.12em] text-ink/55">Награда недели</p>
       </div>
     </div>
   );

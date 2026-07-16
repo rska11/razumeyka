@@ -5,8 +5,8 @@ import { createYooKassaPayment, isYooKassaConfigured } from "@/lib/yookassa";
 import {
   DIRECTIONS,
   SUBSCRIPTION_MONTHS,
-  SUBSCRIPTION_PRICE,
   directionFromReturnTo,
+  directionPrice,
 } from "@/lib/subscription";
 
 // Оформление доступа к направлению self-study. Создаёт платёж purpose="subscription"
@@ -37,7 +37,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "OFFER_NOT_ACCEPTED" }, { status: 400 });
   }
 
-  const amount = SUBSCRIPTION_PRICE;
+  const amount = directionPrice(direction);
   const description = `«Разумейка» · доступ · ${DIRECTIONS[direction].title} · ${SUBSCRIPTION_MONTHS} мес`;
 
   const payment = await prisma.payment.create({

@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 // Оплата открывает конкретное направление; чтобы открыть второе — отдельная оплата.
 // Пилот: оплаченный период доступа без автосписания (продлевается вручную/новой оплатой).
 
-export const SUBSCRIPTION_PRICE = 490; // ₽ за период
+export const SUBSCRIPTION_PRICE = 490; // ₽ за период (по умолчанию)
 export const SUBSCRIPTION_MONTHS = 1;
 
 // Направления, которые продаются как self-study доступ.
@@ -14,6 +14,18 @@ export const DIRECTIONS = {
 } as const;
 
 export type DirectionSlug = keyof typeof DIRECTIONS;
+
+// Цена доступа по направлению. ВРЕМЕННО: рисование — 10 ₽ для тестового платежа
+// (проверка сквозного потока ЮKassa). ВЕРНУТЬ на 490 после теста.
+export const DIRECTION_PRICE: Record<DirectionSlug, number> = {
+  risovanie: 10, // TEST: тестовый платёж — вернуть на 490
+  "mentalnaya-arifmetika": SUBSCRIPTION_PRICE,
+};
+
+/** Цена доступа к направлению в рублях. */
+export function directionPrice(direction: DirectionSlug): number {
+  return DIRECTION_PRICE[direction] ?? SUBSCRIPTION_PRICE;
+}
 
 export function isDirectionSlug(v: unknown): v is DirectionSlug {
   return typeof v === "string" && Object.prototype.hasOwnProperty.call(DIRECTIONS, v);

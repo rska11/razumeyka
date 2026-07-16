@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getAuthSession } from "@/lib/auth";
 import { getCabinetData } from "@/lib/cabinet";
-import { DIRECTIONS, SUBSCRIPTION_PRICE, type DirectionSlug } from "@/lib/subscription";
+import { DIRECTIONS, directionPrice, type DirectionSlug } from "@/lib/subscription";
 
 function rub(n: number) {
   return n.toLocaleString("ru-RU") + " ₽";
@@ -64,7 +64,7 @@ export default async function CabinetOverview() {
                 </p>
               ) : (
                 <Link href={`${meta.path}#podpiska`} className="inline-flex w-fit items-center gap-1 rounded-full bg-brand-blue px-3 py-1.5 text-xs font-extrabold text-white transition hover:-translate-y-0.5 hover:bg-brand-blue/90">
-                  Открыть за {SUBSCRIPTION_PRICE} ₽ →
+                  Открыть за {directionPrice(slug)} ₽ →
                 </Link>
               )}
             </div>

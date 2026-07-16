@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 
-const AUTH_DISABLED_KEY = "authDisabled";
+const AUTH_DISABLED_KEY = "authDisabledV2";
 
 /** Выключена ли авторизация глобально (рубильник из админки). */
 export async function isAuthDisabled(): Promise<boolean> {

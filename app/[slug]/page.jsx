@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { directionsData, getDirectionBySlug } from '@/data/directions.js';
 import { landingsData, getLandingBySlug } from '@/data/landings.js';
 import { LandingPage } from '@/components/LandingPage.jsx';
+import { isDirectionReady } from '@/data/launch.js';
 
 export function generateStaticParams() {
   return [
@@ -104,12 +105,14 @@ export default async function DirectionPage({ params }) {
 
   const direction = getDirectionBySlug(slug);
   if (direction) {
-    return <LandingPage landing={directionToLanding(direction)} />;
+    const comingSoon = !isDirectionReady(slug);
+    return <LandingPage landing={{ ...directionToLanding(direction), comingSoon, waitlistDirection: slug }} />;
   }
 
   const landing = getLandingBySlug(slug);
   if (landing) {
-    return <LandingPage landing={landing} />;
+    // Все [slug]-лендинги — направления, которые ещё не открыты как продукт.
+    return <LandingPage landing={{ ...landing, comingSoon: true, waitlistDirection: slug }} />;
   }
 
   notFound();

@@ -7,6 +7,8 @@ import { getLandingBySlug } from '@/data/landings.js';
 import { DirectionGame } from '@/components/games/DirectionGame.jsx';
 import { LanguagesHub } from '@/components/LanguagesHub.jsx';
 import { LaunchBadge } from '@/components/LaunchBadge.jsx';
+import { WaitlistForm } from '@/components/WaitlistForm.jsx';
+import { LAUNCH_LABEL } from '@/data/launch.js';
 
 const accents = {
   blue: { soft: 'bg-brand-blue/8', text: 'text-brand-blue', grad: 'from-brand-blue/25 to-brand-purple/20' },
@@ -49,6 +51,8 @@ export function LandingPage({ landing }) {
 
   const a = accents[landing.theme] ?? accents.blue;
   const hg = h1grad[landing.theme] ?? h1grad.blue;
+  const comingSoon = Boolean(landing.comingSoon);
+  const waitlistDirection = landing.waitlistDirection ?? landing.slug;
   const stats = landing.stats ?? [
     { v: 'бесплатно', l: 'первые уроки' },
     { v: 'онлайн', l: 'из любого города' },
@@ -115,7 +119,7 @@ export function LandingPage({ landing }) {
                   <span>Первые уроки бесплатно</span>
                 </div>
                 <p className="mt-4 text-sm font-semibold leading-6 text-ink/56">
-                  Это направление открываем <span className="font-extrabold text-ink/80">17 июля</span>. А формат уроков-игр уже можно попробовать бесплатно на{' '}
+                  Это направление открываем <span className="font-extrabold text-ink/80">{LAUNCH_LABEL}</span>. А формат уроков-игр уже можно попробовать бесплатно на{' '}
                   <Link href="/risovanie" className={`font-extrabold ${a.text} underline underline-offset-2`}>правополушарном рисовании</Link>.
                 </p>
               </div>
@@ -347,13 +351,23 @@ export function LandingPage({ landing }) {
                   ))}
                 </ul>
               </div>
-              <div className={`${PC} p-8 text-center`}>
-                <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-ink/44">Полный доступ</p>
-                <p className="mt-2 font-display text-6xl font-black text-ink">490₽<span className="text-2xl text-ink/50">/мес</span></p>
-                <p className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-brand-blue/10 px-3 py-1 text-xs font-extrabold text-brand-blue">🚀 Запуск направления — 17 июля</p>
-                <a href="/risovanie" className="primary-btn mt-5 w-full">Попробовать бесплатно на рисовании</a>
-                <p className="mt-3.5 text-xs font-semibold text-ink/48">Первые уроки бесплатно · доступ на 30 дней</p>
-              </div>
+              {comingSoon ? (
+                <div className={`${PC} p-8`}>
+                  <p className="text-center text-xs font-extrabold uppercase tracking-[0.16em] text-ink/44">Скоро открываем</p>
+                  <WaitlistForm direction={waitlistDirection} source="landing" className="mt-4" />
+                  <p className="mt-4 text-center text-xs font-semibold text-ink/48">
+                    А пока попробуйте формат бесплатно на{' '}
+                    <Link href="/risovanie" className={`font-extrabold ${a.text} underline underline-offset-2`}>рисовании</Link>.
+                  </p>
+                </div>
+              ) : (
+                <div className={`${PC} p-8 text-center`}>
+                  <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-ink/44">Полный доступ</p>
+                  <p className="mt-2 font-display text-6xl font-black text-ink">490₽<span className="text-2xl text-ink/50">/мес</span></p>
+                  <a href={`/${landing.slug}`} className="primary-btn mt-5 w-full">Начать бесплатно</a>
+                  <p className="mt-3.5 text-xs font-semibold text-ink/48">Первые уроки бесплатно · доступ на 30 дней</p>
+                </div>
+              )}
             </div>
           </div>
         </section>

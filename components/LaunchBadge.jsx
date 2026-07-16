@@ -1,9 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
-// Дата запуска направлений (правополушарное рисование уже открыто, остальные — с этой даты).
-export const LAUNCH_DATE = new Date('2026-07-17T10:00:00+03:00');
+import { LAUNCH_DATE, LAUNCH_LABEL } from '@/data/launch.js';
 
 function plural(n, one, few, many) {
   const d10 = n % 10;
@@ -53,7 +51,7 @@ export function LaunchBadge({ className = '' }) {
       <span className="flex flex-col leading-tight">
         <span className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-ink/45">Запуск направления</span>
         <span className="font-display text-sm font-black text-ink">
-          17 июля
+          {LAUNCH_LABEL}
           {countdown && (
             <span className="ml-2 rounded-full bg-brand-blue/12 px-2 py-0.5 text-xs font-extrabold text-brand-blue">
               {countdown}

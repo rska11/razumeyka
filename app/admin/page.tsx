@@ -2,7 +2,18 @@ import { prisma } from "@/lib/prisma";
 import { isAuthDisabled } from "@/lib/settings";
 import { getAuthSession } from "@/lib/auth";
 import { DIRECTIONS, getAccessMap, type DirectionSlug } from "@/lib/subscription";
+import { directionsData } from "@/data/directions.js";
+import { landingsData } from "@/data/landings.js";
 import { toggleAuth, unlockAllForMe, lockAllForMe, grantAccessToUser, revokeAccessFromUser } from "./actions";
+
+// Читаемое название направления по слагу (для листа ожидания — там слаги неоткрытых направлений).
+function directionLabel(slug: string): string {
+  return (
+    directionsData.find((d: { slug: string; title?: string }) => d.slug === slug)?.title ??
+    landingsData.find((l: { slug: string; h1?: string }) => l.slug === slug)?.h1 ??
+    slug
+  );
+}
 
 function rub(n: number) {
   return n.toLocaleString("ru-RU") + " ₽";
@@ -29,7 +40,7 @@ export default async function AdminPage() {
   const allMineUnlocked = myUnlocked.length > 0 && myUnlocked.every((d) => d.active);
   const anyMineUnlocked = myUnlocked.some((d) => d.active);
 
-  const [authDisabled, users, payments, accesses] = await Promise.all([
+  const [authDisabled, users, payments, accesses, waitlist] = await Promise.all([
     isAuthDisabled(),
     prisma.user.findMany({
       orderBy: { createdAt: "desc" },
@@ -43,6 +54,7 @@ export default async function AdminPage() {
       orderBy: { until: "desc" },
       include: { user: { select: { email: true } } },
     }),
+    prisma.waitlist.findMany({ orderBy: { createdAt: "desc" } }),
   ]);
 
   // Карта доступов по пользователям: userId → { direction → until }
@@ -57,6 +69,17 @@ export default async function AdminPage() {
   const activeAccesses = accesses
     .filter((a) => a.until.getTime() > now && DIRECTIONS[a.direction as DirectionSlug])
     .sort((a, b) => a.until.getTime() - b.until.getTime());
+
+  // Лист ожидания, сгруппированный по направлениям (по убыванию числа ожидающих).
+  const waitlistByDirection = new Map<string, typeof waitlist>();
+  for (const w of waitlist) {
+    const arr = waitlistByDirection.get(w.direction) ?? [];
+    arr.push(w);
+    waitlistByDirection.set(w.direction, arr);
+  }
+  const waitlistGroups = [...waitlistByDirection.entries()]
+    .map(([direction, entries]) => ({ direction, entries }))
+    .sort((a, b) => b.entries.length - a.entries.length);
 
   const childrenCount = users.reduce((s, u) => s + u.children.length, 0);
   const enrollCount = users.reduce((s, u) => s + u.children.reduce((a, c) => a + c.enrollments.length, 0), 0);
@@ -170,6 +193,33 @@ export default async function AdminPage() {
               </div>
               <span className="rounded-full bg-brand-green/12 px-2.5 py-1 text-[11px] font-extrabold text-brand-green">до {fmtDate(a.until)}</span>
             </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Лист ожидания запуска */}
+      <section className="rounded-[24px] border border-white/80 bg-white/85 p-5 shadow-card backdrop-blur-xl sm:p-6">
+        <h2 className="font-display text-xl font-extrabold text-ink">Лист ожидания ({waitlist.length})</h2>
+        <p className="mt-1 text-xs font-bold text-ink/52">Кто оставил email на «скоро»-направлениях. На запуске направления по ним делаем рассылку.</p>
+        <div className="mt-4 grid gap-3">
+          {waitlistGroups.length === 0 && (
+            <p className="rounded-[16px] bg-ink/[0.02] px-4 py-6 text-center text-sm font-bold text-ink/50">Заявок в листе ожидания пока нет.</p>
+          )}
+          {waitlistGroups.map(({ direction, entries }) => (
+            <details key={direction} className="rounded-[16px] border border-ink/6 bg-white px-4 py-3">
+              <summary className="flex cursor-pointer items-center justify-between gap-2 text-sm font-extrabold text-ink">
+                <span className="truncate">{directionLabel(direction)}</span>
+                <span className="shrink-0 rounded-full bg-brand-orange/12 px-2.5 py-1 text-[11px] font-extrabold text-brand-orange">{entries.length} ждут</span>
+              </summary>
+              <div className="mt-3 grid gap-1.5">
+                {entries.map((w) => (
+                  <div key={w.id} className="flex items-center justify-between gap-2 text-xs">
+                    <span className="truncate font-bold text-ink/72">{w.email}</span>
+                    <span className="shrink-0 font-bold text-ink/40">{fmtDate(w.createdAt)}{w.notifiedAt ? " · уведомлён" : ""}</span>
+                  </div>
+                ))}
+              </div>
+            </details>
           ))}
         </div>
       </section>

@@ -124,6 +124,20 @@ model Achievement {
   @@index([childId])
 }
 
+/// Лист ожидания запуска направления. Пользователь оставляет email на «скоро»-странице
+/// направления, которое ещё не открыто; на запуске по нему делается рассылка.
+model Waitlist {
+  id         String    @id @default(cuid())
+  email      String
+  direction  String    // слаг направления (speed-reading | intuition | podgotovka-k-shkole | ...)
+  source     String?   // откуда пришёл (card | landing) — для аналитики
+  notifiedAt DateTime? // когда отправили письмо «мы запустились»
+  createdAt  DateTime  @default(now())
+
+  @@unique([email, direction])
+  @@index([direction])
+}
+
 /// Глобальные настройки-тумблеры (key-value), управляемые из админки без деплоя.
 /// Сейчас: authDisabled = "true"|"false" — рубильник авторизации.
 model SystemSetting {

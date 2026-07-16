@@ -38,6 +38,10 @@ npx prisma db push --skip-generate
 # 3. Сборка в .next-pending (сайт всё ещё работает на .next)
 echo "[update] build → .next-pending"
 rm -rf .next-pending
+# TypeScript scans the paths listed in tsconfig.json. Remove type stubs from the
+# currently running build so deleted routes cannot poison the new build. These
+# files are used only for type checking; Next.js does not need them at runtime.
+rm -rf .next/types .next/dev/types
 NEXT_DIST_DIR=".next-pending" npm run build
 
 if [ ! -f .next-pending/BUILD_ID ]; then

@@ -42,10 +42,13 @@ function LoginForm() {
         setNotice(`Код отправлен на ${email}. Проверьте почту.`);
       } else {
         const data = await res.json().catch(() => ({}));
+        if (data.error === "RATE_LIMITED") {
+          setStep("code");
+          setNotice(`Код уже отправлен на ${email}. Введите его ниже.`);
+          return;
+        }
         setError(
-          data.error === "RATE_LIMITED"
-            ? "Код уже отправлен. Подождите минуту перед повторной отправкой."
-            : data.error === "INVALID_EMAIL"
+          data.error === "INVALID_EMAIL"
               ? "Введите корректный email."
               : data.error === "FOREIGN_EMAIL"
                 ? "Вход только с российской почты (Яндекс, Mail.ru и др.) — требование закона РФ."

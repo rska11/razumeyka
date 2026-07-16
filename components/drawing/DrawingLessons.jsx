@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 // Карта уроков рисования: возраст → главы курса → уроки.
 // Прогресс хранится локально, замки остаются для платной библиотеки.
@@ -27,6 +27,8 @@ const STAGE_META = [
 ];
 
 const MONTH_DAYS = 20;
+const LESSONS_PER_DAY = 10;
+const MONTH_TOTAL_LESSONS = MONTH_DAYS * LESSONS_PER_DAY;
 const COURSE_MONTHS = [
   { n: 1, title: 'Месяц 1', status: 'Идёт сейчас', note: '20 учебных дней: 5 занятий + 2 выходных' },
   { n: 2, title: 'Месяц 2', status: 'Скоро', note: 'новые сюжеты и упражнения второй рукой' },
@@ -35,18 +37,21 @@ const COURSE_MONTHS = [
   { n: 5, title: 'Месяц 5', status: 'Скоро', note: 'закрепление и мини-портфолио ребёнка' },
 ];
 const FUTURE_DAY_TITLES = [
-  'День линий и дорожек',
-  'День цветов и листиков',
-  'День смешных зверят',
-  'День транспорта',
-  'День узоров',
-  'День настроения',
-  'День маленькой сказки',
-  'День двух рук',
-  'День перевёрнутой картинки',
-  'День большой сцены',
-  'День фантазии',
-  'День итоговой работы',
+  'Новые формы и уверенная линия',
+  'Цвет, фон и настроение',
+  'Герои и характер',
+  'Предметы вокруг нас',
+  'Большая работа недели 2',
+  'Свет, детали и объём',
+  'Животные и движение',
+  'Сказочный сюжет',
+  'Две руки и симметрия',
+  'Большая работа недели 3',
+  'Композиция и планы',
+  'Перевёрнутый рисунок',
+  'Мой авторский герой',
+  'Серия рисунков',
+  'Финальная выставка месяца',
 ];
 
 function lessonOrder(lesson) {
@@ -171,7 +176,7 @@ function groupByChapter(lessons) {
     .sort((a, b) => a.chapterOrder - b.chapterOrder);
 }
 
-function MonthRoadmap({ readyDays, doneCount, totalLessons }) {
+function MonthRoadmap({ readyDays }) {
   return (
     <div className="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
       {COURSE_MONTHS.map((month) => {
@@ -220,17 +225,30 @@ function WeekendPause({ week }) {
   );
 }
 
-function LockedDay({ dayNumber, title }) {
+function lockedWeekNumber(dayNumber) {
+  return Math.ceil(dayNumber / 5);
+}
+
+function LockedDay({ dayNumber, title, firstWeekDone }) {
+  const week = lockedWeekNumber(dayNumber);
   return (
-    <section className="border-t border-ink/8 pt-5">
-      <div className="rounded-2xl border border-white/65 bg-white/45 p-4 shadow-sm">
-        <div className="flex items-center justify-between gap-3">
+    <section className="drawing-locked-day">
+      <div className="drawing-locked-day-card">
+        <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-ink/36">День {dayNumber}</p>
-            <h4 className="mt-1 font-display text-xl font-extrabold text-ink/54">{title}</h4>
-            <p className="mt-1 text-xs font-bold text-ink/42">Уроки этого дня готовятся для следующего пополнения месяца.</p>
+            <p className="drawing-locked-day-kicker">Неделя {week} · день {dayNumber} · 10 уроков</p>
+            <h4>{title}</h4>
+            <p>
+              {firstWeekDone
+                ? 'Следующая часть месяца откроется по расписанию курса: новые сюжеты, детали и задания без скачка сложности.'
+                : 'Откроется после прохождения первой недели: ребёнок сначала закрепляет 50 стартовых уроков, затем переходит к новым сюжетам месяца.'}
+            </p>
+            <div className="drawing-locked-day-progress">
+              <span>Входит в полный месяц</span>
+              <b>{LESSONS_PER_DAY} уроков</b>
+            </div>
           </div>
-          <span className="grid h-10 w-10 flex-none place-items-center rounded-full bg-ink/8 text-ink/38">🔒</span>
+          <span className="drawing-locked-day-lock">🔒</span>
         </div>
       </div>
     </section>
@@ -344,7 +362,9 @@ export function DrawingLessons({ hasSubscription = false }) {
   const playable = useMemo(() => orderedLessons.filter(unlocked), [orderedLessons, hasSubscription]);
   const doneCount = lessons.filter((l) => doneSet.has(l.slug)).length;
   const activeBand = ageBands.find((b) => b.key === band);
-  const percent = lessons.length ? Math.round((doneCount / lessons.length) * 100) : 0;
+  const totalMonthLessons = MONTH_TOTAL_LESSONS;
+  const percent = Math.round((doneCount / totalMonthLessons) * 100);
+  const firstWeekDone = chapters.slice(0, 5).every((chapter) => chapter.lessons.every((lesson) => doneSet.has(lesson.slug)));
 
   function nextAfter(lesson) {
     const idx = playable.findIndex((l) => l.slug === lesson.slug);
@@ -374,7 +394,7 @@ export function DrawingLessons({ hasSubscription = false }) {
         })}
       </div>
 
-      <MonthRoadmap readyDays={chapters.length} doneCount={doneCount} totalLessons={lessons.length} />
+      <MonthRoadmap readyDays={Math.min(chapters.length, MONTH_DAYS)} />
 
       <div className="drawing-course-overview">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -382,12 +402,12 @@ export function DrawingLessons({ hasSubscription = false }) {
             <p className="section-kicker">Путь художника · {activeBand?.label}</p>
             <h3 className="mt-2 font-display text-2xl font-extrabold text-ink">{activeBand?.tag}: от формы к своей картинке</h3>
             <p className="mt-2 max-w-2xl text-sm font-semibold leading-6 text-ink/60">
-Месяц состоит из 20 учебных дней: 5 занятий в неделю, затем 2 дня отдыха и повторения. Сейчас открыт первый месяц, следующие месяцы появятся в подписке позже.
+Месяц состоит из 20 учебных дней по 10 уроков — всего 200 уроков в возрастной программе. После первой недели открываются следующие блоки месяца: новые сюжеты, детали и итоговые работы.
             </p>
           </div>
           <div className="min-w-[180px] rounded-2xl bg-cream/80 px-4 py-3">
             <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-ink/42">Прогресс</p>
-            <p className="mt-1 font-display text-2xl font-extrabold text-ink">{doneCount}/{lessons.length}</p>
+            <p className="mt-1 font-display text-2xl font-extrabold text-ink">{doneCount}/{totalMonthLessons}</p>
             <div className="mt-2 h-2 overflow-hidden rounded-full bg-white">
               <div className="h-full rounded-full bg-brand-green transition-all" style={{ width: `${percent}%` }} />
             </div>
@@ -411,7 +431,11 @@ export function DrawingLessons({ hasSubscription = false }) {
                   onLocked={goSubscribe}
                 />
               ) : (
-                <LockedDay dayNumber={dayNumber} title={FUTURE_DAY_TITLES[dayIndex - chapters.length] ?? 'Новый день рисования'} />
+                <LockedDay
+                  dayNumber={dayNumber}
+                  title={FUTURE_DAY_TITLES[dayIndex - chapters.length] ?? 'Новый день рисования'}
+                  firstWeekDone={firstWeekDone}
+                />
               )}
               {dayNumber % 5 === 0 && <WeekendPause week={dayNumber / 5} />}
             </div>

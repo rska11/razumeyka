@@ -21,8 +21,8 @@ export function StickyMobileCTA() {
         isVisible ? 'translate-y-0' : 'translate-y-full'
       }`}
     >
-      <a href="/risovanie" className="primary-btn w-full justify-center py-4 text-base">
-        <span className="relative">Начать бесплатно</span>
+      <a href="/#programs" className="primary-btn w-full justify-center py-4 text-base">
+        <span className="relative">Открыть уроки</span>
         <Icon name="arrow" className="relative h-5 w-5" />
       </a>
     </div>

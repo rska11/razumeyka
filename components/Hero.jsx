@@ -5,7 +5,7 @@ import { Icon } from './Icon.jsx';
 
 const stats = [
   ['бесплатно', 'первые уроки'],
-  ['4-12', 'лет'],
+  ['3–10+', 'лет'],
   ['490 ₽', 'полный доступ/мес'],
 ];
 
@@ -45,13 +45,13 @@ export function Hero() {
       <div className="pointer-events-none absolute right-[-8rem] top-8 -z-10 h-[32rem] w-[32rem] rounded-full bg-brand-pink/22 blur-3xl" />
       <div className="pointer-events-none absolute bottom-0 left-1/2 -z-10 h-[28rem] w-[28rem] -translate-x-1/2 rounded-full bg-brand-orange/20 blur-3xl" />
 
-      <div className="container-pad grid min-h-[calc(100vh-88px)] items-center gap-12 pb-16 lg:grid-cols-[0.95fr_1.05fr]">
+      <div className="container-pad grid min-h-[calc(100vh-88px)] items-center gap-10 pb-12 lg:grid-cols-[0.95fr_1.05fr]">
         <div className="relative animate-rise">
           <span className="inline-flex rounded-full border-2 border-white/80 bg-white/78 px-5 py-3 text-sm font-extrabold uppercase tracking-[0.18em] text-forest-700 shadow-color backdrop-blur-xl">
-            Разумейка · онлайн школа развития детей 4-12 лет
+            Разумейка · онлайн школа развития детей 3–10+ лет
           </span>
 
-          <div className="mt-7 flex flex-wrap gap-2">
+          <div className="mt-6 flex flex-wrap gap-2">
             {benefits.map((item, index) => (
               <span
                 key={item}
@@ -62,7 +62,7 @@ export function Hero() {
             ))}
           </div>
 
-          <h1 className="display-title mt-9 max-w-4xl text-[2.55rem] sm:text-[3.65rem] lg:text-[4.8rem]">
+          <h1 className="display-title mt-7 max-w-4xl text-[2.45rem] sm:text-[3.35rem] lg:text-[4.35rem]">
             <span className="block text-[#0B1F3A]">Ребенок учится</span>
             <span className="mt-2 block bg-gradient-to-r from-brand-blue via-brand-purple to-brand-pink bg-clip-text text-transparent">
               смело, быстро
@@ -75,12 +75,12 @@ export function Hero() {
             </span>
           </h1>
 
-          <p className="mt-8 max-w-2xl text-[1.15rem] font-semibold leading-8 text-ink/68 sm:text-xl">
+          <p className="mt-6 max-w-2xl text-[1.08rem] font-semibold leading-8 text-ink/68 sm:text-lg">
             Онлайн занятия Разумейки развивают интеллект, уверенность и креативность через понятный результат
             для родителя: ребенок лучше читает, считает, говорит и не боится новых задач.
           </p>
 
-          <div className="mt-11 flex flex-col gap-4 sm:flex-row">
+          <div className="mt-9 flex flex-col gap-4 sm:flex-row">
             <a href="/risovanie" className="primary-btn">
               <span className="relative">Начать бесплатно</span>
               <Icon name="arrow" className="relative h-5 w-5" />
@@ -90,9 +90,9 @@ export function Hero() {
             </a>
           </div>
 
-          <div className="mt-12 grid max-w-2xl grid-cols-3 gap-3">
+          <div className="mt-9 grid max-w-2xl grid-cols-3 gap-3">
             {stats.map(([value, label], index) => (
-              <div key={label} className="group rounded-[8px] border-2 border-white/80 bg-white/78 p-4 shadow-card backdrop-blur-xl transition hover:-translate-y-1 hover:shadow-color">
+              <div key={label} className="group rounded-[22px] border border-white/80 bg-white/78 p-4 shadow-card backdrop-blur-xl transition hover:-translate-y-1 hover:shadow-color">
                 <p className={`font-display text-2xl font-bold sm:text-3xl ${index === 0 ? 'text-brand-blue' : index === 1 ? 'text-brand-pink' : 'text-brand-orange'}`}>
                   {value}
                 </p>
@@ -102,7 +102,7 @@ export function Hero() {
           </div>
         </div>
 
-        <div className="relative min-h-[460px] animate-rise sm:min-h-[560px] lg:min-h-[680px]" style={{ animationDelay: '130ms' }}>
+        <div className="relative min-h-[430px] animate-rise sm:min-h-[520px] lg:min-h-[620px]" style={{ animationDelay: '130ms' }}>
           <div className="hero-orbit absolute -inset-4 rounded-[8px] opacity-80 blur-xl" />
           <div className="absolute inset-x-5 bottom-0 top-14 rounded-[8px] bg-night shadow-luxe" />
 
@@ -139,7 +139,7 @@ export function Hero() {
               playsInline
               preload="metadata"
               aria-label="Видео онлайн-занятий Разумейка"
-              className="h-[460px] w-full rounded-[8px] object-cover object-center sm:h-[560px] lg:h-[680px]"
+              className="h-[430px] w-full rounded-[8px] object-cover object-center sm:h-[520px] lg:h-[620px]"
             />
             <div className="pointer-events-none absolute inset-3 rounded-[8px] bg-gradient-to-t from-night/44 via-night/4 to-white/10" />
             <div className="pointer-events-none absolute inset-3 rounded-[8px] ring-1 ring-white/50" />

@@ -109,7 +109,7 @@ export function BeforeAfter() {
                 </div>
 
                 <div className="flex items-center justify-center">
-                  <div className="flex h-14 w-14 animate-pulse items-center justify-center rounded-full border-2 border-ink bg-white text-brand-purple shadow-[5px_5px_0_rgba(139,92,246,0.18)]">
+                  <div className="flex h-14 w-14 animate-pulse items-center justify-center rounded-full border border-ink/10 bg-white text-brand-purple shadow-card">
                     <Icon name="arrow" className="h-7 w-7" />
                   </div>
                 </div>

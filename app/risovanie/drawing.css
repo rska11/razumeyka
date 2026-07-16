@@ -1874,3 +1874,588 @@
 .drawing-hero-art-overlay {
   display: none;
 }
+/* Locked month days: premium promise of the full 200-lesson month. */
+.drawing-locked-day {
+  border-top: 1px solid rgba(21,35,61,.08);
+  padding-top: 5px;
+}
+.drawing-locked-day-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.78);
+  border-radius: 28px;
+  padding: 22px;
+  background:
+    radial-gradient(circle at 90% 12%, rgba(242,111,97,.16), transparent 32%),
+    radial-gradient(circle at 8% 90%, rgba(67,160,141,.12), transparent 34%),
+    rgba(255,255,255,.66);
+  box-shadow: 0 16px 42px rgba(21,35,61,.06);
+  backdrop-filter: blur(14px);
+}
+.drawing-locked-day-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(135deg, rgba(21,35,61,.035) 1px, transparent 1px);
+  background-size: 18px 18px;
+  opacity: .55;
+  pointer-events: none;
+}
+.drawing-locked-day-card > * { position: relative; }
+.drawing-locked-day-kicker {
+  color: var(--draw-coral);
+  font-family: Unbounded, sans-serif;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.drawing-locked-day h4 {
+  margin-top: 7px;
+  color: rgba(21,35,61,.72);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 23px;
+  font-weight: 850;
+  letter-spacing: -.025em;
+}
+.drawing-locked-day p:not(.drawing-locked-day-kicker) {
+  margin-top: 8px;
+  max-width: 680px;
+  color: rgba(21,35,61,.52);
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.65;
+}
+.drawing-locked-day-lock {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  flex: none;
+  place-items: center;
+  border: 1px solid rgba(21,35,61,.07);
+  border-radius: 999px;
+  background: rgba(255,255,255,.72);
+  box-shadow: 0 10px 24px rgba(21,35,61,.06);
+}
+.drawing-locked-day-progress {
+  margin-top: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(21,35,61,.07);
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: rgba(255,255,255,.68);
+}
+.drawing-locked-day-progress span {
+  color: rgba(21,35,61,.44);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.drawing-locked-day-progress b {
+  color: var(--draw-ink);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 850;
+}
+@media (max-width: 719px) {
+  .drawing-locked-day-card { padding: 17px; border-radius: 23px; }
+  .drawing-locked-day h4 { font-size: 20px; }
+  .drawing-locked-day-progress { align-items: flex-start; flex-direction: column; gap: 3px; border-radius: 18px; }
+}
+
+/* Compact premium student gallery: shared age exhibition, no empty weekly slots. */
+.drawing-showcase-compact {
+  position: relative;
+  padding-top: 48px;
+  padding-bottom: 54px;
+  background:
+    radial-gradient(circle at 8% 16%, rgba(242,111,97,.10), transparent 28%),
+    linear-gradient(180deg, rgba(255,255,255,.76), rgba(237,244,244,.72)),
+    var(--draw-paper);
+}
+
+.drawing-showcase-panel {
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.78);
+  border-radius: 34px;
+  padding: 22px;
+  background:
+    radial-gradient(circle at 88% 10%, rgba(233,185,73,.20), transparent 30%),
+    rgba(255,255,255,.74);
+  box-shadow: 0 22px 70px rgba(21,35,61,.08);
+  backdrop-filter: blur(16px);
+}
+
+.drawing-showcase-compact-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+
+.drawing-showcase-compact-head span,
+.drawing-gallery-intro span {
+  color: var(--draw-coral);
+  font-family: Unbounded, sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.drawing-showcase-compact-head h2 {
+  margin-top: 8px;
+  max-width: 700px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(1.85rem, 3vw, 3.05rem);
+  font-weight: 850;
+  letter-spacing: -.045em;
+  line-height: 1.02;
+}
+
+.drawing-showcase-compact-head p {
+  max-width: 620px;
+  margin-top: 8px;
+  color: rgba(21,35,61,.58);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.55;
+}
+
+.drawing-showcase-compact-main {
+  display: grid;
+  align-items: stretch;
+  gap: 14px;
+  grid-template-columns: 250px minmax(0, 1fr);
+}
+
+.drawing-showcase-side-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border: 1px solid rgba(21,35,61,.07);
+  border-radius: 26px;
+  padding: 12px;
+  background: rgba(255,255,255,.64);
+}
+
+.drawing-age-filter-showcase {
+  grid-template-columns: 1fr;
+  margin-bottom: 0;
+}
+
+.drawing-age-filter-showcase .drawing-age-filter-btn {
+  min-height: 58px;
+}
+
+.drawing-showcase-mini-stats {
+  display: grid;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.drawing-showcase-mini-stats div {
+  border-radius: 19px;
+  padding: 11px 12px;
+  background: rgba(21,35,61,.045);
+}
+
+.drawing-showcase-mini-stats b,
+.drawing-showcase-mini-stats span {
+  display: block;
+}
+
+.drawing-showcase-mini-stats b {
+  color: var(--draw-ink);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 23px;
+  font-weight: 850;
+  line-height: 1;
+}
+
+.drawing-showcase-mini-stats span {
+  margin-top: 4px;
+  color: rgba(21,35,61,.48);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.drawing-showcase-strip {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.drawing-showcase-work,
+.drawing-gallery-filter-card {
+  border: 1px solid rgba(21,35,61,.075);
+  background: rgba(255,255,255,.76);
+  box-shadow: 0 14px 36px rgba(21,35,61,.055);
+}
+
+.drawing-showcase-work {
+  overflow: hidden;
+  border-radius: 24px;
+}
+
+.drawing-showcase-work-image {
+  position: relative;
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  background: #fffaf0;
+}
+
+.drawing-showcase-work-image img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 0;
+  object-fit: cover;
+  transition: transform .25s ease;
+}
+
+.drawing-showcase-work-image:hover img {
+  transform: scale(1.025);
+}
+
+.drawing-showcase-work-image span {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  border-radius: 999px;
+  padding: 6px 9px;
+  color: #fff;
+  background: rgba(21,35,61,.84);
+  font-size: 9px;
+  font-weight: 900;
+  opacity: 0;
+  transform: translateY(5px);
+  transition: opacity .2s ease, transform .2s ease;
+}
+
+.drawing-showcase-work-image:hover span {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.drawing-showcase-work-body {
+  padding: 12px;
+}
+
+.drawing-showcase-work-body p,
+.drawing-gallery-tile-body-open p {
+  margin-top: 0;
+  color: var(--draw-coral);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.drawing-showcase-work-body h3 {
+  margin-top: 5px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 850;
+  letter-spacing: -.02em;
+  line-height: 1.13;
+}
+
+.drawing-showcase-work-body small {
+  display: block;
+  min-height: 30px;
+  margin-top: 5px;
+  color: rgba(21,35,61,.52);
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.drawing-like-btn {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  margin-top: 10px;
+  padding: 0 12px;
+  color: #fff;
+  background: var(--draw-coral);
+  font-size: 12px;
+  font-weight: 900;
+  transition: transform .2s ease, opacity .2s ease, background .2s ease;
+}
+
+.drawing-like-btn:not(:disabled):hover {
+  transform: translateY(-2px);
+}
+
+.drawing-like-btn-liked,
+.drawing-like-btn:disabled {
+  color: var(--draw-ink);
+  background: rgba(233,185,73,.52);
+  opacity: 1;
+}
+
+.drawing-gallery-page-compact {
+  padding-top: 46px;
+}
+
+.drawing-gallery-toolbar {
+  display: grid;
+  align-items: end;
+  gap: 18px;
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 470px);
+  margin-bottom: 18px;
+}
+
+.drawing-gallery-intro h2 {
+  margin-top: 8px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(2rem, 3.5vw, 3.5rem);
+  font-weight: 850;
+  letter-spacing: -.045em;
+  line-height: 1;
+}
+
+.drawing-gallery-intro p {
+  max-width: 620px;
+  margin-top: 10px;
+  color: rgba(21,35,61,.58);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.drawing-gallery-filter-card {
+  border-radius: 25px;
+  padding: 12px;
+}
+
+.drawing-age-filter-gallery {
+  margin-bottom: 10px;
+}
+
+.drawing-age-filter-gallery .drawing-age-filter-btn {
+  min-height: 60px;
+  padding: 10px 12px;
+}
+
+.drawing-gallery-count-pill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-radius: 18px;
+  padding: 11px 13px;
+  background: rgba(21,35,61,.045);
+}
+
+.drawing-gallery-count-pill b {
+  color: var(--draw-ink);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 25px;
+  font-weight: 850;
+}
+
+.drawing-gallery-count-pill span {
+  color: rgba(21,35,61,.48);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  text-align: right;
+}
+
+.drawing-gallery-page-grid-open {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.drawing-gallery-tile {
+  border-radius: 24px;
+}
+
+.drawing-gallery-tile-body-open {
+  padding: 13px;
+}
+
+.drawing-gallery-tile-body-open h3 {
+  font-size: 17px;
+  letter-spacing: -.02em;
+  line-height: 1.14;
+}
+
+.drawing-gallery-tile-body-open small {
+  font-size: 11px;
+}
+
+.drawing-gallery-tile-body-open .drawing-like-btn {
+  min-height: 36px;
+  margin-top: 0;
+  padding: 0 11px;
+}
+
+.drawing-gallery-bottom-compact {
+  grid-template-columns: minmax(300px, .78fr) minmax(0, 1fr);
+}
+
+.drawing-gallery-leaders-card .drawing-ranking-title p {
+  max-width: 210px;
+}
+
+@media (max-width: 1180px) {
+  .drawing-showcase-compact-main,
+  .drawing-gallery-toolbar,
+  .drawing-gallery-bottom-compact {
+    grid-template-columns: 1fr;
+  }
+
+  .drawing-age-filter-showcase {
+    grid-template-columns: repeat(3, minmax(0,1fr));
+  }
+
+  .drawing-showcase-mini-stats {
+    grid-template-columns: repeat(2, minmax(0,1fr));
+  }
+
+  .drawing-gallery-page-grid-open {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 860px) {
+  .drawing-showcase-strip,
+  .drawing-gallery-page-grid-open {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 719px) {
+  .drawing-showcase-compact {
+    padding-top: 34px;
+    padding-bottom: 38px;
+  }
+
+  .drawing-showcase-panel {
+    border-radius: 26px;
+    padding: 14px;
+  }
+
+  .drawing-showcase-compact-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .drawing-showcase-link {
+    width: 100%;
+  }
+
+  .drawing-age-filter-showcase,
+  .drawing-showcase-strip,
+  .drawing-gallery-page-grid-open {
+    grid-template-columns: 1fr;
+  }
+
+  .drawing-showcase-mini-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .drawing-gallery-toolbar {
+    gap: 12px;
+  }
+
+  .drawing-gallery-filter-card {
+    padding: 10px;
+  }
+}
+
+
+/* Extra compaction pass for the student-work teaser. */
+.drawing-showcase-compact {
+  padding-top: 36px;
+  padding-bottom: 40px;
+}
+
+.drawing-showcase-panel {
+  border-radius: 30px;
+  padding: 18px;
+}
+
+.drawing-showcase-compact-head {
+  margin-bottom: 12px;
+}
+
+.drawing-showcase-compact-head h2 {
+  font-size: clamp(1.7rem, 2.55vw, 2.65rem);
+}
+
+.drawing-showcase-compact-head p {
+  max-width: 560px;
+  font-size: 12px;
+  line-height: 1.48;
+}
+
+.drawing-showcase-compact-main {
+  gap: 12px;
+  grid-template-columns: 226px minmax(0, 1fr);
+}
+
+.drawing-showcase-side-card {
+  border-radius: 22px;
+  padding: 10px;
+}
+
+.drawing-age-filter-showcase .drawing-age-filter-btn {
+  min-height: 50px;
+  padding: 9px 12px;
+}
+
+.drawing-showcase-mini-stats div {
+  border-radius: 16px;
+  padding: 9px 10px;
+}
+
+.drawing-showcase-mini-stats b {
+  font-size: 20px;
+}
+
+.drawing-showcase-mini-stats span {
+  font-size: 9px;
+}
+
+.drawing-showcase-work {
+  border-radius: 21px;
+}
+
+.drawing-showcase-work-image img {
+  aspect-ratio: 5 / 3;
+}
+
+.drawing-showcase-work-body {
+  padding: 10px;
+}
+
+.drawing-showcase-work-body h3 {
+  font-size: 15px;
+}
+
+.drawing-showcase-work-body small {
+  min-height: 0;
+  overflow: hidden;
+  font-size: 10.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.drawing-showcase-work-body .drawing-like-btn {
+  min-height: 30px;
+  margin-top: 8px;
+  padding: 0 10px;
+}

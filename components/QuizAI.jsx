@@ -6,7 +6,7 @@ import { reachGoal } from '@/lib/metrika';
 import { getDirectionBySlug } from '@/data/directions.js';
 
 const questions = [
-  { key: 'age', q: 'Сколько лет ребёнку?', opts: ['4–5 лет', '6–7 лет', '8–9 лет', '10–12 лет'] },
+  { key: 'age', q: 'Сколько лет ребёнку?', opts: ['3–4 года', '5–7 лет', '8–10+ лет'] },
   {
     key: 'goal',
     q: 'Что хотите улучшить больше всего?',
@@ -96,18 +96,18 @@ export function QuizAI() {
   }
 
   return (
-    <section className="px-5 py-16 sm:px-8 lg:px-14">
+    <section className="px-5 py-12 sm:px-8 sm:py-14 lg:px-14 lg:py-16">
       <div className="container-pad px-0">
-        <div className="mx-auto max-w-3xl overflow-hidden rounded-[26px] border border-ink/8 bg-white/92 p-8 shadow-[0_22px_60px_rgba(16,42,86,0.10)] backdrop-blur-xl sm:p-12">
-          <div className="text-center">
-            <span className="section-kicker bg-brand-purple/8">✨ Подбор с искусственным интеллектом</span>
-            <h2 className="section-title mt-5">Не знаете, что выбрать?</h2>
-            <p className="mx-auto mt-3 max-w-lg text-lg font-medium text-ink/64">
-              Ответьте на 3 вопроса — наш ИИ-помощник за пару секунд подберёт подходящее направление для вашего ребёнка.
+        <div className="mx-auto max-w-5xl overflow-hidden rounded-[34px] border border-white/80 bg-white/90 p-6 text-center shadow-luxe backdrop-blur-xl sm:p-9 lg:p-10">
+          <div className="mx-auto max-w-3xl">
+            <span className="section-kicker justify-center bg-brand-purple/8">✨ ИИ-подбор направления</span>
+            <h2 className="section-title mx-auto mt-5 max-w-2xl">Не знаете, что выбрать?</h2>
+            <p className="mx-auto mt-3 max-w-2xl text-lg font-medium leading-8 text-ink/64">
+              Ответьте на 3 коротких вопроса — подскажем курс, который лучше подходит возрасту, цели и текущей сложности ребёнка.
             </p>
           </div>
 
-          <div className="mt-9">
+          <div className="mx-auto mt-8 max-w-3xl">
             {loading ? (
               <div className="py-12 text-center">
                 <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-blue to-brand-purple text-3xl shadow-color">
@@ -148,7 +148,7 @@ export function QuizAI() {
               </div>
             ) : (
               <div>
-                <div className="mb-6 flex items-center justify-between text-xs font-extrabold uppercase tracking-[0.14em] text-ink/44">
+                <div className="mb-6 flex flex-col items-center justify-center gap-3 text-xs font-extrabold uppercase tracking-[0.14em] text-ink/44 sm:flex-row sm:justify-between">
                   <span>Вопрос {step + 1} из {questions.length}</span>
                   <div className="flex gap-1.5">
                     {questions.map((_, i) => (
@@ -157,7 +157,7 @@ export function QuizAI() {
                   </div>
                 </div>
                 <p className="text-center font-display text-2xl font-black text-ink sm:text-3xl">{questions[step].q}</p>
-                <div className="mt-7 grid gap-3 sm:grid-cols-2">
+                <div className="mx-auto mt-7 grid max-w-3xl gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   {questions[step].opts.map((o) => (
                     <button
                       key={o}

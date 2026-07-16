@@ -36,7 +36,7 @@ export default function HomePage() {
             alternateName: "Онлайн-школа Разумейка",
             url: "https://razumeyka-school.ru",
             description:
-              "Онлайн-школа развития детей 4–12 лет: ментальная арифметика, скорочтение, правополушарное рисование и другие направления.",
+              "Онлайн-школа развития детей 3–10+ лет: правополушарное рисование, ментальная арифметика, скорочтение и другие направления.",
             logo: "https://razumeyka-school.ru/images/logo.png",
             areaServed: "RU",
             audience: { "@type": "EducationalAudience", educationalRole: "student" },
@@ -61,8 +61,8 @@ export default function HomePage() {
       <main>
         <Hero />
         <PainPoints />
-        <AgePrograms />
         <Directions />
+        <AgePrograms />
         <QuizAI />
         <BetterThanSchool />
         <PresentationMap />

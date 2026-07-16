@@ -1,9 +1,10 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useMemo, useState } from 'react';
 
 const STORAGE_KEY = 'razumeyka_drawing_artwork_uploads';
 const LIKED_KEY = 'razumeyka_drawing_liked_artworks';
+const DEMO_LIKE_BOOSTS_KEY = 'razumeyka_drawing_demo_like_boosts';
 
 export const AGE_OPTIONS = [
   { key: '3-4', label: '3-4 года', note: 'малыши' },
@@ -28,7 +29,7 @@ export const fallbackWorks = [
     "week": "week-1",
     "ageBand": "3-4",
     "likes": 128,
-    "imageUrl": "/images/drawing-gallery/age-3-4-sunny-garden.png"
+    "imageUrl": "/images/drawing-gallery/age-3-4-sunny-garden.webp"
   },
   {
     "id": "demo-3-4-2",
@@ -38,7 +39,7 @@ export const fallbackWorks = [
     "week": "week-2",
     "ageBand": "3-4",
     "likes": 117,
-    "imageUrl": "/images/drawing-gallery/age-3-4-kind-robot.png"
+    "imageUrl": "/images/drawing-gallery/age-3-4-kind-robot.webp"
   },
   {
     "id": "demo-3-4-3",
@@ -48,7 +49,7 @@ export const fallbackWorks = [
     "week": "week-1",
     "ageBand": "3-4",
     "likes": 109,
-    "imageUrl": "/images/drawing-gallery/age-3-4-sunny-house.png"
+    "imageUrl": "/images/drawing-gallery/age-3-4-sunny-house.webp"
   },
   {
     "id": "demo-3-4-4",
@@ -58,7 +59,7 @@ export const fallbackWorks = [
     "week": "week-2",
     "ageBand": "3-4",
     "likes": 101,
-    "imageUrl": "/images/drawing-gallery/age-3-4-orange-cat.png"
+    "imageUrl": "/images/drawing-gallery/age-3-4-orange-cat.webp"
   },
   {
     "id": "demo-3-4-5",
@@ -68,7 +69,7 @@ export const fallbackWorks = [
     "week": "week-3",
     "ageBand": "3-4",
     "likes": 96,
-    "imageUrl": "/images/drawing-gallery/age-3-4-red-bus.png"
+    "imageUrl": "/images/drawing-gallery/age-3-4-red-bus.webp"
   },
   {
     "id": "demo-3-4-6",
@@ -78,7 +79,7 @@ export const fallbackWorks = [
     "week": "week-3",
     "ageBand": "3-4",
     "likes": 91,
-    "imageUrl": "/images/drawing-gallery/age-3-4-teddy-balloon.png"
+    "imageUrl": "/images/drawing-gallery/age-3-4-teddy-balloon.webp"
   },
   {
     "id": "demo-3-4-7",
@@ -88,7 +89,7 @@ export const fallbackWorks = [
     "week": "week-4",
     "ageBand": "3-4",
     "likes": 86,
-    "imageUrl": "/images/drawing-gallery/age-3-4-rainbow-fish.png"
+    "imageUrl": "/images/drawing-gallery/age-3-4-rainbow-fish.webp"
   },
   {
     "id": "demo-3-4-8",
@@ -98,7 +99,7 @@ export const fallbackWorks = [
     "week": "week-4",
     "ageBand": "3-4",
     "likes": 82,
-    "imageUrl": "/images/drawing-gallery/age-3-4-butterfly.png"
+    "imageUrl": "/images/drawing-gallery/age-3-4-butterfly.webp"
   },
   {
     "id": "demo-3-4-9",
@@ -108,7 +109,7 @@ export const fallbackWorks = [
     "week": "final",
     "ageBand": "3-4",
     "likes": 77,
-    "imageUrl": "/images/drawing-gallery/age-3-4-birthday-cake.png"
+    "imageUrl": "/images/drawing-gallery/age-3-4-birthday-cake.webp"
   },
   {
     "id": "demo-3-4-10",
@@ -118,7 +119,7 @@ export const fallbackWorks = [
     "week": "final",
     "ageBand": "3-4",
     "likes": 72,
-    "imageUrl": "/images/drawing-gallery/age-3-4-apple-tree.png"
+    "imageUrl": "/images/drawing-gallery/age-3-4-apple-tree.webp"
   },
   {
     "id": "demo-5-7-1",
@@ -128,7 +129,7 @@ export const fallbackWorks = [
     "week": "week-1",
     "ageBand": "5-7",
     "likes": 132,
-    "imageUrl": "/images/drawing-gallery/age-5-7-city-park.png"
+    "imageUrl": "/images/drawing-gallery/age-5-7-city-park.webp"
   },
   {
     "id": "demo-5-7-2",
@@ -138,7 +139,7 @@ export const fallbackWorks = [
     "week": "week-3",
     "ageBand": "5-7",
     "likes": 123,
-    "imageUrl": "/images/drawing-gallery/age-5-7-dragon-fairy.png"
+    "imageUrl": "/images/drawing-gallery/age-5-7-dragon-fairy.webp"
   },
   {
     "id": "demo-5-7-3",
@@ -148,7 +149,7 @@ export const fallbackWorks = [
     "week": "week-1",
     "ageBand": "5-7",
     "likes": 115,
-    "imageUrl": "/images/drawing-gallery/age-5-7-animal-picnic.png"
+    "imageUrl": "/images/drawing-gallery/age-5-7-animal-picnic.webp"
   },
   {
     "id": "demo-5-7-4",
@@ -158,7 +159,7 @@ export const fallbackWorks = [
     "week": "week-2",
     "ageBand": "5-7",
     "likes": 108,
-    "imageUrl": "/images/drawing-gallery/age-5-7-breakfast-table.png"
+    "imageUrl": "/images/drawing-gallery/age-5-7-breakfast-table.webp"
   },
   {
     "id": "demo-5-7-5",
@@ -168,7 +169,7 @@ export const fallbackWorks = [
     "week": "week-2",
     "ageBand": "5-7",
     "likes": 101,
-    "imageUrl": "/images/drawing-gallery/age-5-7-birdhouse-garden.png"
+    "imageUrl": "/images/drawing-gallery/age-5-7-birdhouse-garden.webp"
   },
   {
     "id": "demo-5-7-6",
@@ -178,7 +179,7 @@ export const fallbackWorks = [
     "week": "week-3",
     "ageBand": "5-7",
     "likes": 96,
-    "imageUrl": "/images/drawing-gallery/age-5-7-castle-bridge.png"
+    "imageUrl": "/images/drawing-gallery/age-5-7-castle-bridge.webp"
   },
   {
     "id": "demo-5-7-7",
@@ -188,7 +189,7 @@ export const fallbackWorks = [
     "week": "week-4",
     "ageBand": "5-7",
     "likes": 90,
-    "imageUrl": "/images/drawing-gallery/age-5-7-rainy-umbrella.png"
+    "imageUrl": "/images/drawing-gallery/age-5-7-rainy-umbrella.webp"
   },
   {
     "id": "demo-5-7-8",
@@ -198,7 +199,7 @@ export const fallbackWorks = [
     "week": "week-4",
     "ageBand": "5-7",
     "likes": 86,
-    "imageUrl": "/images/drawing-gallery/age-5-7-farm-sunflowers.png"
+    "imageUrl": "/images/drawing-gallery/age-5-7-farm-sunflowers.webp"
   },
   {
     "id": "demo-5-7-9",
@@ -208,7 +209,7 @@ export const fallbackWorks = [
     "week": "final",
     "ageBand": "5-7",
     "likes": 81,
-    "imageUrl": "/images/drawing-gallery/age-5-7-cozy-bedroom.png"
+    "imageUrl": "/images/drawing-gallery/age-5-7-cozy-bedroom.webp"
   },
   {
     "id": "demo-5-7-10",
@@ -218,7 +219,27 @@ export const fallbackWorks = [
     "week": "final",
     "ageBand": "5-7",
     "likes": 77,
-    "imageUrl": "/images/drawing-gallery/age-5-7-circus-seal.png"
+    "imageUrl": "/images/drawing-gallery/age-5-7-circus-seal.webp"
+  },
+  {
+    "id": "demo-5-7-11",
+    "child": "Соня В.",
+    "city": "Рязань",
+    "title": "Домик на дереве",
+    "week": "week-3",
+    "ageBand": "5-7",
+    "likes": 74,
+    "imageUrl": "/images/drawing-gallery/age-5-7-treehouse-fox.webp"
+  },
+  {
+    "id": "demo-5-7-12",
+    "child": "Миша К.",
+    "city": "Тверь",
+    "title": "Котёнок у цветка",
+    "week": "week-4",
+    "ageBand": "5-7",
+    "likes": 69,
+    "imageUrl": "/images/drawing-gallery/age-5-7-kitten-flower.webp"
   },
   {
     "id": "demo-8-10-1",
@@ -228,7 +249,7 @@ export const fallbackWorks = [
     "week": "final",
     "ageBand": "8-10",
     "likes": 140,
-    "imageUrl": "/images/drawing-gallery/age-8-10-exhibition.png"
+    "imageUrl": "/images/drawing-gallery/age-8-10-exhibition.webp"
   },
   {
     "id": "demo-8-10-2",
@@ -238,7 +259,7 @@ export const fallbackWorks = [
     "week": "week-4",
     "ageBand": "8-10",
     "likes": 129,
-    "imageUrl": "/images/drawing-gallery/age-8-10-dino-museum.png"
+    "imageUrl": "/images/drawing-gallery/age-8-10-dino-museum.webp"
   },
   {
     "id": "demo-8-10-3",
@@ -248,7 +269,7 @@ export const fallbackWorks = [
     "week": "week-1",
     "ageBand": "8-10",
     "likes": 121,
-    "imageUrl": "/images/drawing-gallery/age-8-10-city-evening.png"
+    "imageUrl": "/images/drawing-gallery/age-8-10-city-evening.webp"
   },
   {
     "id": "demo-8-10-4",
@@ -258,7 +279,7 @@ export const fallbackWorks = [
     "week": "week-1",
     "ageBand": "8-10",
     "likes": 114,
-    "imageUrl": "/images/drawing-gallery/age-8-10-fantasy-map.png"
+    "imageUrl": "/images/drawing-gallery/age-8-10-fantasy-map.webp"
   },
   {
     "id": "demo-8-10-5",
@@ -268,7 +289,7 @@ export const fallbackWorks = [
     "week": "week-2",
     "ageBand": "8-10",
     "likes": 107,
-    "imageUrl": "/images/drawing-gallery/age-8-10-library-cat.png"
+    "imageUrl": "/images/drawing-gallery/age-8-10-library-cat.webp"
   },
   {
     "id": "demo-8-10-6",
@@ -278,7 +299,7 @@ export const fallbackWorks = [
     "week": "week-2",
     "ageBand": "8-10",
     "likes": 100,
-    "imageUrl": "/images/drawing-gallery/age-8-10-robot-workshop.png"
+    "imageUrl": "/images/drawing-gallery/age-8-10-robot-workshop.webp"
   },
   {
     "id": "demo-8-10-7",
@@ -288,7 +309,7 @@ export const fallbackWorks = [
     "week": "week-3",
     "ageBand": "8-10",
     "likes": 94,
-    "imageUrl": "/images/drawing-gallery/age-8-10-autumn-park.png"
+    "imageUrl": "/images/drawing-gallery/age-8-10-autumn-park.webp"
   },
   {
     "id": "demo-8-10-8",
@@ -298,7 +319,7 @@ export const fallbackWorks = [
     "week": "week-3",
     "ageBand": "8-10",
     "likes": 89,
-    "imageUrl": "/images/drawing-gallery/age-8-10-greenhouse.png"
+    "imageUrl": "/images/drawing-gallery/age-8-10-greenhouse.webp"
   },
   {
     "id": "demo-8-10-9",
@@ -308,7 +329,7 @@ export const fallbackWorks = [
     "week": "week-4",
     "ageBand": "8-10",
     "likes": 83,
-    "imageUrl": "/images/drawing-gallery/age-8-10-theater-stage.png"
+    "imageUrl": "/images/drawing-gallery/age-8-10-theater-stage.webp"
   },
   {
     "id": "demo-8-10-10",
@@ -318,7 +339,57 @@ export const fallbackWorks = [
     "week": "final",
     "ageBand": "8-10",
     "likes": 78,
-    "imageUrl": "/images/drawing-gallery/age-8-10-mountain-river.png"
+    "imageUrl": "/images/drawing-gallery/age-8-10-mountain-river.webp"
+  },
+  {
+    "id": "demo-8-10-11",
+    "child": "Маша Е.",
+    "city": "Кострома",
+    "title": "Велосипед во дворе",
+    "week": "week-2",
+    "ageBand": "8-10",
+    "likes": 75,
+    "imageUrl": "/images/drawing-gallery/age-8-10-blue-bicycle.webp"
+  },
+  {
+    "id": "demo-8-10-12",
+    "child": "Паша Н.",
+    "city": "Псков",
+    "title": "Поезд в осеннем лесу",
+    "week": "week-3",
+    "ageBand": "8-10",
+    "likes": 71,
+    "imageUrl": "/images/drawing-gallery/age-8-10-autumn-train-child.webp"
+  },
+  {
+    "id": "demo-8-10-13",
+    "child": "Катя Д.",
+    "city": "Архангельск",
+    "title": "Станция под водой",
+    "week": "week-3",
+    "ageBand": "8-10",
+    "likes": 68,
+    "imageUrl": "/images/drawing-gallery/age-8-10-underwater-station.webp"
+  },
+  {
+    "id": "demo-8-10-14",
+    "child": "Лёша Т.",
+    "city": "Мурманск",
+    "title": "Зимняя деревня",
+    "week": "week-4",
+    "ageBand": "8-10",
+    "likes": 64,
+    "imageUrl": "/images/drawing-gallery/age-8-10-snow-village.webp"
+  },
+  {
+    "id": "demo-8-10-15",
+    "child": "Настя Р.",
+    "city": "Коломна",
+    "title": "Жёлтый трамвай",
+    "week": "final",
+    "ageBand": "8-10",
+    "likes": 61,
+    "imageUrl": "/images/drawing-gallery/age-8-10-yellow-tram.webp"
   }
 ];
 
@@ -338,6 +409,10 @@ export function ageBandLabel(ageBand) {
   return AGE_OPTIONS.find((item) => item.key === ageBand)?.label ?? '3-4 года';
 }
 
+export function galleryScopeLabel(item) {
+  return item.week === 'final' ? 'финальная работа' : 'работа ученика';
+}
+
 function readStoredUploads() {
   try {
     return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
@@ -354,6 +429,27 @@ function readLiked() {
   }
 }
 
+function readDemoLikeBoosts() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(DEMO_LIKE_BOOSTS_KEY) || '{}');
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function persistLiked(nextLiked) {
+  try {
+    localStorage.setItem(LIKED_KEY, JSON.stringify([...nextLiked]));
+  } catch {}
+}
+
+function persistDemoLikeBoosts(nextBoosts) {
+  try {
+    localStorage.setItem(DEMO_LIKE_BOOSTS_KEY, JSON.stringify(nextBoosts));
+  } catch {}
+}
+
 export function usePublishedArtworks() {
   const [gallery, setGallery] = useState([]);
 
@@ -367,29 +463,73 @@ export function usePublishedArtworks() {
   return gallery.length ? gallery : fallbackWorks;
 }
 
+export function useArtworkLikes() {
+  const [liked, setLiked] = useState(() => new Set());
+  const [demoLikeBoosts, setDemoLikeBoosts] = useState({});
+  const [optimisticLikes, setOptimisticLikes] = useState({});
+
+  useEffect(() => {
+    setLiked(readLiked());
+    setDemoLikeBoosts(readDemoLikeBoosts());
+  }, []);
+
+  function withLikes(items) {
+    return items.map((item) => ({
+      ...item,
+      likes: (item.likes ?? 0) + (item.id.startsWith('demo-') ? (demoLikeBoosts[item.id] ?? 0) : (optimisticLikes[item.id] ?? 0)),
+    }));
+  }
+
+  async function likeWork(item) {
+    if (!item?.id || liked.has(item.id)) return;
+
+    const nextLiked = new Set(liked);
+    nextLiked.add(item.id);
+    setLiked(nextLiked);
+    persistLiked(nextLiked);
+
+    if (item.id.startsWith('demo-')) {
+      setDemoLikeBoosts((current) => {
+        const next = { ...current, [item.id]: (current[item.id] ?? 0) + 1 };
+        persistDemoLikeBoosts(next);
+        return next;
+      });
+      return;
+    }
+
+    setOptimisticLikes((current) => ({ ...current, [item.id]: (current[item.id] ?? 0) + 1 }));
+
+    try {
+      await fetch('/api/drawing/artworks/' + item.id + '/like', { method: 'POST' });
+    } catch {}
+  }
+
+  return { liked, withLikes, likeWork };
+}
+
 export function DrawingGallery() {
-  const [form, setForm] = useState({ child: '', city: '', title: '', week: 'week-1', ageBand: '3-4' });
+  const [form, setForm] = useState({ child: '', city: '', title: '', week: 'final', ageBand: '3-4' });
   const [preview, setPreview] = useState('');
   const [fileName, setFileName] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploads, setUploads] = useState([]);
-  const [activeWeek, setActiveWeek] = useState('week-1');
   const [activeAge, setActiveAge] = useState('3-4');
-  const [liked, setLiked] = useState(() => new Set());
   const [opened, setOpened] = useState(null);
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState('');
-  const published = usePublishedArtworks();
+  const rawPublished = usePublishedArtworks();
+  const { liked, withLikes, likeWork } = useArtworkLikes();
+  const published = withLikes(rawPublished);
 
   useEffect(() => {
     setUploads(readStoredUploads());
-    setLiked(readLiked());
   }, []);
 
-  const activeWorks = sortByLikes(published.filter((item) => item.week === activeWeek && (item.ageBand ?? '3-4') === activeAge));
-  const topWorks = sortByLikes(published.filter((item) => (item.ageBand ?? '3-4') === activeAge)).slice(0, 3);
+  const activeWorks = sortByLikes(published.filter((item) => (item.ageBand ?? '3-4') === activeAge));
+  const topWorks = activeWorks.slice(0, 3);
   const canSubmit = selectedFile && preview && form.child.trim() && form.city.trim() && form.title.trim();
   const latestUpload = useMemo(() => uploads[0], [uploads]);
+  const totalLikes = activeWorks.reduce((sum, item) => sum + (item.likes ?? 0), 0);
 
   function updateField(key, value) {
     setForm((current) => ({ ...current, [key]: value }));
@@ -447,23 +587,9 @@ export function DrawingGallery() {
     }
   }
 
-  async function likeWork(item) {
-    if (item.id.startsWith('demo-') || liked.has(item.id)) return;
-    const nextLiked = new Set(liked);
-    nextLiked.add(item.id);
-    setLiked(nextLiked);
-    try {
-      localStorage.setItem(LIKED_KEY, JSON.stringify([...nextLiked]));
-    } catch {}
-
-    try {
-      await fetch('/api/drawing/artworks/' + item.id + '/like', { method: 'POST' });
-    } catch {}
-  }
-
   return (
     <>
-      <section className="drawing-gallery-hero px-5 pb-16 pt-28 sm:px-8 lg:px-14">
+      <section className="drawing-gallery-hero px-5 pb-14 pt-28 sm:px-8 lg:px-14">
         <div className="container-pad px-0">
           <a className="drawing-back-link" href="/risovanie">← Вернуться к урокам</a>
           <div className="drawing-gallery-hero-grid">
@@ -488,39 +614,42 @@ export function DrawingGallery() {
         </div>
       </section>
 
-      <section id="gallery-grid" className="drawing-section drawing-gallery-page px-5 sm:px-8 lg:px-14">
+      <section id="gallery-grid" className="drawing-section drawing-gallery-page drawing-gallery-page-compact px-5 sm:px-8 lg:px-14">
         <div className="container-pad px-0">
-          <div className="drawing-age-filter">
-            {AGE_OPTIONS.map((age) => (
-              <button key={age.key} type="button" onClick={() => setActiveAge(age.key)} className={activeAge === age.key ? 'drawing-age-filter-btn drawing-age-filter-btn-active' : 'drawing-age-filter-btn'}>
-                <b>{age.label}</b><span>{age.note}</span>
-              </button>
-            ))}
+          <div className="drawing-gallery-toolbar">
+            <div className="drawing-gallery-intro">
+              <span>Работы по возрастам</span>
+              <h2>{ageBandLabel(activeAge)} · вся галерея</h2>
+              <p>Переключайте возраст, открывайте работы крупнее и отмечайте рисунки, которые понравились.</p>
+            </div>
+            <div className="drawing-gallery-filter-card">
+              <div className="drawing-age-filter drawing-age-filter-gallery">
+                {AGE_OPTIONS.map((age) => (
+                  <button key={age.key} type="button" onClick={() => setActiveAge(age.key)} className={activeAge === age.key ? 'drawing-age-filter-btn drawing-age-filter-btn-active' : 'drawing-age-filter-btn'}>
+                    <b>{age.label}</b><span>{age.note}</span>
+                  </button>
+                ))}
+              </div>
+              <div className="drawing-gallery-count-pill">
+                <b>{activeWorks.length}</b><span>работ · {totalLikes} отметок</span>
+              </div>
+            </div>
           </div>
 
-          <div className="drawing-week-tabs" aria-label="Разделы галереи">
-            {WEEK_OPTIONS.map((week) => (
-              <button key={week.key} type="button" onClick={() => setActiveWeek(week.key)} className={activeWeek === week.key ? 'drawing-week-tab drawing-week-tab-active' : 'drawing-week-tab'}>
-                <b>{week.short}</b>
-                <span>{week.hint}</span>
-              </button>
-            ))}
-          </div>
-
-          <div className="drawing-gallery-page-grid">
+          <div className="drawing-gallery-page-grid drawing-gallery-page-grid-open">
             {activeWorks.map((item, index) => (
               <article key={item.id} className="drawing-gallery-tile">
                 <button type="button" onClick={() => setOpened(item)} className="drawing-gallery-image-button">
                   <ArtworkPreview item={item} />
                   <span>Открыть</span>
                 </button>
-                <div className="drawing-gallery-tile-body">
+                <div className="drawing-gallery-tile-body drawing-gallery-tile-body-open">
                   <div>
-                    <p>#{index + 1} · {ageBandLabel(item.ageBand ?? '3-4')} · {workWeekLabel(item.week)}</p>
+                    <p>#{index + 1} · {ageBandLabel(item.ageBand ?? '3-4')}</p>
                     <h3>{item.title}</h3>
                     <small>{item.child}, {item.city}</small>
                   </div>
-                  <button type="button" onClick={() => likeWork(item)} disabled={item.id.startsWith('demo-') || liked.has(item.id)}>
+                  <button type="button" className={liked.has(item.id) ? 'drawing-like-btn drawing-like-btn-liked' : 'drawing-like-btn'} onClick={() => likeWork(item)} disabled={liked.has(item.id)} aria-label="Поддержать эту работу">
                     ♥ {item.likes ?? 0}
                   </button>
                 </div>
@@ -532,11 +661,11 @@ export function DrawingGallery() {
 
       <section className="px-5 pb-24 sm:px-8 lg:px-14">
         <div className="container-pad px-0">
-          <div className="drawing-gallery-bottom">
-            <div className="drawing-week-list">
+          <div className="drawing-gallery-bottom drawing-gallery-bottom-compact">
+            <div className="drawing-week-list drawing-gallery-leaders-card">
               <div className="drawing-ranking-title">
-                <span>Топ-3 категории {ageBandLabel(activeAge)}</span>
-                <p>Лидеры по отметкам зрителей</p>
+                <span>Топ-3 · {ageBandLabel(activeAge)}</span>
+                <p>Лидеры среди учеников по отметкам зрителей</p>
               </div>
               {topWorks.map((item, index) => (
                 <button key={item.id} type="button" onClick={() => setOpened(item)} className="drawing-ranking-row drawing-ranking-row-button">
@@ -554,14 +683,11 @@ export function DrawingGallery() {
               <div>
                 <span>Заявка на выставку</span>
                 <h3>Загрузите фото свободной работы</h3>
-                <p>Выберите возраст и неделю, прикрепите фото рисунка и отправьте на модерацию. После одобрения работа появится в своей возрастной категории.</p>
+                <p>Выберите возраст, прикрепите фото рисунка и отправьте на модерацию. После одобрения работа появится в своей возрастной категории.</p>
               </div>
 
               <select value={form.ageBand} onChange={(event) => updateField('ageBand', event.target.value)} className="drawing-upload-select">
                 {AGE_OPTIONS.map((age) => <option key={age.key} value={age.key}>{age.label}</option>)}
-              </select>
-              <select value={form.week} onChange={(event) => updateField('week', event.target.value)} className="drawing-upload-select">
-                {WEEK_OPTIONS.map((week) => <option key={week.key} value={week.key}>{week.label}</option>)}
               </select>
 
               <label className={'drawing-upload-drop ' + (preview ? 'drawing-upload-drop-filled' : '')}>
@@ -581,7 +707,7 @@ export function DrawingGallery() {
 
               {latestUpload && (
                 <div className="drawing-upload-status">
-                  <b>На модерации: {ageBandLabel(latestUpload.ageBand ?? '3-4')} · {workWeekLabel(latestUpload.week)}</b>
+                  <b>На модерации: {ageBandLabel(latestUpload.ageBand ?? '3-4')}</b>
                   <span>{latestUpload.child}, {latestUpload.city} · «{latestUpload.title}»</span>
                 </div>
               )}
@@ -596,7 +722,7 @@ export function DrawingGallery() {
             <button type="button" onClick={() => setOpened(null)} className="drawing-art-modal-close">×</button>
             <ArtworkPreview item={opened} />
             <div>
-              <p>{ageBandLabel(opened.ageBand ?? '3-4')} · {workWeekLabel(opened.week)}</p>
+              <p>{ageBandLabel(opened.ageBand ?? '3-4')} · {galleryScopeLabel(opened)}</p>
               <h3>{opened.title}</h3>
               <span>{opened.child}, {opened.city} · {opened.likes ?? 0} отметок</span>
             </div>
@@ -606,3 +732,4 @@ export function DrawingGallery() {
     </>
   );
 }
+

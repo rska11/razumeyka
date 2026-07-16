@@ -8,10 +8,10 @@ import { directionsData } from '../data/directions.js';
 import { Icon } from './Icon.jsx';
 
 const directionByTitle = new Map(directionsData.map((direction) => [direction.title, direction]));
-const fallbackDirectionByAge = {
-  '7-9': 'languages',
-  '10-12': 'languages',
-};
+const extraDirectionLinks = new Map([
+  ['Подготовка к школе', { title: 'Подготовка к школе', href: '/podgotovka-k-shkole' }],
+  ['Английский для детей', { title: 'Английский для детей', href: '/english-for-kids' }],
+]);
 
 function AgePattern() {
   const blob = (duration, delay = '0s', rotate = '0deg') => ({
@@ -121,62 +121,70 @@ export function AgePrograms() {
         <div className="grid gap-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-end">
           <div>
             <span className="inline-flex rounded-full border border-ink/8 bg-white/72 px-4 py-2 text-xs font-extrabold uppercase tracking-[0.18em] text-forest-700 shadow-sm backdrop-blur-xl">
-              Выбор по возрасту
+              Маршрут по возрасту
             </span>
             <h2 className="mt-5 font-display text-[2.35rem] font-bold leading-[1.05] tracking-[-0.02em] sm:text-5xl">
-              Занятия растут вместе с ребенком
+              Занятия растут вместе с ребёнком
             </h2>
           </div>
           <p className="max-w-2xl text-lg font-medium leading-8 text-ink/64">
-            Вместо общей программы для всех подбираем уровень нагрузки, формат заданий и направления под возраст,
-            внимание и текущую школьную нагрузку.
+            Подберите программу по возрасту ребёнка: малышам — короткие творческие победы, дошкольникам — внимание и подготовка руки,
+            детям 8–10+ — более сложные задания, детализация и самостоятельность без перегруза.
           </p>
         </div>
 
-        <div className="mt-10 rounded-[8px] border border-white/80 bg-white/72 p-2 shadow-insetline backdrop-blur-xl">
-          <div className="grid gap-2 md:grid-cols-3">
+        <div className="mt-10 rounded-[30px] border border-white/80 bg-white/72 p-3 shadow-luxe backdrop-blur-xl">
+          <div className="grid gap-3 md:grid-cols-3">
             {ageGroups.map((group) => (
               <button
                 key={group.id}
                 type="button"
                 onClick={() => setActiveId(group.id)}
-                className={`rounded-[8px] p-5 text-left transition duration-300 focus:outline-none focus:ring-4 focus:ring-gold-300/35 ${
+                className={`group relative overflow-hidden rounded-[24px] p-5 text-left transition duration-300 focus:outline-none focus:ring-4 focus:ring-gold-300/35 ${
                   activeId === group.id
-                    ? 'bg-porcelain text-ink shadow-luxe'
-                    : 'bg-transparent text-ink/62 hover:bg-white/84 hover:text-ink'
+                    ? 'bg-ink text-white shadow-luxe'
+                    : 'bg-white/68 text-ink/62 shadow-insetline hover:-translate-y-0.5 hover:bg-white hover:text-ink hover:shadow-color'
                 }`}
               >
-                <span className="text-xs font-extrabold uppercase tracking-[0.16em] text-gold-500">{group.eyebrow}</span>
-                <span className="mt-2 block font-display text-3xl font-bold">{group.label}</span>
-                <span className="mt-3 block text-sm font-bold leading-5 opacity-70">{group.headline}</span>
+                <span className={`absolute -right-8 -top-8 h-24 w-24 rounded-full transition ${
+                  activeId === group.id ? 'bg-brand-yellow/24' : 'bg-brand-blue/10 group-hover:bg-brand-pink/12'
+                }`} />
+                <span className={`relative text-xs font-extrabold uppercase tracking-[0.16em] ${
+                  activeId === group.id ? 'text-brand-yellow' : 'text-gold-500'
+                }`}>{group.eyebrow}</span>
+                <span className="relative mt-2 block font-display text-3xl font-bold">{group.label}</span>
+                <span className="relative mt-3 block text-sm font-bold leading-5 opacity-75">{group.headline}</span>
               </button>
             ))}
           </div>
         </div>
 
         <div className="mt-5 grid gap-5 lg:grid-cols-[1.08fr_0.92fr]">
-          <div className="rounded-[8px] border border-white/78 bg-white/72 p-6 text-ink shadow-luxe backdrop-blur-xl sm:p-8">
+          <div className="relative overflow-hidden rounded-[30px] border border-white/78 bg-white/78 p-6 text-ink shadow-luxe backdrop-blur-xl sm:p-8">
+            <div className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-brand-blue/16 blur-2xl" />
+            <div className="pointer-events-none absolute -bottom-24 left-12 h-52 w-52 rounded-full bg-brand-pink/12 blur-2xl" />
             <div className="flex flex-col justify-between gap-8 sm:flex-row">
-              <div>
+              <div className="relative">
                 <p className="text-sm font-extrabold uppercase tracking-[0.18em] text-forest-700">Рекомендуемый фокус</p>
                 <h3 className="mt-4 max-w-2xl font-display text-3xl font-bold leading-tight sm:text-4xl">
                   {active.headline}
                 </h3>
                 <p className="mt-5 max-w-2xl text-lg font-medium leading-8 text-ink/64">{active.description}</p>
               </div>
-              <div className="h-fit rounded-[8px] bg-brand-yellow p-5 text-night shadow-luxe">
-                <p className="text-xs font-extrabold uppercase tracking-[0.18em]">длительность</p>
+              <div className="relative h-fit min-w-[10rem] rounded-[24px] bg-brand-yellow p-5 text-night shadow-luxe">
+                <p className="text-xs font-extrabold uppercase tracking-[0.18em]">урок</p>
                 <p className="mt-2 font-display text-4xl font-bold">{active.stat}</p>
+                <p className="mt-2 text-sm font-extrabold text-night/62">без перегруза</p>
               </div>
             </div>
           </div>
 
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-1">
-            <div className="direction-chip-panel rounded-[8px] bg-white p-6 text-ink shadow-luxe">
+            <div className="direction-chip-panel rounded-[30px] bg-white p-6 text-ink shadow-luxe">
               <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-forest-700">Подходящие направления</p>
               <div className="mt-5 flex flex-wrap gap-2">
                 {active.programs.map((program) => {
-                  const direction = resolveDirection(program, active.id);
+                  const direction = resolveDirection(program);
 
                   if (!direction) {
                     return (
@@ -190,7 +198,7 @@ export function AgePrograms() {
                 })}
               </div>
             </div>
-            <div className="rounded-[8px] border border-brand-pink/22 bg-white/68 p-6 text-ink shadow-insetline backdrop-blur-xl">
+            <div className="rounded-[30px] border border-brand-pink/22 bg-white/68 p-6 text-ink shadow-insetline backdrop-blur-xl">
               <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-brand-pink">Что усиливаем</p>
               <div className="mt-5 space-y-3">
                 {active.outcomes.map((outcome) => (
@@ -208,15 +216,14 @@ export function AgePrograms() {
   );
 }
 
-function resolveDirection(program, ageId) {
+function resolveDirection(program) {
   const exactMatch = directionByTitle.get(program);
 
   if (exactMatch) {
     return exactMatch;
   }
 
-  const fallbackSlug = fallbackDirectionByAge[ageId];
-  return directionsData.find((direction) => direction.slug === fallbackSlug);
+  return extraDirectionLinks.get(program) ?? null;
 }
 
 function DirectionChip({ direction, pathname }) {

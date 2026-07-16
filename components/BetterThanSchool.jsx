@@ -81,7 +81,7 @@ export function BetterThanSchool() {
             <h2 className="section-title mt-5">Результат — это не случайность</h2>
           </div>
           <div
-            className={`rounded-[8px] border-2 border-ink bg-cream p-5 shadow-[10px_10px_0_rgba(59,130,246,0.14)] transition duration-700 ${
+            className={`rounded-[28px] border border-white/80 bg-white/84 p-6 shadow-luxe backdrop-blur-xl transition duration-700 ${
               isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
             }`}
           >
@@ -91,15 +91,15 @@ export function BetterThanSchool() {
           </div>
         </div>
 
-        <div className="relative mt-14">
+        <div className="relative mt-10">
           <div className="absolute left-8 right-8 top-1/2 hidden h-1 -translate-y-1/2 rounded-full bg-gradient-to-r from-brand-blue via-brand-orange via-brand-pink to-brand-green lg:block" />
 
           <div className="grid gap-6 lg:grid-cols-4">
             {methodCards.map((card, index) => (
               <article
                 key={card.title}
-                className={`group relative min-h-[330px] overflow-hidden rounded-[8px] border-2 border-white bg-white/84 p-6 shadow-card backdrop-blur-xl transition duration-500 hover:-translate-y-2 hover:scale-[1.015] hover:shadow-color ${
-                  index % 2 ? 'lg:translate-y-10' : 'lg:translate-y-0'
+                className={`group relative min-h-[310px] overflow-hidden rounded-[24px] border border-white/85 bg-white/86 p-6 shadow-card backdrop-blur-xl transition duration-500 hover:-translate-y-2 hover:scale-[1.012] hover:shadow-color ${
+                  index % 2 ? 'lg:translate-y-6' : 'lg:translate-y-0'
                 } ${isVisible ? 'opacity-100' : 'translate-y-8 opacity-0'}`}
                 style={{ transitionDelay: `${index * 130}ms` }}
               >
@@ -107,7 +107,7 @@ export function BetterThanSchool() {
                 <div className={`absolute inset-x-0 top-0 h-2 bg-gradient-to-r ${card.accent}`} />
 
                 <div className="relative flex items-start justify-between gap-4">
-                  <div className={`flex h-14 w-14 items-center justify-center rounded-[8px] bg-gradient-to-br ${card.accent} text-white shadow-luxe`}>
+                  <div className={`flex h-14 w-14 items-center justify-center rounded-[18px] bg-gradient-to-br ${card.accent} text-white shadow-luxe`}>
                     <Icon name={card.icon} className="h-7 w-7" />
                   </div>
                   <span className="font-display text-5xl font-black text-ink/10">{card.number}</span>
@@ -122,7 +122,7 @@ export function BetterThanSchool() {
                 </div>
 
                 {index < methodCards.length - 1 && (
-                  <div className="absolute -right-7 top-1/2 z-10 hidden h-14 w-14 -translate-y-1/2 animate-floaty items-center justify-center rounded-full border-2 border-ink bg-white text-ink shadow-[5px_5px_0_rgba(19,35,27,0.14)] lg:flex">
+                  <div className="absolute -right-7 top-1/2 z-10 hidden h-14 w-14 -translate-y-1/2 animate-floaty items-center justify-center rounded-full border border-ink/10 bg-white text-ink shadow-card lg:flex">
                     <Icon name="arrow" className="h-6 w-6" />
                   </div>
                 )}
@@ -132,11 +132,11 @@ export function BetterThanSchool() {
         </div>
 
         <div
-          className={`mt-14 grid gap-4 rounded-[8px] border-2 border-ink bg-night p-5 text-white shadow-[12px_12px_0_rgba(19,35,27,0.12)] transition duration-700 lg:grid-cols-[auto_1fr_auto] lg:items-center ${
+          className={`mt-10 grid gap-4 rounded-[28px] border border-white/10 bg-night p-5 text-white shadow-luxe transition duration-700 lg:grid-cols-[auto_1fr_auto] lg:items-center ${
             isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}
         >
-          <div className="flex h-14 w-14 items-center justify-center rounded-[8px] bg-white text-ink">
+          <div className="flex h-14 w-14 items-center justify-center rounded-[18px] bg-white text-ink">
             <Icon name="check" className="h-7 w-7" />
           </div>
           <p className="text-lg font-bold leading-8 text-white/78">

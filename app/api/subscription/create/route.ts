@@ -60,7 +60,7 @@ export async function POST(req: Request) {
     const yk = await createYooKassaPayment({
       amountRub: amount,
       description,
-      returnUrl: `${site}${returnTo}`,
+      returnUrl: `${site}/payment/success?p=${payment.id}`,
       metadata: { paymentId: payment.id },
       customerEmail: session.user.email || undefined,
     });

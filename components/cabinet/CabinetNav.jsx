@@ -14,18 +14,18 @@ export function CabinetNav({ isAdmin = false }) {
   const pathname = usePathname();
 
   return (
-    <nav className="mt-5 grid gap-1">
+    <nav className="mt-5 grid gap-1.5">
       {links.map(([href, label, d]) => {
         const active = href === '/cabinet' ? pathname === href : pathname.startsWith(href);
         return (
           <Link
             key={href}
             href={href}
-            className={`flex items-center gap-3 rounded-[14px] px-3 py-2.5 text-sm font-extrabold transition ${
-              active ? 'bg-ink text-white shadow-[0_10px_24px_rgba(16,42,86,0.16)]' : 'text-ink/64 hover:bg-ink/[0.05] hover:text-ink'
+            className={`flex min-h-[46px] items-center gap-3 rounded-[15px] px-3.5 py-2.5 text-sm font-extrabold transition ${
+              active ? 'bg-ink text-white shadow-[0_12px_28px_rgba(16,42,86,0.18)]' : 'text-ink/62 hover:bg-ink/[0.05] hover:text-ink'
             }`}
           >
-            <svg className="h-4.5 w-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d={d} />
             </svg>
             {label}
@@ -36,11 +36,11 @@ export function CabinetNav({ isAdmin = false }) {
       {isAdmin && (
         <Link
           href="/admin"
-          className={`mt-1 flex items-center gap-3 rounded-[14px] px-3 py-2.5 text-sm font-extrabold transition ${
+          className={`mt-1 flex min-h-[46px] items-center gap-3 rounded-[15px] px-3.5 py-2.5 text-sm font-extrabold transition ${
             pathname.startsWith('/admin') ? 'bg-ink text-white' : 'text-brand-blue hover:bg-brand-blue/8'
           }`}
         >
-          <svg className="h-4.5 w-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z" />
           </svg>
           Админка
@@ -50,9 +50,9 @@ export function CabinetNav({ isAdmin = false }) {
       <button
         type="button"
         onClick={() => signOut({ callbackUrl: '/' })}
-        className="mt-2 flex items-center gap-3 rounded-[14px] px-3 py-2.5 text-sm font-extrabold text-ink/52 transition hover:bg-brand-red/8 hover:text-brand-red"
+        className="mt-2 flex min-h-[46px] items-center gap-3 rounded-[15px] px-3.5 py-2.5 text-sm font-extrabold text-ink/52 transition hover:bg-brand-red/8 hover:text-brand-red"
       >
-        <svg className="h-4.5 w-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M16 17l5-5-5-5M21 12H9M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
         </svg>
         Выйти

@@ -151,14 +151,15 @@ export default async function SchoolPrepPage() {
                 </div>
                 <div className="mt-9 grid max-w-[680px] grid-cols-2 gap-3 sm:grid-cols-4">
                   {[
-                    ['25', 'шагов в день'],
-                    ['125', 'шагов в неделю'],
-                    ['500', 'шагов в месяц'],
-                    ['1 день', 'бесплатно'],
-                  ].map(([value, label]) => (
-                    <div key={label} className="rounded-[20px] border border-white/80 bg-white/65 p-4 shadow-sm backdrop-blur-xl">
-                      <strong className="font-display text-2xl font-extrabold tracking-tight text-ink">{value}</strong>
-                      <span className="mt-1 block text-[11px] font-bold leading-4 text-ink/48">{label}</span>
+                    ['День', '25', 'шагов', 'from-brand-cyan/20 to-brand-blue/8', 'text-brand-blue'],
+                    ['Неделя', '125', 'шагов', 'from-brand-yellow/24 to-brand-orange/8', 'text-brand-orange'],
+                    ['Месяц', '500', 'шагов', 'from-brand-pink/18 to-brand-purple/8', 'text-brand-pink'],
+                    ['Весь курс', '1 500', 'шагов', 'from-brand-green/18 to-brand-cyan/8', 'text-brand-green'],
+                  ].map(([period, value, label, background, tone]) => (
+                    <div key={period} className={`relative overflow-hidden rounded-[22px] border border-white/90 bg-gradient-to-br ${background} p-4 shadow-card backdrop-blur-xl sm:min-h-[132px]`}>
+                      <span className="text-[9px] font-extrabold uppercase tracking-[0.16em] text-ink/42">{period}</span>
+                      <strong className={`mt-2 block font-display text-[34px] font-extrabold leading-none tracking-[-0.055em] sm:text-[38px] ${tone}`}>{value}</strong>
+                      <span className="mt-2 block text-xs font-extrabold leading-4 text-ink/62">{label}</span>
                     </div>
                   ))}
                 </div>
@@ -185,18 +186,26 @@ export default async function SchoolPrepPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   {[
-                    ['25', 'шагов', 'одно занятие · 20–25 минут', 'text-brand-cyan'],
-                    ['125', 'шагов', 'полная неделя · 5 дней', 'text-brand-yellow'],
-                    ['500', 'шагов', 'первый месяц · 20 дней', 'text-brand-pink'],
-                    ['1 500', 'шагов', 'вся экспедиция · 12 недель', 'text-brand-green'],
-                  ].map(([value, unit, note, tone]) => (
-                    <article key={value} className="rounded-[24px] border border-white/10 bg-white/[0.065] p-5 backdrop-blur-xl sm:p-6">
-                      <p className={`font-display text-3xl font-extrabold tracking-[-0.04em] sm:text-4xl ${tone}`}>{value}</p>
-                      <p className="mt-1 text-sm font-extrabold text-white">{unit}</p>
-                      <p className="mt-3 text-[11px] font-semibold leading-5 text-white/46">{note}</p>
+                    ['01 · День', '25', 'шагов', 'одно занятие · 20–25 минут', 'from-[#168ED9] to-[#34C9D3]', 'shadow-[0_22px_55px_rgba(52,201,211,.18)]'],
+                    ['02 · Неделя', '125', 'шагов', 'полный маршрут · 5 дней', 'from-[#F59E0B] to-[#F6C945]', 'shadow-[0_22px_55px_rgba(245,158,11,.16)]'],
+                    ['03 · Месяц', '500', 'шагов', '4 недели · 20 занятий', 'from-[#E74887] to-[#8C5BE8]', 'shadow-[0_22px_55px_rgba(231,72,135,.18)]'],
+                    ['04 · Курс', '1 500', 'шагов', 'вся экспедиция · 12 недель', 'from-[#10A875] to-[#22B8A7]', 'shadow-[0_22px_55px_rgba(16,168,117,.16)]'],
+                  ].map(([period, value, unit, note, tone, shadow]) => (
+                    <article key={value} className={`relative min-h-[178px] overflow-hidden rounded-[26px] bg-gradient-to-br ${tone} p-5 text-white ${shadow} sm:min-h-[196px] sm:p-6`}>
+                      <div className="pointer-events-none absolute -right-10 -top-12 h-32 w-32 rounded-full bg-white/18 blur-2xl" />
+                      <p className="relative text-[9px] font-extrabold uppercase tracking-[0.18em] text-white/68">{period}</p>
+                      <p className="relative mt-4 font-display text-[44px] font-extrabold leading-none tracking-[-0.065em] sm:text-[58px]">{value}</p>
+                      <p className="relative mt-1 text-base font-extrabold text-white">{unit}</p>
+                      <p className="relative mt-4 text-[11px] font-bold leading-5 text-white/72">{note}</p>
                     </article>
                   ))}
                 </div>
+              </div>
+              <div className="relative mt-7 grid grid-cols-2 gap-2 rounded-[22px] border border-white/9 bg-white/[0.055] p-3 text-center text-xs font-extrabold text-white/68 sm:grid-cols-4 sm:items-center">
+                <span className="rounded-[14px] bg-white/7 px-3 py-2.5"><b className="text-brand-cyan">25</b> × 5 дней</span>
+                <span className="rounded-[14px] bg-white/7 px-3 py-2.5"><b className="text-brand-yellow">125</b> × 4 недели</span>
+                <span className="rounded-[14px] bg-white/7 px-3 py-2.5"><b className="text-brand-pink">500</b> × 3 месяца</span>
+                <span className="rounded-[14px] bg-white/7 px-3 py-2.5"><b className="text-brand-green">1 500</b> шагов</span>
               </div>
               <div className="relative mt-8 flex flex-col gap-3 border-t border-white/9 pt-6 text-sm font-semibold text-white/56 sm:flex-row sm:items-center sm:justify-between">
                 <p>Короткие шаги удерживают внимание — большой маршрут создаёт реальный объём практики.</p>
@@ -251,7 +260,7 @@ export default async function SchoolPrepPage() {
           <div className="container-pad px-0">
             <div className="mx-auto mb-12 max-w-3xl text-center">
               <span className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-brand-blue">Полноценный пробный маршрут</span>
-              <h2 className="mt-5 font-display text-4xl font-extrabold tracking-[-0.045em] sm:text-6xl">Один день, чтобы почувствовать весь подход</h2>
+              <h2 className="mt-5 font-display text-4xl font-extrabold tracking-[-0.045em] sm:text-6xl"><span className="text-brand-blue">25 шагов.</span><br />Один день, чтобы почувствовать весь подход</h2>
               <p className="mt-5 text-base font-semibold leading-7 text-ink/58 sm:text-lg">25 последовательных шагов на 20–25 минут: разминка, игры на речь, счёт, внимание и самостоятельность, а в финале — понятный итог для родителя. День 1 бесплатный, продолжение входит в полный курс.</p>
             </div>
             <div className="mb-10 overflow-hidden rounded-[32px] border border-ink/7 bg-white/82 p-6 shadow-card backdrop-blur-xl sm:p-8">
@@ -314,10 +323,12 @@ export default async function SchoolPrepPage() {
                     </div>
                     <h3 className="mt-4 font-display text-lg font-extrabold leading-tight text-ink">{week.title}</h3>
                     <p className="mt-2 text-xs font-semibold leading-5 text-ink/52">{week.focus}</p>
-                    <div className="mt-4 flex flex-wrap gap-1.5 text-[9px] font-extrabold uppercase tracking-[0.08em] text-ink/48">
-                      <span className="rounded-full border border-ink/7 bg-white/60 px-2.5 py-1.5">5 дней</span>
-                      <span className="rounded-full border border-ink/7 bg-white/60 px-2.5 py-1.5">125 шагов</span>
-                      <span className="rounded-full border border-ink/7 bg-white/60 px-2.5 py-1.5">20–25 мин/день</span>
+                    <div className="mt-4 rounded-[18px] border border-white/80 bg-white/72 p-3 shadow-sm">
+                      <div className="flex items-end justify-between gap-3">
+                        <div><strong className="font-display text-3xl font-extrabold leading-none tracking-[-0.045em]">{125}</strong><span className="ml-1.5 text-xs font-extrabold text-ink/68">шагов</span></div>
+                        <span className="rounded-full bg-ink/5 px-2.5 py-1 text-[9px] font-extrabold uppercase tracking-[0.08em] text-ink/44">5 дней</span>
+                      </div>
+                      <p className="mt-2 text-[10px] font-bold text-ink/42">20–25 минут в день</p>
                     </div>
                   </article>
                 ))}

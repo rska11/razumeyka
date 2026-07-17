@@ -637,7 +637,7 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false }) {
                 type="button"
                 disabled={!isUnlocked}
                 onClick={() => selectDay(index)}
-                className={`relative min-h-[154px] rounded-[20px] border p-3 text-left transition duration-250 ${
+                className={`relative min-h-[190px] rounded-[22px] border p-3.5 text-left transition duration-250 ${
                   active
                     ? "border-white/30 bg-white/16 shadow-insetline"
                     : isUnlocked
@@ -665,11 +665,14 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false }) {
                 </div>
                 <p className="mt-3 text-[10px] font-extrabold uppercase tracking-[0.13em] text-white/42">День {day.number}</p>
                 <p className="mt-1 text-xs font-extrabold leading-5 text-white/88 sm:text-sm">{day.title}</p>
-                <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[9px] font-extrabold">
-                  <span className="rounded-full bg-white/9 px-2 py-1 text-white/72">{day.missions.length} шагов</span>
-                  <span className="text-white/40">20–25 мин</span>
+                <div className="mt-3 rounded-[15px] border border-white/8 bg-white/[0.07] px-3 py-2.5">
+                  <div className="flex items-baseline gap-1.5">
+                    <strong className="font-display text-[26px] font-extrabold leading-none tracking-[-0.045em] text-brand-cyan">{day.missions.length}</strong>
+                    <span className="text-[10px] font-extrabold uppercase tracking-[0.08em] text-white/74">шагов</span>
+                  </div>
+                  <p className="mt-1 text-[9px] font-bold text-white/42">20–25 минут</p>
                 </div>
-                {!isUnlocked && <p className="mt-1.5 text-[9px] font-bold text-brand-cyan/70">В полном курсе</p>}
+                {!isUnlocked && <p className="mt-2 text-[9px] font-extrabold uppercase tracking-[0.08em] text-brand-cyan/80">Откроется в полном курсе</p>}
               </button>
             );
           })}

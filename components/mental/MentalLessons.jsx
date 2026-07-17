@@ -84,18 +84,39 @@ function WeekendPause({ week }) {
   );
 }
 
-function LockedDay({ dayNumber, title }) {
+function NextWeeksPreview() {
+  const routes = [
+    { week: 2, from: 6, to: 10, title: 'Цепочки и друзья пятёрки', note: 'Сложение и вычитание через понятные числовые связи.', tone: 'from-brand-blue/14 to-brand-cyan/7' },
+    { week: 3, from: 11, to: 15, title: 'Абакус в воображении', note: 'Учимся удерживать бусины мысленно и считать без экрана.', tone: 'from-brand-purple/14 to-brand-pink/7' },
+    { week: 4, from: 16, to: 20, title: 'Скорость, точность и финал', note: 'Игровой марафон и личный результат без сравнения с другими.', tone: 'from-brand-orange/16 to-brand-yellow/8' },
+  ];
   return (
-    <section className="border-t border-ink/8 pt-5">
-      <div className="rounded-2xl border border-white/65 bg-white/45 p-4 shadow-sm">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-ink/36">День {dayNumber}</p>
-            <h4 className="mt-1 font-display text-xl font-extrabold text-ink/54">{title}</h4>
-            <p className="mt-1 text-xs font-bold text-ink/42">Уроки этого дня готовятся для следующего пополнения месяца.</p>
-          </div>
-          <span className="grid h-10 w-10 flex-none place-items-center rounded-full bg-ink/8 text-ink/38">🔒</span>
+    <section className="mental-next-route">
+      <div className="mental-next-route-head">
+        <div>
+          <p>После первой недели</p>
+          <h4>Навык растёт следующими маршрутами</h4>
         </div>
+        <span>ещё 3 недели · 75 миссий · 375 заданий</span>
+      </div>
+      <div className="mental-next-route-grid">
+        {routes.map((route) => (
+          <article key={route.week} className={`bg-gradient-to-br ${route.tone}`}>
+            <div><span>Неделя {route.week}</span><b>25 миссий</b></div>
+            <h5>{route.title}</h5>
+            <p>{route.note}</p>
+            <ul>
+              {mentalDays.filter((day) => day.n >= route.from && day.n <= route.to).map((day) => (
+                <li key={day.n}>
+                  <span><b>День {day.n}</b><em>{day.title}</em></span>
+                  <i>5 миссий</i>
+                  <strong aria-label="Откроется по маршруту">⌁</strong>
+                </li>
+              ))}
+            </ul>
+            <small>Открывается последовательно по маршруту →</small>
+          </article>
+        ))}
       </div>
     </section>
   );
@@ -248,7 +269,7 @@ export function MentalLessons({ hasSubscription = false }) {
             <p className="section-kicker">Путь счетовода · {activeBand.label}</p>
             <h3 className="mt-2 font-display text-2xl font-extrabold text-ink">От первой бусины к счёту в уме</h3>
             <p className="mt-2 max-w-2xl text-sm font-semibold leading-6 text-ink/60">
-              Месяц состоит из 20 учебных дней: 5 занятий в неделю, затем 2 дня отдыха. Программа одна для всех — ребёнок идёт в своём темпе, младшим просто нужно чуть больше времени.
+              Месяц — это 20 учебных дней, 100 игровых миссий и более 500 заданий. Каждый день содержит 5 коротких миссий примерно по 5 действий. Перед стартом можно пройти 10 необязательных разминок «Ступени 0».
             </p>
             <p className="mt-2 max-w-2xl rounded-xl bg-brand-blue/8 px-3 py-2 text-xs font-bold leading-5 text-brand-blue">
               💡 {activeBand.hint}
@@ -274,7 +295,7 @@ export function MentalLessons({ hasSubscription = false }) {
             onLocked={goSubscribe}
           />
         )}
-        {Array.from({ length: MONTH_DAYS }).map((_, dayIndex) => {
+        {Array.from({ length: 5 }).map((_, dayIndex) => {
           const dayNumber = dayIndex + 1;
           const day = daysByN.get(dayNumber);
           return (
@@ -287,13 +308,12 @@ export function MentalLessons({ hasSubscription = false }) {
                   onOpen={setActive}
                   onLocked={goSubscribe}
                 />
-              ) : (
-                <LockedDay dayNumber={dayNumber} title={mentalDays.find((d) => d.n === dayNumber)?.title ?? 'Новый день счёта'} />
-              )}
-              {dayNumber % 5 === 0 && dayNumber < MONTH_DAYS && <WeekendPause week={dayNumber / 5} />}
+              ) : null}
+              {dayNumber === 5 && <WeekendPause week={1} />}
             </div>
           );
         })}
+        <NextWeeksPreview />
       </div>
 
       {active && (

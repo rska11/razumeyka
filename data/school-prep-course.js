@@ -1,11 +1,15 @@
 import { schoolPrepDayOneExtraMissions } from './school-prep-day-one.js';
+import { schoolPrepDayTwoExtraMissions } from './school-prep-day-two.js';
+import { schoolPrepDayThreeExtraMissions } from './school-prep-day-three.js';
+import { schoolPrepDayFourExtraMissions } from './school-prep-day-four.js';
+import { schoolPrepDayFiveExtraMissions } from './school-prep-day-five.js';
 
 export const schoolPrepProgram = {
   title: 'Экспедиция в Город знаний',
   age: '5–7 лет',
   duration: '12 недель',
   rhythm: '5 коротких занятий в неделю',
-  lessonTime: '15–20 минут',
+  lessonTime: '20–25 минут',
   promise: 'Не натаскиваем на ответы — учим понимать инструкцию, рассуждать, говорить и не бояться ошибок.',
   principles: [
     {
@@ -15,7 +19,7 @@ export const schoolPrepProgram = {
     },
     {
       title: 'Маленькие победы каждый день',
-      text: 'Три короткие миссии дают ощущение успеха, но тренируют внимание, речь, счёт и самоконтроль по-настоящему.',
+      text: '25 коротких игровых шагов дают ощущение успеха и постепенно тренируют внимание, речь, счёт и самоконтроль без перегруза.',
       icon: 'star',
     },
     {
@@ -50,7 +54,7 @@ export const schoolPrepWeekOne = {
   title: 'Ключ от Города знаний',
   subtitle: 'Пять дней, чтобы научиться слышать инструкцию, замечать главное и смело браться за новое.',
   story:
-    'Лисёнок Искра нашёл ворота в Город знаний, но они закрыты на пять волшебных печатей. Каждый день ребёнок проходит три миссии и возвращает одну печать.',
+    'Лисёнок Искра нашёл ворота в Город знаний, но они закрыты на пять волшебных печатей. Каждый день ребёнок проходит 25 коротких миссий и возвращает одну печать.',
   reward: 'Золотой ключ будущего первоклассника',
   days: [
     {
@@ -145,6 +149,7 @@ export const schoolPrepWeekOne = {
           id: 'd2-sound',
           type: 'choice',
           mode: 'multi',
+          chapter: 'Глава 1 · Открываем площадь слов',
           skill: 'Фонематический слух',
           title: 'Поймай звук «М»',
           prompt: 'Выбери картинки, названия которых начинаются со звука «М».',
@@ -164,6 +169,7 @@ export const schoolPrepWeekOne = {
           id: 'd2-syllable',
           type: 'choice',
           mode: 'single',
+          chapter: 'Глава 1 · Открываем площадь слов',
           skill: 'Слоговое чтение',
           title: 'Собери секретное слово',
           prompt: 'Соедини два слога: МА + МА. Какое слово получилось?',
@@ -179,6 +185,7 @@ export const schoolPrepWeekOne = {
         {
           id: 'd2-story',
           type: 'sequence',
+          chapter: 'Глава 1 · Открываем площадь слов',
           skill: 'Связная речь',
           title: 'История одного семечка',
           prompt: 'Расставь события от самого первого до последнего.',
@@ -192,6 +199,7 @@ export const schoolPrepWeekOne = {
           hint: 'Цветок не может появиться раньше семечка.',
           success: 'История ожила! Попробуй теперь рассказать её вслух.',
         },
+        ...schoolPrepDayTwoExtraMissions,
       ],
     },
     {
@@ -212,6 +220,7 @@ export const schoolPrepWeekOne = {
           id: 'd3-number',
           type: 'choice',
           mode: 'single',
+          chapter: 'Глава 1 · Первые шаги по мосту',
           skill: 'Числовой ряд',
           title: 'Верни вагончик',
           prompt: 'Какого числа не хватает?  1 · 2 · ? · 4 · 5',
@@ -228,6 +237,7 @@ export const schoolPrepWeekOne = {
           id: 'd3-compare',
           type: 'choice',
           mode: 'single',
+          chapter: 'Глава 1 · Первые шаги по мосту',
           skill: 'Сравнение',
           title: 'Где звёзд больше?',
           prompt: 'Слева: ⭐⭐⭐⭐⭐   Справа: ⭐⭐⭐. Выбери верный ответ.',
@@ -244,6 +254,7 @@ export const schoolPrepWeekOne = {
           id: 'd3-pattern',
           type: 'choice',
           mode: 'single',
+          chapter: 'Глава 1 · Первые шаги по мосту',
           skill: 'Закономерности',
           title: 'Зажги следующий фонарик',
           prompt: 'Продолжи ритм: 🔵 🔵 🟡  🔵 🔵 🟡  ?',
@@ -256,6 +267,7 @@ export const schoolPrepWeekOne = {
           hint: 'Найди кусочек, который всё время повторяется.',
           success: 'Мост сияет! Ты заметил повторяющийся ритм.',
         },
+        ...schoolPrepDayThreeExtraMissions,
       ],
     },
     {
@@ -275,6 +287,7 @@ export const schoolPrepWeekOne = {
         {
           id: 'd4-memory',
           type: 'memory',
+          chapter: 'Глава 1 · Включаем радар внимания',
           skill: 'Рабочая память',
           title: 'Найди пары',
           prompt: 'Открывай карточки по две и запоминай, где спрятаны одинаковые символы.',
@@ -294,6 +307,7 @@ export const schoolPrepWeekOne = {
           id: 'd4-double',
           type: 'choice',
           mode: 'multi',
+          chapter: 'Глава 1 · Включаем радар внимания',
           skill: 'Двойное условие',
           title: 'Точный приказ профессора',
           prompt: 'Выбери ЖЁЛТУЮ ЗВЕЗДУ и СИНИЙ КРУГ.',
@@ -311,6 +325,7 @@ export const schoolPrepWeekOne = {
           id: 'd4-space',
           type: 'choice',
           mode: 'single',
+          chapter: 'Глава 1 · Включаем радар внимания',
           skill: 'Ориентация в пространстве',
           title: 'Где спрятался Искра?',
           prompt: '🏠   🦊   🌳  — Лисёнок стоит…',
@@ -323,6 +338,7 @@ export const schoolPrepWeekOne = {
           hint: 'Посмотри на домик, а затем веди взгляд вправо.',
           success: 'Нашёл! Искра справа от домика и слева от дерева.',
         },
+        ...schoolPrepDayFourExtraMissions,
       ],
     },
     {
@@ -343,6 +359,7 @@ export const schoolPrepWeekOne = {
           id: 'd5-odd',
           type: 'choice',
           mode: 'single',
+          chapter: 'Глава 1 · Испытание башни',
           skill: 'Логика',
           title: 'Кто здесь лишний?',
           prompt: 'Найди предмет, который не относится к школьным принадлежностям.',
@@ -359,6 +376,7 @@ export const schoolPrepWeekOne = {
         {
           id: 'd5-plan',
           type: 'sequence',
+          chapter: 'Глава 1 · Испытание башни',
           skill: 'Планирование',
           title: 'План маленького проекта',
           prompt: 'Расставь шаги, чтобы сделать открытку.',
@@ -372,9 +390,11 @@ export const schoolPrepWeekOne = {
           hint: 'Сначала появляется замысел, а подарок — уже в самом конце.',
           success: 'Проект спланирован! Так большие дела становятся понятными.',
         },
+        ...schoolPrepDayFiveExtraMissions,
         {
           id: 'd5-final',
           type: 'quiz',
+          chapter: 'Финал · Золотой ключ недели',
           skill: 'Итоговая миссия',
           title: 'Открой Башню уверенности',
           prompt: 'Пять коротких вопросов соберут золотой ключ.',

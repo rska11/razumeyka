@@ -9,6 +9,8 @@ const toneClasses = {
   "text-brand-pink": "text-brand-pink",
   "text-brand-orange": "text-brand-orange",
   "text-brand-yellow": "text-brand-yellow",
+  "text-brand-green": "text-brand-green",
+  "text-brand-purple": "text-brand-purple",
 };
 
 function sameAnswers(selected, correct) {
@@ -650,7 +652,7 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false }) {
             <p className="mt-5 text-xs font-extrabold uppercase tracking-[0.2em] text-gold-300">Первая неделя завершена</p>
             <h3 className="mt-3 font-display text-3xl font-extrabold tracking-[-0.035em] sm:text-5xl">Золотой ключ твой!</h3>
             <p className="mx-auto mt-4 max-w-2xl text-base font-medium leading-7 text-white/70">
-              Ребёнок прошёл 15 миссий: слушал инструкцию, находил закономерности, работал со звуками и числами и учился пробовать снова.
+              Ребёнок прошёл 125 миссий: слушал инструкцию, находил закономерности, работал со звуками и числами и учился пробовать снова.
             </p>
             <div className="mx-auto mt-7 inline-flex rounded-full border border-white/16 bg-white/10 px-5 py-3 text-sm font-extrabold">
               Награда: {week.reward} · 15 ⭐

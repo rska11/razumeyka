@@ -123,7 +123,7 @@ export default function SchoolPrepPage() {
                 <div className="mt-9 grid max-w-[680px] grid-cols-2 gap-3 sm:grid-cols-4">
                   {[
                     ['12', 'недель'],
-                    ['15–20', 'минут в день'],
+                    ['20–25', 'минут в день'],
                     ['5', 'дней в неделю'],
                     ['1 день', 'бесплатно'],
                   ].map(([value, label]) => (
@@ -186,7 +186,10 @@ export default function SchoolPrepPage() {
               <h2 className="mt-5 font-display text-4xl font-extrabold tracking-[-0.045em] sm:text-6xl">Один день, чтобы почувствовать весь подход</h2>
               <p className="mt-5 text-base font-semibold leading-7 text-ink/58 sm:text-lg">25 последовательных шагов на 20–25 минут: разминка, игры на речь, счёт, внимание и самостоятельность, а в финале — понятный итог для родителя. День 1 бесплатный, продолжение входит в полный курс.</p>
             </div>
-            <SchoolPrepAdventure week={schoolPrepWeekOne} />
+            <SchoolPrepAdventure
+              week={schoolPrepWeekOne}
+              hasFullAccess={process.env.NODE_ENV !== 'production'}
+            />
           </div>
         </section>
 
@@ -233,7 +236,7 @@ export default function SchoolPrepPage() {
                 </div>
                 <div className="grid gap-3">
                   {[
-                    ['01', 'Рядом 15–20 минут', 'Не нужно готовить материалы и объяснять длинную теорию.'],
+                    ['01', 'Рядом 20–25 минут', 'Не нужно готовить материалы и объяснять длинную теорию.'],
                     ['02', 'Видеть реальный навык', 'Не просто «молодец», а конкретно: удержал инструкцию, нашёл закономерность, составил план.'],
                     ['03', 'Продолжить в обычной жизни', 'Одна мини-игра переносит навык с экрана в прогулку, дорогу или домашнее дело.'],
                   ].map(([number, title, text]) => (

@@ -149,19 +149,33 @@ export default async function SchoolPrepPage() {
                     Оформить месяц курса · {SCHOOL_PREP_PRICE} ₽
                   </a>
                 </div>
-                <div className="mt-9 grid max-w-[680px] grid-cols-2 gap-3 sm:grid-cols-4">
+                <div className="mt-10 max-w-[720px]">
+                  <div className="mb-4 flex items-end justify-between gap-4">
+                    <div>
+                      <span className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-brand-purple">Масштаб курса</span>
+                      <p className="mt-1 font-display text-xl font-extrabold tracking-[-0.035em] text-ink sm:text-2xl">Не несколько пробных игр — большая программа</p>
+                    </div>
+                    <span className="hidden rounded-full bg-brand-green/10 px-3 py-2 text-[10px] font-extrabold text-brand-green sm:inline-flex">12 недель практики</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
                   {[
-                    ['День', '25', 'шагов', 'from-brand-cyan/20 to-brand-blue/8', 'text-brand-blue'],
-                    ['Неделя', '125', 'шагов', 'from-brand-yellow/24 to-brand-orange/8', 'text-brand-orange'],
-                    ['Месяц', '500', 'шагов', 'from-brand-pink/18 to-brand-purple/8', 'text-brand-pink'],
-                    ['Весь курс', '1 500', 'шагов', 'from-brand-green/18 to-brand-cyan/8', 'text-brand-green'],
-                  ].map(([period, value, label, background, tone]) => (
-                    <div key={period} className={`relative overflow-hidden rounded-[22px] border border-white/90 bg-gradient-to-br ${background} p-4 shadow-card backdrop-blur-xl sm:min-h-[132px]`}>
-                      <span className="text-[9px] font-extrabold uppercase tracking-[0.16em] text-ink/42">{period}</span>
-                      <strong className={`mt-2 block font-display text-[34px] font-extrabold leading-none tracking-[-0.055em] sm:text-[38px] ${tone}`}>{value}</strong>
-                      <span className="mt-2 block text-xs font-extrabold leading-4 text-ink/62">{label}</span>
+                    ['Один день', '25', 'шагов', '20–25 минут увлекательной практики', 'from-[#E5F8FF] to-[#DDEBFF]', 'text-[#1978D4]', 'bg-[#35BFD0]'],
+                    ['Одна неделя', '125', 'шагов', '5 полноценных учебных дней', 'from-[#FFF5D5] to-[#FFE8CB]', 'text-[#E57C14]', 'bg-[#F4B83F]'],
+                    ['Один месяц', '500', 'шагов', '20 занятий без однообразия', 'from-[#FFE5F0] to-[#EDE4FF]', 'text-[#D93F83]', 'bg-[#E4589A]'],
+                    ['Полный курс', '1 500', 'шагов', '12 недель большой экспедиции', 'from-[#DFF8EE] to-[#DDF7F8]', 'text-[#0B9B70]', 'bg-[#20B98B]'],
+                  ].map(([period, value, label, note, background, tone, accent]) => (
+                    <div key={period} className={`group relative min-h-[164px] overflow-hidden rounded-[26px] border border-white bg-gradient-to-br ${background} p-5 shadow-[0_18px_48px_rgba(20,35,70,.10)] transition duration-300 hover:-translate-y-1 hover:shadow-color sm:min-h-[184px] sm:p-6`}>
+                      <i className={`absolute -right-8 -top-10 h-28 w-28 rounded-full ${accent} opacity-15 blur-xl transition group-hover:scale-125`} />
+                      <div className={`absolute inset-y-5 left-0 w-1 rounded-r-full ${accent}`} />
+                      <span className="relative text-[10px] font-extrabold uppercase tracking-[0.17em] text-ink/48">{period}</span>
+                      <div className="relative mt-3 flex items-end gap-2">
+                        <strong className={`font-display text-[48px] font-extrabold leading-[.84] tracking-[-0.07em] sm:text-[62px] ${tone}`}>{value}</strong>
+                        <span className="pb-1 text-sm font-extrabold text-ink/66 sm:text-base">{label}</span>
+                      </div>
+                      <p className="relative mt-4 text-[11px] font-bold leading-5 text-ink/52 sm:text-xs">{note}</p>
                     </div>
                   ))}
+                  </div>
                 </div>
               </div>
               <CityMap />

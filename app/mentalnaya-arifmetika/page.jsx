@@ -132,8 +132,8 @@ export default async function MentalArithmeticPage() {
 
             <div className="mt-14 grid grid-cols-2 gap-3 lg:grid-cols-4">
               {[
-                ['100', 'игровых миссий', 'маршрут первого месяца', 'from-[#236BFF] to-[#45A9F4]'],
-                ['500+', 'интерактивных заданий', 'двигать, считать, запоминать', 'from-[#7B59E8] to-[#B366E7]'],
+                ['200', 'игровых миссий', 'маршрут первого месяца', 'from-[#236BFF] to-[#45A9F4]'],
+                ['1 000+', 'интерактивных заданий', 'двигать, считать, запоминать', 'from-[#7B59E8] to-[#B366E7]'],
                 ['20', 'учебных дней', '4 недели без перегруза', 'from-[#E6942A] to-[#F4BE4B]'],
                 ['3', 'урока бесплатно', 'без банковской карты', 'from-[#11A77B] to-[#42C9A3]'],
               ].map(([value, label, note, tone]) => (
@@ -219,11 +219,11 @@ export default async function MentalArithmeticPage() {
             <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
               <div className="max-w-4xl">
                 <span className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-brand-blue">Полный маршрут первого месяца</span>
-                <h2 className="mt-5 font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.05em] sm:text-6xl">20 дней. 100 миссий. Более 500 игровых заданий.</h2>
-                <p className="mt-5 max-w-3xl text-base font-semibold leading-7 text-ink/56">В каждом учебном дне — 5 коротких миссий и около 25 действий ребёнка. Следующие дни открываются по маршруту, чтобы навык рос последовательно и без перегруза.</p>
+                <h2 className="mt-5 font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.05em] sm:text-6xl">20 дней. 200 миссий. Более 1 000 игровых заданий.</h2>
+                <p className="mt-5 max-w-3xl text-base font-semibold leading-7 text-ink/56">В каждом учебном дне — 10 разных миссий и около 50 действий ребёнка: абакус, память, сравнение, последовательности, цепочки и игровые финалы.</p>
               </div>
               <div className="grid grid-cols-3 gap-2">
-                {[[20, 'дней'], [100, 'миссий'], ['500+', 'заданий']].map(([value, label]) => (
+                {[[20, 'дней'], [200, 'миссий'], ['1 000+', 'заданий']].map(([value, label]) => (
                   <div key={label} className="min-w-[100px] rounded-[20px] bg-white px-4 py-4 text-center shadow-card">
                     <strong className="font-display text-3xl font-extrabold text-brand-blue">{value}</strong>
                     <span className="mt-1 block text-[9px] font-extrabold text-ink/42">{label}</span>
@@ -269,7 +269,7 @@ export default async function MentalArithmeticPage() {
                 <div>
                   <span className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-[#75E5C1]">30 дней доступа</span>
                   <h2 className="mt-5 max-w-3xl font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.05em] sm:text-6xl">Целый месяц числовых приключений</h2>
-                  <p className="mt-5 max-w-2xl text-base font-semibold leading-7 text-white/62">Маршрут из 100 игровых миссий и более 500 интерактивных заданий. Включена дополнительная Ступень 0 для уверенного старта.</p>
+                  <p className="mt-5 max-w-2xl text-base font-semibold leading-7 text-white/62">Маршрут из 200 игровых миссий и более 1 000 интерактивных заданий. Включена дополнительная Ступень 0 для уверенного старта.</p>
                   <ul className="mt-8 grid gap-3 sm:grid-cols-2">
                     {mentalSubscription.perks.map((perk) => (
                       <li key={perk} className="flex items-start gap-3 rounded-[18px] border border-white/9 bg-white/[0.06] px-4 py-3.5 text-sm font-semibold leading-6 text-white/74">
@@ -287,8 +287,8 @@ export default async function MentalArithmeticPage() {
                   <p className="mt-2 text-sm font-bold text-ink/46">на 30 дней · без автосписания</p>
                   <div className="my-6 h-px bg-ink/8" />
                   <div className="space-y-3 text-sm font-semibold text-ink/62">
-                    <p className="flex justify-between gap-4"><span>Маршрут месяца</span><strong className="text-ink">100 миссий</strong></p>
-                    <p className="flex justify-between gap-4"><span>Игровая практика</span><strong className="text-ink">500+ заданий</strong></p>
+                    <p className="flex justify-between gap-4"><span>Маршрут месяца</span><strong className="text-ink">200 миссий</strong></p>
+                    <p className="flex justify-between gap-4"><span>Игровая практика</span><strong className="text-ink">1 000+ заданий</strong></p>
                     <p className="flex justify-between gap-4"><span>Бесплатный старт</span><strong className="text-brand-green">3 урока</strong></p>
                   </div>
                   <SubscribeButton isLoggedIn={Boolean(session?.user?.id)} hasAccess={hasSub} accessUntil={accessUntilLabel} returnTo="/mentalnaya-arifmetika" />

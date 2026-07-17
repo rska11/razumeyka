@@ -97,19 +97,19 @@ function NextWeeksPreview() {
           <p>После первой недели</p>
           <h4>Навык растёт следующими маршрутами</h4>
         </div>
-        <span>ещё 3 недели · 75 миссий · 375 заданий</span>
+        <span>ещё 3 недели · 150 миссий · 750 заданий</span>
       </div>
       <div className="mental-next-route-grid">
         {routes.map((route) => (
           <article key={route.week} className={`bg-gradient-to-br ${route.tone}`}>
-            <div><span>Неделя {route.week}</span><b>25 миссий</b></div>
+            <div><span>Неделя {route.week}</span><b>50 миссий</b></div>
             <h5>{route.title}</h5>
             <p>{route.note}</p>
             <ul>
               {mentalDays.filter((day) => day.n >= route.from && day.n <= route.to).map((day) => (
                 <li key={day.n}>
                   <span><b>День {day.n}</b><em>{day.title}</em></span>
-                  <i>5 миссий</i>
+                  <i>10 миссий</i>
                   <strong aria-label="Откроется по маршруту">⌁</strong>
                 </li>
               ))}
@@ -269,7 +269,7 @@ export function MentalLessons({ hasSubscription = false }) {
             <p className="section-kicker">Путь счетовода · {activeBand.label}</p>
             <h3 className="mt-2 font-display text-2xl font-extrabold text-ink">От первой бусины к счёту в уме</h3>
             <p className="mt-2 max-w-2xl text-sm font-semibold leading-6 text-ink/60">
-              Месяц — это 20 учебных дней, 100 игровых миссий и более 500 заданий. Каждый день содержит 5 коротких миссий примерно по 5 действий. Перед стартом можно пройти 10 необязательных разминок «Ступени 0».
+              Месяц — это 20 учебных дней, 200 игровых миссий и более 1 000 заданий. Каждый день содержит 10 разных миссий примерно по 5 действий. Перед стартом можно пройти 10 необязательных разминок «Ступени 0».
             </p>
             <p className="mt-2 max-w-2xl rounded-xl bg-brand-blue/8 px-3 py-2 text-xs font-bold leading-5 text-brand-blue">
               💡 {activeBand.hint}

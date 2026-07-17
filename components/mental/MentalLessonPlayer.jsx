@@ -12,6 +12,8 @@
 //   flash — флеш-карты (числа мелькают, ребёнок называет);
 //   solve — пример-цепочка, опционально с абакусом-помощником;
 //   count — «посчитай предметы» (эмодзи, без абакуса — ступень 0).
+//   compare — сравни два абакуса и выбери, где число больше;
+//   missing — найди пропавшее число в короткой последовательности.
 //
 // paceFactor — возрастной множитель темпа (mentalAgeBands): растягивает показ
 // флеш-карт для младших. Контент от возраста не меняется.
@@ -34,6 +36,7 @@ function answerFor(step) {
   if (step.type === 'flash') return chainSum(step.cards);
   if (step.type === 'solve') return chainSum(step.chain);
   if (step.type === 'count') return step.n;
+  if (step.type === 'missing') return step.answer;
   return null;
 }
 
@@ -69,11 +72,13 @@ function lessonColumns(lesson) {
         max = Math.max(max, acc);
       }
     }
+    if (s.type === 'compare') max = Math.max(max, s.left, s.right);
+    if (s.type === 'missing') max = Math.max(max, ...s.sequence.filter(Number.isFinite), s.answer);
   }
   return columnsFor(max);
 }
 
-const INTERACTIVE_TYPES = new Set(['set', 'read', 'flash', 'solve', 'count']);
+const INTERACTIVE_TYPES = new Set(['set', 'read', 'flash', 'solve', 'count', 'compare', 'missing']);
 
 // ——— Кнопки-варианты ответа (read / flash / solve) ———
 function AnswerButtons({ options, answer, onCorrect }) {
@@ -100,7 +105,7 @@ function AnswerButtons({ options, answer, onCorrect }) {
             key={n}
             onClick={() => pick(n)}
             disabled={ok}
-            className={`grid h-14 w-14 place-items-center rounded-2xl border-2 font-display text-2xl font-extrabold transition ${
+            className={`grid h-14 place-items-center rounded-2xl border-2 font-display font-extrabold transition ${typeof n === 'string' ? 'min-w-[82px] px-3 text-sm' : 'w-14 text-2xl'} ${
               ok && n === answer
                 ? 'border-brand-green bg-brand-green/12 text-brand-green'
                 : picked === n
@@ -146,6 +151,37 @@ function CountStep({ step, onSolved }) {
         ))}
       </div>
       <AnswerButtons options={options} answer={step.n} onCorrect={onSolved} />
+    </div>
+  );
+}
+
+function CompareStep({ step, columns, onSolved }) {
+  const answer = step.left === step.right ? 'Равны' : step.left > step.right ? 'Слева' : 'Справа';
+  return (
+    <div className="flex flex-1 flex-col items-center justify-center">
+      <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-2 rounded-[22px] bg-gradient-to-br from-brand-cyan/10 to-brand-purple/10 p-3">
+        <div className="text-center"><Soroban value={step.left} columns={columns} interactive={false} className="mx-auto h-[150px] w-auto" /><b className="text-xs text-ink/45">Слева</b></div>
+        <span className="font-display text-2xl font-black text-brand-purple">?</span>
+        <div className="text-center"><Soroban value={step.right} columns={columns} interactive={false} className="mx-auto h-[150px] w-auto" /><b className="text-xs text-ink/45">Справа</b></div>
+      </div>
+      <p className="mt-3 text-xs font-extrabold text-ink/50">Где число больше?</p>
+      <AnswerButtons options={['Слева', 'Равны', 'Справа']} answer={answer} onCorrect={onSolved} />
+    </div>
+  );
+}
+
+function MissingStep({ step, onSolved }) {
+  const options = useMemo(() => makeOptions(step), [step]);
+  return (
+    <div className="flex flex-1 flex-col items-center justify-center">
+      <div className="flex flex-wrap items-center justify-center gap-2 rounded-[22px] bg-gradient-to-br from-brand-yellow/16 to-brand-orange/8 p-5">
+        {step.sequence.map((value, index) => (
+          <span key={index} className={`grid h-16 w-16 place-items-center rounded-[18px] font-display text-3xl font-black ${value == null ? 'border-2 border-dashed border-brand-orange/45 bg-white/70 text-brand-orange' : 'bg-white text-ink shadow-sm'}`}>
+            {value == null ? '?' : value}
+          </span>
+        ))}
+      </div>
+      <AnswerButtons options={options} answer={step.answer} onCorrect={onSolved} />
     </div>
   );
 }
@@ -421,6 +457,12 @@ export function MentalLessonPlayer({ lesson, nextLesson, onComplete, onNext, onC
               )}
               {current?.type === 'count' && (
                 <CountStep key={step} step={current} onSolved={(first) => markPassed(step, first)} />
+              )}
+              {current?.type === 'compare' && (
+                <CompareStep key={step} step={current} columns={columns} onSolved={(first) => markPassed(step, first)} />
+              )}
+              {current?.type === 'missing' && (
+                <MissingStep key={step} step={current} onSolved={(first) => markPassed(step, first)} />
               )}
 
               <div className="mt-3 flex flex-none items-center gap-3">

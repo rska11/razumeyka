@@ -323,6 +323,158 @@ function QuizMission({ mission, done, onComplete }) {
   );
 }
 
+function SortMission({ mission, done, onComplete }) {
+  const [itemIndex, setItemIndex] = useState(done ? mission.items.length : 0);
+  const [result, setResult] = useState(done ? "success" : "");
+  const current = mission.items[itemIndex];
+
+  function place(groupId) {
+    if (!current) return;
+    if (current.group !== groupId) {
+      setResult("hint");
+      return;
+    }
+    const next = itemIndex + 1;
+    if (next === mission.items.length) {
+      setItemIndex(next);
+      setResult("success");
+      onComplete();
+      return;
+    }
+    setItemIndex(next);
+    setResult("");
+  }
+
+  return (
+    <>
+      <div className="mt-5 overflow-hidden rounded-[24px] border border-brand-cyan/18 bg-gradient-to-br from-brand-cyan/[0.08] to-brand-blue/[0.04] p-5">
+        <div className="flex items-center justify-between gap-3 text-xs font-extrabold text-ink/48">
+          <span>Сортировочная станция</span>
+          <span>{Math.min(itemIndex, mission.items.length)} / {mission.items.length}</span>
+        </div>
+        <div className="mt-3 h-2 overflow-hidden rounded-full bg-white">
+          <div className="h-full rounded-full bg-gradient-to-r from-brand-cyan to-brand-blue transition-all" style={{ width: `${(itemIndex / mission.items.length) * 100}%` }} />
+        </div>
+        {current ? (
+          <div className="mt-5 text-center">
+            <span className="text-6xl" aria-hidden="true">{current.emoji}</span>
+            <p className="mt-2 font-display text-xl font-extrabold text-ink">{current.label}</p>
+            <p className="mt-1 text-xs font-bold text-ink/42">В какую зону отправить?</p>
+          </div>
+        ) : (
+          <div className="mt-5 text-center text-5xl" aria-hidden="true">🎉</div>
+        )}
+      </div>
+      {current && (
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          {mission.groups.map((group) => (
+            <button key={group.id} type="button" onClick={() => place(group.id)} className="flex min-h-[82px] items-center justify-center gap-3 rounded-[18px] border border-ink/8 bg-white px-4 py-3 text-sm font-extrabold text-ink transition hover:-translate-y-0.5 hover:border-brand-cyan/30 hover:shadow-card">
+              <span className="text-3xl">{group.emoji}</span>{group.label}
+            </button>
+          ))}
+        </div>
+      )}
+      <ResultMessage state={result} success={mission.success} hint={mission.hint} />
+    </>
+  );
+}
+
+function PathMission({ mission, done, onComplete }) {
+  const [position, setPosition] = useState(done ? mission.goal : mission.start);
+  const [result, setResult] = useState(done ? "success" : "");
+  const blocked = new Set(mission.blocked.map(([row, col]) => `${row}-${col}`));
+
+  function move(rowDelta, colDelta) {
+    const next = [position[0] + rowDelta, position[1] + colDelta];
+    const outside = next[0] < 0 || next[0] >= mission.rows || next[1] < 0 || next[1] >= mission.cols;
+    if (outside || blocked.has(`${next[0]}-${next[1]}`)) {
+      setResult("hint");
+      return;
+    }
+    setPosition(next);
+    if (next[0] === mission.goal[0] && next[1] === mission.goal[1]) {
+      setResult("success");
+      onComplete();
+    } else {
+      setResult("");
+    }
+  }
+
+  function restart() {
+    setPosition(mission.start);
+    setResult("");
+  }
+
+  return (
+    <>
+      <div className="mt-5 grid gap-5 rounded-[24px] border border-brand-purple/16 bg-brand-purple/[0.035] p-5 sm:grid-cols-[1fr_auto] sm:items-center">
+        <div className="mx-auto grid w-full max-w-[360px] gap-2" style={{ gridTemplateColumns: `repeat(${mission.cols}, minmax(0, 1fr))` }}>
+          {Array.from({ length: mission.rows * mission.cols }, (_, index) => {
+            const row = Math.floor(index / mission.cols);
+            const col = index % mission.cols;
+            const key = `${row}-${col}`;
+            const fox = position[0] === row && position[1] === col;
+            const goal = mission.goal[0] === row && mission.goal[1] === col;
+            return (
+              <div key={key} className={`grid aspect-square place-items-center rounded-[14px] border text-2xl sm:text-3xl ${blocked.has(key) ? "border-ink/5 bg-ink/8" : goal ? "border-brand-yellow/30 bg-brand-yellow/14" : "border-white bg-white shadow-sm"}`}>
+                {fox ? "🦊" : blocked.has(key) ? "🌳" : goal ? mission.goalEmoji : ""}
+              </div>
+            );
+          })}
+        </div>
+        <div className="mx-auto grid grid-cols-3 gap-2">
+          <span />
+          <button type="button" onClick={() => move(-1, 0)} className="grid h-12 w-12 place-items-center rounded-[15px] bg-ink text-xl font-black text-white">↑</button>
+          <span />
+          <button type="button" onClick={() => move(0, -1)} className="grid h-12 w-12 place-items-center rounded-[15px] bg-ink text-xl font-black text-white">←</button>
+          <button type="button" onClick={restart} className="grid h-12 w-12 place-items-center rounded-[15px] border border-ink/10 bg-white text-base">↻</button>
+          <button type="button" onClick={() => move(0, 1)} className="grid h-12 w-12 place-items-center rounded-[15px] bg-ink text-xl font-black text-white">→</button>
+          <span />
+          <button type="button" onClick={() => move(1, 0)} className="grid h-12 w-12 place-items-center rounded-[15px] bg-ink text-xl font-black text-white">↓</button>
+          <span />
+        </div>
+      </div>
+      <ResultMessage state={result} success={mission.success} hint={mission.hint} />
+    </>
+  );
+}
+
+function ActionMission({ mission, done, onComplete }) {
+  const [step, setStep] = useState(done ? mission.actions.length : 0);
+  const finished = step >= mission.actions.length;
+  const action = mission.actions[step];
+
+  function next() {
+    const nextStep = step + 1;
+    setStep(nextStep);
+    if (nextStep === mission.actions.length) onComplete();
+  }
+
+  return (
+    <>
+      <div className="mt-5 overflow-hidden rounded-[24px] border border-brand-orange/18 bg-gradient-to-br from-brand-orange/[0.1] via-white to-brand-yellow/[0.08] p-5 text-center sm:p-7">
+        <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-brand-orange">Перерыв-игра · встаём со стула</p>
+        {!finished ? (
+          <>
+            <div className="mt-5 text-7xl" aria-hidden="true">{action.emoji}</div>
+            <h5 className="mt-4 font-display text-2xl font-extrabold text-ink">{action.title}</h5>
+            <p className="mx-auto mt-2 max-w-lg text-sm font-semibold leading-6 text-ink/56">{action.text}</p>
+            <div className="mt-5 flex justify-center gap-1.5">
+              {mission.actions.map((_, index) => <span key={index} className={`h-2 w-9 rounded-full ${index <= step ? "bg-brand-orange" : "bg-ink/8"}`} />)}
+            </div>
+            <button type="button" onClick={next} className="mt-5 inline-flex min-h-[50px] items-center justify-center rounded-full bg-ink px-7 py-3 text-sm font-extrabold text-white shadow-sm transition hover:-translate-y-0.5">
+              Выполнил! Дальше →
+            </button>
+          </>
+        ) : (
+          <div className="py-4"><div className="text-6xl">🌟</div><p className="mt-3 font-display text-2xl font-extrabold text-ink">Тело и внимание снова готовы!</p></div>
+        )}
+      </div>
+      {finished && <ResultMessage state="success" success={mission.success} />}
+    </>
+  );
+}
+
 function MissionCard({ mission, index, done, onComplete }) {
   return (
     <article className={`rounded-[28px] border bg-white/88 p-5 shadow-card backdrop-blur-xl sm:p-7 ${
@@ -352,6 +504,9 @@ function MissionCard({ mission, index, done, onComplete }) {
       {mission.type === "sequence" && <SequenceMission mission={mission} done={done} onComplete={onComplete} />}
       {mission.type === "memory" && <MemoryMission mission={mission} done={done} onComplete={onComplete} />}
       {mission.type === "quiz" && <QuizMission mission={mission} done={done} onComplete={onComplete} />}
+      {mission.type === "sort" && <SortMission mission={mission} done={done} onComplete={onComplete} />}
+      {mission.type === "path" && <PathMission mission={mission} done={done} onComplete={onComplete} />}
+      {mission.type === "action" && <ActionMission mission={mission} done={done} onComplete={onComplete} />}
     </article>
   );
 }
@@ -443,10 +598,22 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false }) {
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
             <span className="inline-flex rounded-full border border-white/14 bg-white/8 px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.18em] text-white/72">
-              День 1 · полноценный пробный маршрут
+              {hasFullAccess ? "Неделя 1 · полный маршрут" : "День 1 · полноценный пробный маршрут"}
             </span>
             <h3 className="mt-4 font-display text-3xl font-extrabold tracking-[-0.035em] sm:text-5xl">{week.title}</h3>
             <p className="mt-3 text-base font-medium leading-7 text-white/62">{week.subtitle}</p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              {[
+                ["5", "учебных дней"],
+                ["125", "игровых шагов"],
+                ["100–125", "минут практики"],
+              ].map(([value, label]) => (
+                <span key={label} className="inline-flex items-baseline gap-1.5 rounded-full border border-white/10 bg-white/[0.07] px-3 py-2 text-xs font-bold text-white/58">
+                  <strong className="font-display text-base font-extrabold text-white">{value}</strong>
+                  {label}
+                </span>
+              ))}
+            </div>
           </div>
           <div className="min-w-[220px] rounded-[22px] border border-white/10 bg-white/8 p-4 backdrop-blur-xl">
             <div className="flex items-center justify-between text-xs font-extrabold text-white/60">
@@ -470,23 +637,26 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false }) {
                 type="button"
                 disabled={!isUnlocked}
                 onClick={() => selectDay(index)}
-                className={`relative min-h-[126px] rounded-[20px] border p-3 text-left transition duration-250 ${
+                className={`relative min-h-[154px] rounded-[20px] border p-3 text-left transition duration-250 ${
                   active
                     ? "border-white/30 bg-white/16 shadow-insetline"
                     : isUnlocked
                       ? "border-white/8 bg-white/[0.055] hover:-translate-y-1 hover:bg-white/10"
-                      : "border-white/5 bg-white/[0.025] opacity-38"
+                      : "border-white/7 bg-white/[0.035]"
                 }`}
               >
                 <div className="flex items-center justify-between gap-2">
-                  {isUnlocked && day.image ? (
-                    <span className="h-11 w-14 overflow-hidden rounded-[13px] border border-white/14 bg-white/8">
+                  {day.image ? (
+                    <span className="relative h-11 w-14 overflow-hidden rounded-[13px] border border-white/14 bg-white/8">
                       <img
                         src={day.image}
                         alt=""
-                        className="h-full w-full object-cover"
+                        className={`h-full w-full object-cover ${isUnlocked ? "" : "opacity-55 saturate-50"}`}
                         style={{ objectPosition: day.imagePosition }}
                       />
+                      {!isUnlocked && (
+                        <span className="absolute inset-0 flex items-center justify-center bg-[#111a35]/30 text-base" aria-hidden="true">🔒</span>
+                      )}
                     </span>
                   ) : (
                     <span className="flex h-11 w-14 items-center justify-center rounded-[13px] bg-white/7 text-2xl">{isUnlocked ? day.emoji : "🔒"}</span>
@@ -495,9 +665,11 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false }) {
                 </div>
                 <p className="mt-3 text-[10px] font-extrabold uppercase tracking-[0.13em] text-white/42">День {day.number}</p>
                 <p className="mt-1 text-xs font-extrabold leading-5 text-white/88 sm:text-sm">{day.title}</p>
-                <p className="mt-1 text-[10px] font-bold text-white/38">
-                  {index === 0 || hasFullAccess ? day.missions.length + " шагов" : "В полном курсе"}
-                </p>
+                <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[9px] font-extrabold">
+                  <span className="rounded-full bg-white/9 px-2 py-1 text-white/72">{day.missions.length} шагов</span>
+                  <span className="text-white/40">20–25 мин</span>
+                </div>
+                {!isUnlocked && <p className="mt-1.5 text-[9px] font-bold text-brand-cyan/70">В полном курсе</p>}
               </button>
             );
           })}
@@ -524,7 +696,7 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false }) {
             <div className="min-w-[150px] rounded-[24px] border border-white/18 bg-[#0b1930]/48 p-4 shadow-insetline backdrop-blur-xl">
               <p className="text-[10px] font-extrabold uppercase tracking-[0.15em] text-white/52">Маршрут дня</p>
               <p className="mt-1 font-display text-2xl font-extrabold">{currentDay.missions.length} шагов</p>
-              <p className="mt-1 text-xs font-bold text-white/62">{currentDay.number === 1 ? '20–25 минут' : 'развиваем дальше'}</p>
+              <p className="mt-1 text-xs font-bold text-white/62">20–25 минут</p>
             </div>
           </div>
           <div className="relative mt-6 rounded-[20px] border border-white/14 bg-white/12 px-4 py-3.5 text-sm font-bold leading-6 text-white/86 backdrop-blur-xl">
@@ -655,7 +827,7 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false }) {
               Ребёнок прошёл 125 миссий: слушал инструкцию, находил закономерности, работал со звуками и числами и учился пробовать снова.
             </p>
             <div className="mx-auto mt-7 inline-flex rounded-full border border-white/16 bg-white/10 px-5 py-3 text-sm font-extrabold">
-              Награда: {week.reward} · 15 ⭐
+              Награда: {week.reward} · 125 ⭐
             </div>
           </div>
         </section>

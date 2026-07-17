@@ -20,6 +20,12 @@ const COURSE_VISUALS: Record<
     gradient: "from-[#079A78] via-[#16A6A1] to-[#3B82F6]",
     glow: "bg-brand-cyan/30",
   },
+  "podgotovka-k-shkole": {
+    kicker: "Экспедиция в Город знаний",
+    description: "Сюжетные миссии на речь, счёт, внимание, самостоятельность и спокойную готовность к школе.",
+    gradient: "from-[#246BFD] via-[#7257E8] to-[#F05A87]",
+    glow: "bg-brand-purple/30",
+  },
 };
 
 function rub(n: number) {
@@ -46,6 +52,15 @@ function CourseIcon({ slug }: { slug: DirectionSlug }) {
       <svg className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
         <path d="M14.5 5.5l4 4M4 20l4.2-1 10.6-10.6a2.8 2.8 0 10-4-4L4.2 15 4 20z" />
         <path d="M12.5 7.5l4 4" />
+      </svg>
+    );
+  }
+
+  if (slug === "podgotovka-k-shkole") {
+    return (
+      <svg className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 8.5L12 4l8 4.5-8 4.5-8-4.5z" />
+        <path d="M7 11v4.5c2.8 2 7.2 2 10 0V11M20 9v5" />
       </svg>
     );
   }

@@ -11,6 +11,7 @@ export const SUBSCRIPTION_MONTHS = 1;
 export const DIRECTIONS = {
   risovanie: { path: "/risovanie", title: "Рисование" },
   "mentalnaya-arifmetika": { path: "/mentalnaya-arifmetika", title: "Ментальная арифметика" },
+  "podgotovka-k-shkole": { path: "/podgotovka-k-shkole", title: "Подготовка к школе" },
 } as const;
 
 export type DirectionSlug = keyof typeof DIRECTIONS;
@@ -20,6 +21,7 @@ export type DirectionSlug = keyof typeof DIRECTIONS;
 export const DIRECTION_PRICE: Record<DirectionSlug, number> = {
   risovanie: 10, // TEST: тестовый платёж — вернуть на 490
   "mentalnaya-arifmetika": SUBSCRIPTION_PRICE,
+  "podgotovka-k-shkole": SUBSCRIPTION_PRICE,
 };
 
 /** Цена доступа к направлению в рублях. */

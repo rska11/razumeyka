@@ -6,7 +6,7 @@ import { schoolPrepProgram, schoolPrepWeekOne } from '@/data/school-prep-course.
 export const metadata = {
   title: 'Подготовка к школе 5–7 лет — курс-игра онлайн',
   description:
-    'Умная подготовка к школе в формате приключения: речь, чтение, счёт, логика, внимание, графомоторика и уверенность. Первая игровая неделя открыта бесплатно.',
+    'Умная подготовка к школе в формате приключения: речь, чтение, счёт, логика, внимание, графомоторика и уверенность. Первый полноценный игровой день доступен бесплатно.',
   alternates: { canonical: '/podgotovka-k-shkole' },
   openGraph: {
     type: 'website',
@@ -114,7 +114,7 @@ export default function SchoolPrepPage() {
                 </p>
                 <div className="mt-9 flex flex-wrap gap-3">
                   <a href="#week-one" className="group inline-flex min-h-[58px] items-center justify-center gap-3 rounded-full bg-ink px-7 py-4 text-sm font-extrabold text-white shadow-button transition hover:-translate-y-1">
-                    Начать первую неделю <span className="transition group-hover:translate-x-1">→</span>
+                    Попробовать День 1 бесплатно <span className="transition group-hover:translate-x-1">→</span>
                   </a>
                   <a href="#program" className="inline-flex min-h-[58px] items-center justify-center rounded-full border border-ink/10 bg-white/75 px-7 py-4 text-sm font-extrabold text-ink/68 transition hover:-translate-y-1 hover:bg-white">
                     Посмотреть 12 недель
@@ -125,7 +125,7 @@ export default function SchoolPrepPage() {
                     ['12', 'недель'],
                     ['15–20', 'минут в день'],
                     ['5', 'дней в неделю'],
-                    ['1-я', 'неделя бесплатно'],
+                    ['1 день', 'бесплатно'],
                   ].map(([value, label]) => (
                     <div key={label} className="rounded-[20px] border border-white/80 bg-white/65 p-4 shadow-sm backdrop-blur-xl">
                       <strong className="font-display text-2xl font-extrabold tracking-tight text-ink">{value}</strong>
@@ -182,9 +182,9 @@ export default function SchoolPrepPage() {
         <section id="week-one" className="scroll-mt-24 px-5 py-24 sm:px-8 lg:px-14 lg:py-32">
           <div className="container-pad px-0">
             <div className="mx-auto mb-12 max-w-3xl text-center">
-              <span className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-brand-blue">Можно начать прямо сейчас</span>
-              <h2 className="mt-5 font-display text-4xl font-extrabold tracking-[-0.045em] sm:text-6xl">Первая неделя — уже живая</h2>
-              <p className="mt-5 text-base font-semibold leading-7 text-ink/58 sm:text-lg">Пять дней открываются по порядку. В каждом — разминка, три короткие миссии и понятный итог для родителя. Прогресс сохранится на этом устройстве.</p>
+              <span className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-brand-blue">Полноценный пробный маршрут</span>
+              <h2 className="mt-5 font-display text-4xl font-extrabold tracking-[-0.045em] sm:text-6xl">Один день, чтобы почувствовать весь подход</h2>
+              <p className="mt-5 text-base font-semibold leading-7 text-ink/58 sm:text-lg">25 последовательных шагов на 20–25 минут: разминка, игры на речь, счёт, внимание и самостоятельность, а в финале — понятный итог для родителя. День 1 бесплатный, продолжение входит в полный курс.</p>
             </div>
             <SchoolPrepAdventure week={schoolPrepWeekOne} />
           </div>
@@ -209,7 +209,7 @@ export default function SchoolPrepPage() {
                     <div className="flex items-center justify-between gap-4">
                       <span className="text-[11px] font-extrabold uppercase tracking-[0.14em]">Неделя {week.week}</span>
                       <span className={`rounded-full px-2.5 py-1 text-[9px] font-extrabold uppercase tracking-[0.1em] ${week.available ? 'bg-brand-green text-white' : 'bg-ink/6 text-ink/38'}`}>
-                        {week.available ? 'Открыта' : 'В программе'}
+                        {week.available ? 'День 1 бесплатно' : 'В полном курсе'}
                       </span>
                     </div>
                     <h3 className="mt-4 font-display text-lg font-extrabold leading-tight text-ink">{week.title}</h3>

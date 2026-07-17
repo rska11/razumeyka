@@ -354,7 +354,7 @@ function MissionCard({ mission, index, done, onComplete }) {
   );
 }
 
-export function SchoolPrepAdventure({ week }) {
+export function SchoolPrepAdventure({ week, hasFullAccess = false }) {
   const [selectedDay, setSelectedDay] = useState(0);
   const [missionIndex, setMissionIndex] = useState(0);
   const [completed, setCompleted] = useState([]);
@@ -384,15 +384,19 @@ export function SchoolPrepAdventure({ week }) {
     () => week.days.flatMap((day) => day.missions.map((mission) => mission.id)),
     [week.days],
   );
+  const visibleProgressIds = hasFullAccess
+    ? allMissionIds
+    : week.days[0].missions.map((mission) => mission.id);
   const dayComplete = (day) => day.missions.every((mission) => completed.includes(mission.id));
-  const unlocked = (index) => index === 0 || dayComplete(week.days[index - 1]);
+  const unlocked = (index) => index === 0 || (hasFullAccess && dayComplete(week.days[index - 1]));
   const currentDay = week.days[selectedDay];
   const currentMission = currentDay.missions[missionIndex] ?? currentDay.missions[0];
   const currentMissionDone = completed.includes(currentMission.id);
   const completedToday = currentDay.missions.filter((mission) => completed.includes(mission.id)).length;
   const currentComplete = dayComplete(currentDay);
   const weekComplete = allMissionIds.every((id) => completed.includes(id));
-  const progress = Math.round((completed.filter((id) => allMissionIds.includes(id)).length / allMissionIds.length) * 100);
+  const visibleCompleted = completed.filter((id) => visibleProgressIds.includes(id)).length;
+  const progress = Math.round((visibleCompleted / visibleProgressIds.length) * 100);
 
   function completeMission(id) {
     setCompleted((current) => (current.includes(id) ? current : [...current, id]));
@@ -437,15 +441,15 @@ export function SchoolPrepAdventure({ week }) {
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
             <span className="inline-flex rounded-full border border-white/14 bg-white/8 px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.18em] text-white/72">
-              Первая неделя · открыта бесплатно
+              День 1 · полноценный пробный маршрут
             </span>
             <h3 className="mt-4 font-display text-3xl font-extrabold tracking-[-0.035em] sm:text-5xl">{week.title}</h3>
             <p className="mt-3 text-base font-medium leading-7 text-white/62">{week.subtitle}</p>
           </div>
           <div className="min-w-[220px] rounded-[22px] border border-white/10 bg-white/8 p-4 backdrop-blur-xl">
             <div className="flex items-center justify-between text-xs font-extrabold text-white/60">
-              <span>Прогресс недели</span>
-              <span>{completed.filter((id) => allMissionIds.includes(id)).length} / {allMissionIds.length} ⭐</span>
+              <span>{hasFullAccess ? "Прогресс недели" : "Прогресс пробного дня"}</span>
+              <span>{visibleCompleted} / {visibleProgressIds.length} ⭐</span>
             </div>
             <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-white/10">
               <div className="h-full rounded-full bg-gradient-to-r from-brand-blue via-brand-purple to-brand-pink transition-all duration-500" style={{ width: `${progress}%` }} />
@@ -489,7 +493,9 @@ export function SchoolPrepAdventure({ week }) {
                 </div>
                 <p className="mt-3 text-[10px] font-extrabold uppercase tracking-[0.13em] text-white/42">День {day.number}</p>
                 <p className="mt-1 text-xs font-extrabold leading-5 text-white/88 sm:text-sm">{day.title}</p>
-                <p className="mt-1 text-[10px] font-bold text-white/38">{day.missions.length} шагов</p>
+                <p className="mt-1 text-[10px] font-bold text-white/38">
+                  {index === 0 || hasFullAccess ? day.missions.length + " шагов" : "В полном курсе"}
+                </p>
               </button>
             );
           })}
@@ -604,10 +610,18 @@ export function SchoolPrepAdventure({ week }) {
                 <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-brand-green">Печать дня получена</p>
                 <h4 className="mt-2 font-display text-2xl font-extrabold text-ink">Все {currentDay.missions.length} шагов выполнены!</h4>
                 <p className="mt-2 max-w-xl text-sm font-medium leading-6 text-ink/58">
-                  {selectedDay < week.days.length - 1 ? "Открыт следующий район Города знаний." : "Все районы пройдены — золотой ключ собран."}
+                  {!hasFullAccess && selectedDay === 0
+                    ? "Пробный маршрут завершён. В полном курсе приключение продолжается в новых районах Города знаний."
+                    : selectedDay < week.days.length - 1
+                      ? "Открыт следующий район Города знаний."
+                      : "Все районы пройдены — золотой ключ собран."}
                 </p>
               </div>
-              {selectedDay < week.days.length - 1 && (
+              {!hasFullAccess && selectedDay === 0 ? (
+                <a href="#program" className="primary-btn shrink-0">
+                  Посмотреть полный маршрут →
+                </a>
+              ) : selectedDay < week.days.length - 1 && (
                 <button type="button" onClick={() => selectDay(selectedDay + 1)} className="primary-btn shrink-0">
                   Открыть день {selectedDay + 2} →
                 </button>

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { Icon } from './Icon.jsx';
 import { directionsData } from '../data/directions.js';
-import { READY_DIRECTIONS, LAUNCH_LABEL } from '../data/launch.js';
+import { READY_DIRECTIONS } from '../data/launch.js';
 import { WaitlistForm } from './WaitlistForm.jsx';
 
 const directionBySlug = new Map(directionsData.map((direction) => [direction.slug, direction]));
@@ -77,7 +77,7 @@ const directionCopy = {
     gradient: 'from-brand-cyan via-brand-green to-brand-blue',
   },
   'podgotovka-k-shkole': {
-    badge: 'следующий запуск',
+    badge: 'уже открыто',
     title: 'Подготовка к школе',
     text: 'Собираем базу перед первым классом: внимание, счёт, чтение, уверенность и привычку заниматься спокойно.',
     chips: ['5–7 лет', 'счёт', 'чтение'],
@@ -118,10 +118,10 @@ export function Directions() {
         <div className="mx-auto max-w-4xl text-center">
           <span className="comic-label">все направления</span>
           <h2 className="display-title mx-auto mt-5 max-w-4xl text-[2.35rem] sm:text-5xl lg:text-[3.85rem]">
-            Сейчас открыты два курса — остальные запускаем {LAUNCH_LABEL}
+            Сейчас открыты три курса — остальные готовим к запуску
           </h2>
           <p className="mx-auto mt-5 max-w-2xl text-lg font-semibold leading-8 text-ink/64">
-            Уже можно заниматься в правополушарном рисовании и ментальной арифметике. Скорочтение, языки, подготовка к школе и интуиция появятся следующим запуском.
+            Уже можно заниматься в правополушарном рисовании, ментальной арифметике и подготовке к школе. Скорочтение, языки и интуицию запустим следующим этапом.
           </p>
           <div className="mx-auto mt-7 flex max-w-3xl flex-col justify-center gap-3 sm:flex-row">
             <Link href="/mentalnaya-arifmetika" className="primary-btn">
@@ -144,8 +144,15 @@ export function Directions() {
                   : 'border-white/72 bg-white/68 hover:bg-white/78'
               }`}
             >
+              {direction.isReady ? (
+                <Link
+                  href={direction.href}
+                  aria-label={`Открыть ${direction.displayTitle}`}
+                  className="absolute inset-0 z-10 rounded-[32px] focus:outline-none focus:ring-4 focus:ring-brand-blue/24"
+                />
+              ) : null}
               <div className={`pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full bg-gradient-to-br ${direction.gradient} opacity-18 blur-2xl transition duration-500 group-hover:scale-125 group-hover:opacity-28`} />
-              <div className="relative flex w-full flex-col">
+              <div className={`relative z-20 flex w-full flex-col ${direction.isReady ? 'pointer-events-none' : ''}`}>
                 <div className="relative h-44 overflow-hidden rounded-[24px] bg-night shadow-card">
                   <img
                     src={direction.image}
@@ -200,13 +207,12 @@ export function Directions() {
                   </div>
 
                   {direction.isReady ? (
-                    <Link
-                      href={direction.href}
-                      className={`mt-auto inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-gradient-to-r ${direction.gradient} px-5 py-3 text-sm font-extrabold text-white shadow-color transition hover:-translate-y-0.5`}
+                    <span
+                      className={`mt-auto inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-gradient-to-r ${direction.gradient} px-5 py-3 text-sm font-extrabold text-white shadow-color transition group-hover:-translate-y-0.5`}
                     >
                       {direction.cta}
                       <Icon name="arrow" className="h-4 w-4" />
-                    </Link>
+                    </span>
                   ) : (
                     <div className="mt-auto rounded-[24px] border border-brand-orange/20 bg-gradient-to-br from-brand-orange/12 via-white/78 to-brand-yellow/16 p-4 shadow-card">
                       <WaitlistForm direction={direction.slug} source="card" compact />

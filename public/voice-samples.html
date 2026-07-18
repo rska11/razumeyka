@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Женские голоса SpeechKit</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;padding:30px 18px 60px;background:#f5f7ff;color:#17203a;font-family:Inter,Arial,sans-serif}main{max-width:1100px;margin:auto}h1{margin:0 0 8px;font-size:clamp(28px,5vw,48px)}.lead{color:#5b647a;line-height:1.55;margin:0 0 26px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:16px}section{background:#fff;border:1px solid #e1e5f2;border-radius:22px;padding:20px;box-shadow:0 8px 24px #26316a12}h2{margin:0 0 12px;font-size:24px;text-transform:capitalize}.sample{border-top:1px solid #edf0f7;padding:14px 0 3px}.sample:first-of-type{border-top:0;padding-top:0}.role{display:flex;justify-content:space-between;margin-bottom:8px}.role span{color:#7a8297;font-size:13px}audio{width:100%;height:40px}.candidate{border-color:#b9a9ff;background:linear-gradient(145deg,#fff,#f6f2ff)}.badge{margin-left:7px;padding:3px 8px;border-radius:999px;background:#7457e8;color:#fff;font-size:11px}
+  </style>
+</head>
+<body><main>
+  <h1>Женские голоса SpeechKit</h1>
+  <p class="lead">Один тестовый текст, API v3, скорость 1.0. Это только примеры для выбора; шёпот исключён.</p>
+  <div class="grid" id="grid"></div>
+</main><script>
+const voices={alena:[['neutral','обычная'],['good','радостная']],jane:[['neutral','обычная'],['good','радостная'],['evil','раздражённая']],dasha:[['neutral','обычная'],['good','радостная'],['friendly','дружелюбная']],julia:[['neutral','обычная'],['strict','строгая']],lera:[['neutral','обычная'],['friendly','дружелюбная']],masha:[['good','радостная'],['friendly','дружелюбная'],['strict','строгая']],marina:[['neutral','обычная'],['friendly','дружелюбная']],omazh:[['neutral','обычная'],['evil','раздражённая']]};
+const picks=new Set(['dasha-friendly','lera-friendly','masha-friendly','marina-friendly']);const grid=document.querySelector('#grid');
+for(const[voice,roles]of Object.entries(voices)){const section=document.createElement('section');if(roles.some(([r])=>picks.has(`${voice}-${r}`)))section.className='candidate';section.innerHTML=`<h2>${voice}</h2>`+roles.map(([role,label])=>`<div class="sample"><div class="role"><strong>${label}${picks.has(`${voice}-${role}`)?'<b class="badge">кандидат</b>':''}</strong><span>${role}</span></div><audio controls preload="none" src="/audio/voice-samples/school-prep-${voice}-${role}.mp3"></audio></div>`).join('');grid.append(section)}
+</script></body></html>

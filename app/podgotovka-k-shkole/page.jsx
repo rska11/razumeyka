@@ -1,6 +1,7 @@
 import { Header } from '@/components/Header.jsx';
 import { Footer } from '@/components/Footer.jsx';
 import { SchoolPrepAdventure } from '@/components/school-prep/SchoolPrepAdventure.jsx';
+import { SchoolPrepIntroAudio } from '@/components/school-prep/SchoolPrepIntroAudio.jsx';
 import { SubscribeButton } from '@/components/drawing/SubscribeButton.jsx';
 import { schoolPrepProgram, schoolPrepWeekOne } from '@/data/school-prep-course.js';
 import { getAuthSession } from '@/lib/auth';
@@ -145,6 +146,7 @@ export default async function SchoolPrepPage() {
                   <a href="#week-one" className="group inline-flex min-h-[58px] items-center justify-center gap-3 rounded-full bg-ink px-7 py-4 text-sm font-extrabold text-white shadow-button transition hover:-translate-y-1">
                     Попробовать День 1 бесплатно <span className="transition group-hover:translate-x-1">→</span>
                   </a>
+                  <SchoolPrepIntroAudio />
                   <a href="#podpiska" className="inline-flex min-h-[58px] items-center justify-center rounded-full border border-ink/10 bg-white/75 px-7 py-4 text-sm font-extrabold text-ink/68 transition hover:-translate-y-1 hover:bg-white">
                     Оформить месяц курса · {SCHOOL_PREP_PRICE} ₽
                   </a>

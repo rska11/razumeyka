@@ -9,7 +9,7 @@ export const LAUNCH_LABEL = '25 июля';
 
 // Слаги направлений, которые уже открыты как полноценный продукт (self-study).
 // Остальные считаются «скоро» и показывают лист ожидания.
-export const READY_DIRECTIONS = new Set(['right-brain-drawing', 'mental-arithmetic']);
+export const READY_DIRECTIONS = new Set(['right-brain-drawing', 'mental-arithmetic', 'podgotovka-k-shkole']);
 
 export function isDirectionReady(slug) {
   return READY_DIRECTIONS.has(slug);

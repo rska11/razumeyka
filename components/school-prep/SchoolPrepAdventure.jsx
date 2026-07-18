@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { SchoolPrepAudioButton } from "./SchoolPrepAudioButton.jsx";
 
 const STORAGE_KEY = "razumeyka_school_prep_week1";
 
@@ -240,7 +241,7 @@ function MemoryMission({ mission, done, onComplete }) {
   );
 }
 
-function QuizMission({ mission, done, onComplete }) {
+function QuizMission({ mission, done, onComplete, audioBase }) {
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState("");
   const [result, setResult] = useState(done ? "success" : "");
@@ -281,6 +282,7 @@ function QuizMission({ mission, done, onComplete }) {
           Вопрос {index + 1} из {mission.questions.length}
         </p>
         <p className="mt-3 font-display text-xl font-extrabold leading-tight text-ink sm:text-2xl">{question.prompt}</p>
+        <SchoolPrepAudioButton src={`${audioBase}/question-${index + 1}.mp3`} label="Послушать вопрос" className="mt-4" />
         <div className="mt-4 grid gap-2">
           {question.options.map((option) => (
             <button
@@ -439,7 +441,7 @@ function PathMission({ mission, done, onComplete }) {
   );
 }
 
-function ActionMission({ mission, done, onComplete }) {
+function ActionMission({ mission, done, onComplete, audioBase }) {
   const [step, setStep] = useState(done ? mission.actions.length : 0);
   const finished = step >= mission.actions.length;
   const action = mission.actions[step];
@@ -459,6 +461,7 @@ function ActionMission({ mission, done, onComplete }) {
             <div className="mt-5 text-7xl" aria-hidden="true">{action.emoji}</div>
             <h5 className="mt-4 font-display text-2xl font-extrabold text-ink">{action.title}</h5>
             <p className="mx-auto mt-2 max-w-lg text-sm font-semibold leading-6 text-ink/56">{action.text}</p>
+            <SchoolPrepAudioButton src={`${audioBase}/action-${step + 1}.mp3`} label="Послушать команду" className="mt-4" />
             <div className="mt-5 flex justify-center gap-1.5">
               {mission.actions.map((_, index) => <span key={index} className={`h-2 w-9 rounded-full ${index <= step ? "bg-brand-orange" : "bg-ink/8"}`} />)}
             </div>
@@ -475,7 +478,8 @@ function ActionMission({ mission, done, onComplete }) {
   );
 }
 
-function MissionCard({ mission, index, done, onComplete }) {
+function MissionCard({ mission, index, done, onComplete, dayId }) {
+  const audioBase = `/audio/school-prep/${dayId}/${mission.id}`;
   return (
     <article className={`rounded-[28px] border bg-white/88 p-5 shadow-card backdrop-blur-xl sm:p-7 ${
       done ? "border-brand-green/24" : "border-white/80"
@@ -499,14 +503,15 @@ function MissionCard({ mission, index, done, onComplete }) {
         </span>
       </div>
       <p className="mt-4 text-sm font-semibold leading-6 text-ink/62 sm:text-base">{mission.prompt}</p>
+      <SchoolPrepAudioButton src={`${audioBase}/instruction.mp3`} className="mt-4" />
 
       {mission.type === "choice" && <ChoiceMission mission={mission} done={done} onComplete={onComplete} />}
       {mission.type === "sequence" && <SequenceMission mission={mission} done={done} onComplete={onComplete} />}
       {mission.type === "memory" && <MemoryMission mission={mission} done={done} onComplete={onComplete} />}
-      {mission.type === "quiz" && <QuizMission mission={mission} done={done} onComplete={onComplete} />}
+      {mission.type === "quiz" && <QuizMission mission={mission} done={done} onComplete={onComplete} audioBase={audioBase} />}
       {mission.type === "sort" && <SortMission mission={mission} done={done} onComplete={onComplete} />}
       {mission.type === "path" && <PathMission mission={mission} done={done} onComplete={onComplete} />}
-      {mission.type === "action" && <ActionMission mission={mission} done={done} onComplete={onComplete} />}
+      {mission.type === "action" && <ActionMission mission={mission} done={done} onComplete={onComplete} audioBase={audioBase} />}
     </article>
   );
 }
@@ -768,6 +773,7 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false }) {
             mission={currentMission}
             index={missionIndex}
             done={currentMissionDone}
+            dayId={currentDay.id}
             onComplete={() => completeMission(currentMission.id)}
           />
 

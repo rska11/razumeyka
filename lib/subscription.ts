@@ -16,10 +16,9 @@ export const DIRECTIONS = {
 
 export type DirectionSlug = keyof typeof DIRECTIONS;
 
-// Цена доступа по направлению. ВРЕМЕННО: рисование — 10 ₽ для тестового платежа
-// (проверка сквозного потока ЮKassa). ВЕРНУТЬ на 490 после теста.
+// Цена доступа по направлению.
 export const DIRECTION_PRICE: Record<DirectionSlug, number> = {
-  risovanie: 10, // TEST: тестовый платёж — вернуть на 490
+  risovanie: SUBSCRIPTION_PRICE,
   "mentalnaya-arifmetika": SUBSCRIPTION_PRICE,
   "podgotovka-k-shkole": SUBSCRIPTION_PRICE,
 };

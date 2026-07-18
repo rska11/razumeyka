@@ -18,8 +18,8 @@ export type DirectionSlug = keyof typeof DIRECTIONS;
 
 // Цена доступа по направлению.
 export const DIRECTION_PRICE: Record<DirectionSlug, number> = {
-  risovanie: SUBSCRIPTION_PRICE,
-  "mentalnaya-arifmetika": SUBSCRIPTION_PRICE,
+  risovanie: 990,
+  "mentalnaya-arifmetika": 1490,
   "podgotovka-k-shkole": SUBSCRIPTION_PRICE,
 };
 

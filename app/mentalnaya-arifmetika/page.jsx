@@ -5,6 +5,7 @@ import { MentalIntroAudio } from '@/components/mental/MentalIntroAudio.jsx';
 import { MentalLessons } from '@/components/mental/MentalLessons.jsx';
 import { SorobanDemo } from '@/components/mental/SorobanDemo.jsx';
 import { SubscribeButton } from '@/components/drawing/SubscribeButton.jsx';
+import { CourseDiscovery } from '@/components/CourseDiscovery.jsx';
 import {
   mentalIntro,
   mentalSubscription,
@@ -296,6 +297,7 @@ export default async function MentalArithmeticPage() {
                 </div>
               </div>
             </div>
+            <CourseDiscovery current="mentalnaya-arifmetika" />
           </div>
         </section>
       </main>

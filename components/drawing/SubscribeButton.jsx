@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 // Кнопка оформления доступа к направлению self-study (раздельно по направлениям).
 // Не залогинен → на вход; залогинен → принимает оферту, создаём платёж и уходим на ЮKassa.
-// returnTo — страница направления: и возврат после логина/оплаты, и определение направления.
+// returnTo определяет направление и страницу возврата после оплаты; после первого входа показываем витрину кабинета.
 export function SubscribeButton({ isLoggedIn, hasAccess, accessUntil, returnTo = '/risovanie' }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -20,7 +20,7 @@ export function SubscribeButton({ isLoggedIn, hasAccess, accessUntil, returnTo =
 
   async function go() {
     if (!isLoggedIn) {
-      window.location.href = `/login?callbackUrl=${encodeURIComponent(returnTo)}`;
+      window.location.href = '/login?callbackUrl=/cabinet';
       return;
     }
     if (!accepted) {

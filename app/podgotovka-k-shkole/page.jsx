@@ -3,6 +3,7 @@ import { Footer } from '@/components/Footer.jsx';
 import { SchoolPrepAdventure } from '@/components/school-prep/SchoolPrepAdventure.jsx';
 import { SchoolPrepIntroAudio } from '@/components/school-prep/SchoolPrepIntroAudio.jsx';
 import { SubscribeButton } from '@/components/drawing/SubscribeButton.jsx';
+import { CourseDiscovery } from '@/components/CourseDiscovery.jsx';
 import { schoolPrepProgram, schoolPrepWeekOne } from '@/data/school-prep-course.js';
 import { getAuthSession } from '@/lib/auth';
 import { reconcileUserPayments } from '@/lib/payments';
@@ -413,7 +414,10 @@ export default async function SchoolPrepPage() {
 
                 <div className="rounded-[30px] border border-white/70 bg-white p-6 text-ink shadow-[0_30px_80px_rgba(7,17,42,.34)] sm:p-8">
                   <p className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-brand-purple">30 дней полного доступа</p>
-                  <div className="mt-4 flex items-end gap-2">
+                  <div className="mt-4 text-lg font-extrabold text-ink/38">
+                    <del>1 490 ₽</del>
+                  </div>
+                  <div className="mt-1 flex items-end gap-2">
                     <strong className="font-display text-6xl font-extrabold tracking-[-0.06em]">{SCHOOL_PREP_PRICE}</strong>
                     <span className="pb-2 text-lg font-extrabold text-ink/48">₽</span>
                   </div>
@@ -436,6 +440,7 @@ export default async function SchoolPrepPage() {
                 </div>
               </div>
             </div>
+            <CourseDiscovery current="podgotovka-k-shkole" />
           </div>
         </section>
       </main>

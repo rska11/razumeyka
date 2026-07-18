@@ -5,6 +5,7 @@ import { ArtworkShowcase } from '@/components/drawing/ArtworkShowcase.jsx';
 import { DrawingIntroAudio } from '@/components/drawing/DrawingIntroAudio.jsx';
 import { DrawingLessons } from '@/components/drawing/DrawingLessons.jsx';
 import { SubscribeButton } from '@/components/drawing/SubscribeButton.jsx';
+import { CourseDiscovery } from '@/components/CourseDiscovery.jsx';
 import { drawingIntro, whyBlocks, drawingSubscription } from '@/data/drawing-lessons.js';
 import { getAuthSession } from '@/lib/auth';
 import { reconcileUserPayments } from '@/lib/payments';
@@ -177,6 +178,7 @@ export default async function DrawingPage() {
               <div className="drawing-price-copy"><span>Полный доступ к мастерской</span><h2>Месяц, который останется<br />в детском портфолио</h2><p>Все уроки, пошаговый плеер, творческие задания и новые работы без ограничений.</p><ul>{drawingSubscription.perks.map((perk) => <li key={perk}><i>✓</i>{perk}</li>)}</ul></div>
               <div className="drawing-price-box"><p>Стоимость доступа</p><strong>{drawingSubscription.price}<small> ₽ / {drawingSubscription.period}</small></strong><span>Первые уроки бесплатно · без карты</span><SubscribeButton isLoggedIn={Boolean(session?.user?.id)} hasAccess={hasSub} accessUntil={accessUntilLabel} /><small>После оплаты доступ открывается сразу на 30 дней</small></div>
             </div>
+            <CourseDiscovery current="risovanie" />
           </div>
         </section>
       </main>

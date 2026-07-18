@@ -8,7 +8,10 @@ const AUTO_AUDIO_ID = "school-prep-auto-narration";
 
 export function SchoolPrepAutoNarration({ src }) {
   const audioRef = useRef(null);
+  const lessonStartedRef = useRef(false);
+  const previousSrcRef = useRef(src);
   const [ready, setReady] = useState(false);
+  const [lessonStarted, setLessonStarted] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [needsGesture, setNeedsGesture] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -56,9 +59,11 @@ export function SchoolPrepAutoNarration({ src }) {
   }, []);
 
   useEffect(() => {
-    if (!ready || !soundEnabled) return;
+    const sourceChanged = previousSrcRef.current !== src;
+    previousSrcRef.current = src;
+    if (!ready || !sourceChanged || !lessonStartedRef.current || !soundEnabled) return;
     playInstruction();
-    // Autoplay is retried whenever the child opens another mission.
+    // После явного старта следующий шаг озвучивается автоматически.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [src, ready]);
 
@@ -75,6 +80,15 @@ export function SchoolPrepAutoNarration({ src }) {
   }, []);
 
   function handleSoundButton() {
+    if (!lessonStartedRef.current) {
+      lessonStartedRef.current = true;
+      setLessonStarted(true);
+      setSoundEnabled(true);
+      saveSoundPreference(true);
+      playInstruction(true);
+      return;
+    }
+
     if (!soundEnabled || needsGesture) {
       setSoundEnabled(true);
       saveSoundPreference(true);
@@ -89,9 +103,11 @@ export function SchoolPrepAutoNarration({ src }) {
     window.dispatchEvent(new CustomEvent(AUDIO_EVENT, { detail: "sound-off" }));
   }
 
-  const buttonLabel = !soundEnabled
-    ? "Включить озвучку"
-    : needsGesture
+  const buttonLabel = !lessonStarted
+    ? "Начать урок со звуком"
+    : !soundEnabled
+      ? "Включить озвучку"
+      : needsGesture
       ? "Начать со звуком"
       : isPlaying
         ? "Звук включён · выключить"
@@ -101,13 +117,15 @@ export function SchoolPrepAutoNarration({ src }) {
     <div className="mb-4 flex flex-col gap-3 rounded-[24px] border border-brand-purple/18 bg-gradient-to-r from-brand-purple/[0.1] via-white to-brand-pink/[0.12] p-4 shadow-card sm:flex-row sm:items-center sm:justify-between sm:p-5">
       <div className="flex items-center gap-3">
         <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-white text-2xl shadow-sm" aria-hidden="true">
-          {soundEnabled ? "🔊" : "🔇"}
+          {lessonStarted && soundEnabled ? "🔊" : "▶"}
         </span>
         <div>
           <p className="text-sm font-extrabold text-ink">Инструкция перед каждым заданием</p>
           <p className="mt-1 text-xs font-semibold leading-5 text-ink/52">
-            {needsGesture
-              ? "Нажмите один раз — дальше задания зазвучат сами."
+            {!lessonStarted
+              ? "Нажмите один раз в начале занятия — обычный просмотр страницы остаётся без звука."
+              : needsGesture
+                ? "Нажмите один раз — дальше задания зазвучат сами."
               : soundEnabled
                 ? "Следующие шаги будут озвучиваться автоматически."
                 : "Звук выключен и не запустится сам."}
@@ -118,9 +136,9 @@ export function SchoolPrepAutoNarration({ src }) {
         type="button"
         onClick={handleSoundButton}
         className="inline-flex min-h-[54px] shrink-0 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-brand-purple to-brand-pink px-6 py-3 text-sm font-extrabold text-white shadow-button transition hover:-translate-y-0.5 hover:shadow-color"
-        aria-pressed={soundEnabled}
+        aria-pressed={lessonStarted && soundEnabled}
       >
-        <span aria-hidden="true">{soundEnabled ? "🔊" : "▶"}</span>
+        <span aria-hidden="true">{lessonStarted && soundEnabled ? "🔊" : "▶"}</span>
         {buttonLabel}
       </button>
     </div>

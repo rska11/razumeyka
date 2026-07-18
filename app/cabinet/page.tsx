@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getAuthSession } from "@/lib/auth";
 import { getCabinetData } from "@/lib/cabinet";
-import { DIRECTIONS, directionPrice, isDirectionSlug, type DirectionSlug } from "@/lib/subscription";
+import { DIRECTIONS, isDirectionSlug, type DirectionSlug } from "@/lib/subscription";
 
 const COURSE_VISUALS: Record<
   DirectionSlug,
@@ -31,7 +31,6 @@ const COURSE_VISUALS: Record<
 function rub(n: number) {
   return n.toLocaleString("ru-RU") + " ₽";
 }
-
 function formatDate(date: Date) {
   return new Intl.DateTimeFormat("ru-RU", {
     day: "numeric",
@@ -198,28 +197,30 @@ export default async function CabinetOverview() {
               <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-brand-purple">Следующий шаг</p>
               <h2 className="mt-1 font-display text-2xl font-extrabold tracking-[-0.025em] text-ink">Другие направления</h2>
             </div>
-            <p className="text-sm font-semibold text-ink/50">Каждое направление открывается отдельно</p>
+            <p className="text-sm font-semibold text-ink/50">Первые уроки можно попробовать бесплатно</p>
           </div>
-          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {lockedDirections.map(({ slug, meta }) => {
               const visual = COURSE_VISUALS[slug];
               return (
-                <article key={slug} className="flex flex-col rounded-[22px] border border-ink/8 bg-white p-5 transition duration-300 hover:-translate-y-1 hover:border-brand-blue/20 hover:shadow-card">
-                  <div className="flex items-center gap-3">
-                    <span className={`flex h-11 w-11 items-center justify-center rounded-[16px] bg-gradient-to-br ${visual.gradient} text-white shadow-sm`}>
-                      <CourseIcon slug={slug} />
-                    </span>
-                    <div>
-                      <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-ink/40">{visual.kicker}</p>
-                      <h3 className="font-display text-lg font-extrabold text-ink">{meta.title}</h3>
+                <article key={slug} className={'group relative isolate flex min-h-[265px] flex-col overflow-hidden rounded-[26px] bg-gradient-to-br ' + visual.gradient + ' p-5 text-white shadow-color transition duration-300 hover:-translate-y-1 hover:shadow-luxe'}>
+                  <div className={'pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full ' + visual.glow + ' blur-3xl transition duration-500 group-hover:scale-125'} />
+                  <div className="relative flex h-full flex-col">
+                    <div className="flex items-center gap-3">
+                      <span className="flex h-12 w-12 items-center justify-center rounded-[17px] border border-white/18 bg-white/16 text-white shadow-sm backdrop-blur-xl">
+                        <CourseIcon slug={slug} />
+                      </span>
+                      <div>
+                        <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-white/62">{visual.kicker}</p>
+                        <h3 className="font-display text-xl font-extrabold text-white">{meta.title}</h3>
+                      </div>
                     </div>
-                  </div>
-                  <p className="mt-4 text-sm font-medium leading-6 text-ink/56">{visual.description}</p>
-                  <div className="mt-5 flex items-center justify-between gap-3">
-                    <span className="font-display text-lg font-extrabold text-ink">{rub(directionPrice(slug))} / месяц</span>
-                    <Link href={`${meta.path}#podpiska`} className="rounded-full bg-ink px-4 py-2.5 text-xs font-extrabold text-white transition hover:-translate-y-0.5 hover:bg-night">
-                      Посмотреть курс →
-                    </Link>
+                    <p className="mt-5 text-sm font-semibold leading-6 text-white/74">{visual.description}</p>
+                    <div className="mt-auto pt-6">
+                      <Link href={meta.path} scroll className="inline-flex min-h-[46px] items-center rounded-full bg-white px-5 py-2.5 text-xs font-extrabold text-ink shadow-sm transition hover:-translate-y-0.5">
+                        Посмотреть курс →
+                      </Link>
+                    </div>
                   </div>
                 </article>
               );

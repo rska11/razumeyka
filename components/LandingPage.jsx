@@ -56,7 +56,7 @@ export function LandingPage({ landing }) {
   const stats = landing.stats ?? [
     { v: 'бесплатно', l: 'первые уроки' },
     { v: 'онлайн', l: 'из любого города' },
-    { v: '490 ₽', l: 'доступ в месяц' },
+    { v: 'от 490 ₽', l: 'доступ в месяц' },
   ];
 
   const faqSchema = {
@@ -341,7 +341,7 @@ export function LandingPage({ landing }) {
                   Первые уроки бесплатны — попробуйте формат, а понравится, откройте полный доступ по подписке.
                 </p>
                 <ul className="mt-6 grid gap-3">
-                  {['Первые уроки — бесплатно, без карты', 'Ребёнок рисует и решает сам, по шагам с экраном-наставником', 'Полный доступ — 490 ₽/мес, отмена в один клик'].map((t) => (
+                  {['Первые уроки — бесплатно, без карты', 'Ребёнок рисует и решает сам, по шагам с экраном-наставником', 'Полный доступ — от 490 ₽/мес, отмена в один клик'].map((t) => (
                     <li key={t} className="flex items-center gap-3 text-base font-semibold text-ink/78">
                       <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white ${a.text} shadow-sm`}>
                         <Icon name="check" className="h-3.5 w-3.5" />
@@ -363,7 +363,7 @@ export function LandingPage({ landing }) {
               ) : (
                 <div className={`${PC} p-8 text-center`}>
                   <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-ink/44">Полный доступ</p>
-                  <p className="mt-2 font-display text-6xl font-black text-ink">490₽<span className="text-2xl text-ink/50">/мес</span></p>
+                  <p className="mt-2 font-display text-6xl font-black text-ink">от 490₽<span className="text-2xl text-ink/50">/мес</span></p>
                   <a href={`/${landing.slug}`} className="primary-btn mt-5 w-full">Начать бесплатно</a>
                   <p className="mt-3.5 text-xs font-semibold text-ink/48">Первые уроки бесплатно · доступ на 30 дней</p>
                 </div>

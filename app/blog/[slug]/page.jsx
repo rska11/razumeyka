@@ -103,6 +103,22 @@ export default async function BlogPost({ params }) {
     orange: 'from-brand-orange to-brand-pink',
   };
   const coverGrad = coverThemes[post.cover?.theme] ?? coverThemes.blue;
+  const editorialMeta = {
+    'kak-podgotovit-rebenka-k-shkole-doma': { category: 'Подготовка к школе', gradient: 'from-[#246BFD] via-[#7257E8] to-[#F05A87]' },
+    'razvitie-vnimaniya-u-detey': { category: 'Внимание', gradient: 'from-[#246BFD] via-[#7257E8] to-[#A855F7]' },
+    'netraditsionnye-tehniki-risovaniya': { category: 'Творчество', gradient: 'from-[#7257E8] via-[#D946EF] to-[#F05A87]' },
+    'uprazhneniya-akterskoe-masterstvo': { category: 'Речь и уверенность', gradient: 'from-[#8B5CF6] via-[#EC4899] to-[#F97316]' },
+    'uprazhneniya-dlya-skorochteniya': { category: 'Чтение', gradient: 'from-[#079A78] via-[#16A6A1] to-[#3B82F6]' },
+    'podgotovka-k-shkole-chto-dolzhen-umet': { category: 'Подготовка к школе', gradient: 'from-[#246BFD] via-[#7257E8] to-[#F05A87]' },
+    'kak-nauchit-rebenka-chitat': { category: 'Чтение', gradient: 'from-[#F59E0B] via-[#F97316] to-[#EC4899]' },
+    'chto-takoe-mentalnaya-arifmetika': { category: 'Ментальная арифметика', gradient: 'from-[#079A78] via-[#16A6A1] to-[#3B82F6]' },
+    'razvitie-rebenka-s-chego-nachat': { category: 'Развитие', gradient: 'from-[#F97316] via-[#EC4899] to-[#8B5CF6]' },
+  }[slug] ?? { category: 'Развитие', gradient: coverGrad };
+  const relatedGradients = {
+    'mental-arithmetic': 'from-[#079A78] via-[#16A6A1] to-[#3B82F6]',
+    'right-brain-drawing': 'from-[#7257E8] via-[#D946EF] to-[#F05A87]',
+    'podgotovka-k-shkole': 'from-[#246BFD] via-[#7257E8] to-[#F05A87]',
+  };
 
   const calloutStyles = {
     secret: { wrap: 'border-brand-blue/25 bg-brand-blue/8', badge: 'bg-brand-blue text-white', icon: 'spark', label: 'Главное' },
@@ -147,44 +163,64 @@ export default async function BlogPost({ params }) {
       <main className="mesh-bg min-h-screen">
         {/* Обложка */}
         <header className="relative overflow-hidden px-5 pt-28 sm:px-8 sm:pt-32 lg:px-14">
-          <div className="container-pad mx-auto max-w-3xl px-0">
+          <div className="container-pad mx-auto max-w-6xl px-0">
             <nav className="flex items-center gap-2 text-sm font-bold text-ink/44">
-              <Link href="/" className="transition hover:text-ink">Главная</Link>
+              <Link href="/" className="transition hover:text-brand-blue">Главная</Link>
               <span>/</span>
-              <Link href="/blog" className="transition hover:text-ink">Блог</Link>
+              <Link href="/blog" className="transition hover:text-brand-blue">Блог</Link>
             </nav>
-            {post.cover?.image ? (
-              <img src={post.cover.image} alt={post.title} className="mt-6 h-52 w-full rounded-[28px] object-cover shadow-color sm:h-72" />
-            ) : (
-              <div className={`mt-6 flex h-44 items-center justify-center rounded-[28px] bg-gradient-to-br ${coverGrad} shadow-color sm:h-56`}>
-                <span className="text-7xl drop-shadow-lg sm:text-8xl">{post.cover?.emoji ?? '📚'}</span>
+
+            <div className="relative isolate mt-6 overflow-hidden rounded-[38px] bg-[#0A1933] text-white shadow-luxe">
+              <div className="pointer-events-none absolute -left-20 -top-24 h-72 w-72 rounded-full bg-brand-blue/38 blur-[90px]" />
+              <div className="pointer-events-none absolute bottom-[-7rem] left-1/3 h-64 w-80 rounded-full bg-brand-pink/24 blur-[90px]" />
+              <div className="relative grid lg:grid-cols-[1.08fr_.92fr] lg:items-stretch">
+                <div className="flex flex-col p-6 sm:p-10 lg:p-12">
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <span className={'rounded-full bg-gradient-to-r ' + editorialMeta.gradient + ' px-3.5 py-2 text-[10px] font-extrabold uppercase tracking-[0.15em] text-white shadow-color'}>
+                      {editorialMeta.category}
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-white/14 bg-white/9 px-3.5 py-2 text-xs font-extrabold text-white/70 backdrop-blur-xl">
+                      <Icon name="calendar" className="h-3.5 w-3.5" /> {minutes} мин чтения
+                    </span>
+                    <span className="text-xs font-bold text-white/42">{fmtDate(post.date)}</span>
+                  </div>
+                  <h1 className="mt-7 font-display text-[2.25rem] font-extrabold leading-[1.02] tracking-[-0.045em] text-white sm:text-[3.3rem] lg:text-[3.7rem]">{post.title}</h1>
+                  {lead && <p className="mt-6 text-lg font-semibold leading-8 text-white/70 sm:text-xl sm:leading-9">{lead.text}</p>}
+                  <div className="mt-auto flex items-center gap-3 pt-8 text-xs font-bold text-white/42">
+                    <span className="grid h-9 w-9 place-items-center rounded-full bg-white/10 text-lg">Р</span>
+                    <span>Редакция «Разумейки»</span>
+                  </div>
+                </div>
+
+                <div className={'group relative min-h-[300px] overflow-hidden bg-gradient-to-br ' + editorialMeta.gradient + ' sm:min-h-[390px] lg:min-h-full'}>
+                  {post.cover?.image ? (
+                    <img src={post.cover.image} alt={post.title} className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]" />
+                  ) : (
+                    <span className="absolute inset-0 grid place-items-center text-8xl">{post.cover?.emoji ?? '📚'}</span>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#07152f]/55 via-transparent to-white/5" />
+                  <div className="absolute bottom-5 left-5 right-5 rounded-[20px] border border-white/20 bg-[#07152f]/36 px-4 py-3 text-xs font-semibold leading-5 text-white/78 backdrop-blur-xl">
+                    Практический материал для спокойных занятий дома
+                  </div>
+                </div>
               </div>
-            )}
-            <div className="mt-6 flex flex-wrap items-center gap-2.5">
-              <span className="rounded-full bg-brand-blue px-3.5 py-1.5 text-xs font-extrabold uppercase tracking-[0.14em] text-white">Развитие детей</span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-ink/12 bg-white/70 px-3.5 py-1.5 text-xs font-extrabold text-ink/62">
-                <Icon name="calendar" className="h-3.5 w-3.5" /> {minutes} мин чтения
-              </span>
-              <span className="text-xs font-bold text-ink/44">{fmtDate(post.date)}</span>
             </div>
-            <h1 className="display-title mt-5 text-[2.2rem] leading-[1.06] sm:text-[3.1rem]">{post.title}</h1>
-            {lead && <p className="mt-6 text-xl font-semibold leading-9 text-ink/72 sm:text-[1.35rem]">{lead.text}</p>}
           </div>
-          <div className="pointer-events-none absolute -right-16 top-24 h-64 w-64 rounded-full bg-brand-pink/20 blur-3xl" />
-          <div className="pointer-events-none absolute -left-16 top-52 h-56 w-56 rounded-full bg-brand-blue/20 blur-3xl" />
+          <div className="pointer-events-none absolute -right-20 top-24 h-72 w-72 rounded-full bg-brand-pink/18 blur-3xl" />
+          <div className="pointer-events-none absolute -left-20 top-64 h-64 w-64 rounded-full bg-brand-blue/18 blur-3xl" />
         </header>
 
-        <article className="px-5 pb-16 pt-10 sm:px-8 lg:px-14">
-          <div className="container-pad mx-auto max-w-3xl px-0">
+        <article className="px-5 pb-20 pt-10 sm:px-8 lg:px-14 lg:pb-28">
+          <div className="container-pad mx-auto max-w-[880px] px-0">
             {/* Оглавление */}
             {toc.length >= 3 && (
-              <nav className="mb-10 rounded-[22px] border border-white/80 bg-white/85 p-6 shadow-card backdrop-blur-xl">
+              <nav className="mb-12 rounded-[26px] border border-brand-blue/14 bg-gradient-to-br from-brand-blue/[0.1] via-white/90 to-brand-pink/[0.12] p-6 shadow-color backdrop-blur-xl sm:p-7">
                 <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-ink/44">В статье</p>
                 <ol className="mt-4 grid gap-2.5 sm:grid-cols-2">
                   {toc.map((t, i) => (
                     <li key={t.id}>
                       <a href={`#${t.id}`} className="flex items-start gap-2.5 text-sm font-bold text-ink/70 transition hover:text-brand-blue">
-                        <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-blue/12 text-[11px] font-black text-brand-blue">{i + 1}</span>
+                        <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-blue to-brand-purple text-[11px] font-black text-white shadow-sm">{i + 1}</span>
                         {t.text}
                       </a>
                     </li>
@@ -313,7 +349,7 @@ export default async function BlogPost({ params }) {
                   );
                 }
 
-                return <p key={i} className="text-lg font-medium leading-8 text-ink/74">{b.text}</p>;
+                return <p key={i} className="text-[1.08rem] font-medium leading-[1.9] text-ink/72 sm:text-lg">{b.text}</p>;
               })}
             </div>
 
@@ -323,7 +359,7 @@ export default async function BlogPost({ params }) {
                 <h2 className="font-display text-[1.6rem] font-extrabold text-ink sm:text-[1.9rem]">Частые вопросы</h2>
                 <div className="mt-5 grid gap-3">
                   {post.faq.map((f, i) => (
-                    <details key={i} className="group rounded-[18px] border border-white/80 bg-white/85 p-5 shadow-card backdrop-blur-xl">
+                    <details key={i} className="group rounded-[22px] border border-white/85 bg-gradient-to-br from-white via-white/90 to-brand-blue/[0.045] p-5 shadow-card backdrop-blur-xl transition open:shadow-color">
                       <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-extrabold text-ink">
                         {f.q}
                         <span className="text-brand-blue transition group-open:rotate-45">
@@ -343,7 +379,7 @@ export default async function BlogPost({ params }) {
                 <h2 className="font-display text-[1.6rem] font-extrabold text-ink sm:text-[1.9rem]">По теме</h2>
                 <div className="mt-5 flex flex-wrap gap-3">
                   {related.map((r) => (
-                    <Link key={r.slug} href={r.href} className="rounded-full border border-ink/12 bg-white/80 px-5 py-3 text-base font-extrabold text-ink transition hover:-translate-y-0.5 hover:bg-white">
+                    <Link key={r.slug} href={r.href} className={'inline-flex min-h-[54px] items-center rounded-[18px] bg-gradient-to-r ' + (relatedGradients[r.slug] ?? 'from-brand-blue to-brand-purple') + ' px-5 py-3 text-base font-extrabold text-white shadow-color transition hover:-translate-y-1 hover:shadow-luxe'}>
                       {r.title}
                     </Link>
                   ))}
@@ -360,7 +396,7 @@ export default async function BlogPost({ params }) {
                     <Link
                       key={p.slug}
                       href={`/blog/${p.slug}`}
-                      className="group flex items-center justify-between gap-4 rounded-[18px] border border-white/80 bg-white/85 p-5 shadow-card backdrop-blur-xl transition hover:-translate-y-0.5"
+                      className="group flex items-center justify-between gap-4 rounded-[22px] border border-white/85 bg-white/88 p-5 shadow-card backdrop-blur-xl transition hover:-translate-y-1 hover:border-brand-purple/18 hover:shadow-color"
                     >
                       <div>
                         <p className="font-display text-lg font-extrabold leading-tight text-ink transition group-hover:text-brand-blue">{p.title}</p>

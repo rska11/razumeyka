@@ -1,16 +1,21 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Политика конфиденциальности — Разумейка",
+  title: "Политика конфиденциальности", // суффикс «— Разумейка» добавит title-шаблон layout
   robots: { index: false },
 };
 
-// ВАЖНО: это типовой шаблон. Замени плейсхолдеры [...] на свои реквизиты
-// (ИП/самозанятый, ИНН, контактный email) и при возможности дай юристу на проверку.
+// Реквизиты берутся из env на сервере (OPERATOR_NAME — ФИО самозанятого, OPERATOR_INN — ИНН).
 const OPERATOR = "Онлайн-школа «Разумейка» (razumeyka-school.ru)";
-const OPERATOR_DETAILS = "[укажите: ИП/самозанятый, ФИО, ИНН]";
+const OPERATOR_DETAILS = [
+  "самозанятый (плательщик налога на профессиональный доход)",
+  process.env.OPERATOR_NAME || "",
+  process.env.OPERATOR_INN ? `ИНН ${process.env.OPERATOR_INN}` : "",
+]
+  .filter(Boolean)
+  .join(", ");
 const CONTACT_EMAIL = "info@razumeyka-school.ru";
-const UPDATED = "25 июня 2026 г.";
+const UPDATED = "18 июля 2026 г.";
 
 function P({ children }: { children: React.ReactNode }) {
   return <p className="mt-3 text-base leading-7 text-ink/72">{children}</p>;
@@ -25,7 +30,7 @@ export default function PrivacyPage() {
       <article className="mx-auto max-w-3xl rounded-[28px] border border-white/80 bg-white/85 p-7 shadow-color backdrop-blur-xl sm:p-10">
         <Link href="/" className="text-sm font-extrabold text-ink/52 transition hover:text-ink">← На главную</Link>
         <h1 className="section-title mt-4">Политика конфиденциальности</h1>
-        <P>Дата обновления: {UPDATED}. Оператор персональных данных: {OPERATOR}, {OPERATOR_DETAILS}.</P>
+        <P>Дата обновления: {UPDATED} Оператор персональных данных: {OPERATOR}, {OPERATOR_DETAILS}.</P>
 
         <H>1. Общие положения</H>
         <P>

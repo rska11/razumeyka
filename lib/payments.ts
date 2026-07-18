@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { getYooKassaPayment, isYooKassaConfigured } from "@/lib/yookassa";
 import { extendAccess, isDirectionSlug } from "@/lib/subscription";
+import { issueReceiptForPayment } from "@/lib/receipts";
 
 /**
  * Сверка незавершённых платежей родителя со статусом в ЮKassa.
@@ -28,6 +29,8 @@ export async function reconcileUserPayments(userId: string): Promise<void> {
             data: { status: "active" },
           });
         }
+        // Чек НПД («Мой налог») + письмо клиенту (идемпотентно — если вебхук уже выдал, повтора не будет)
+        void issueReceiptForPayment(p.id, p.amount);
       } else if (yk.status === "canceled") {
         await prisma.payment.update({ where: { id: p.id }, data: { status: "failed" } });
       }

@@ -40,6 +40,28 @@ function createTransport() {
   });
 }
 
+/** Письмо со ссылкой на чек НПД после успешной оплаты. */
+export async function sendReceiptEmail(to: string, receiptUrl: string): Promise<void> {
+  if (!isMailConfigured()) {
+    console.info(`\n[Разумейка] Чек для ${to}: ${receiptUrl}\n`);
+    return;
+  }
+  const transport = createTransport();
+  await transport.sendMail({
+    from: getFrom(),
+    to,
+    subject: "Чек об оплате — Разумейка",
+    text:
+      `Спасибо за оплату в онлайн-школе «Разумейка»!\n\n` +
+      `Ваш чек доступен по ссылке: ${receiptUrl}\n\n` +
+      `Чек также доступен в личном кабинете на сайте razumeyka-school.ru.`,
+    html:
+      `<p>Спасибо за оплату в онлайн-школе <strong>«Разумейка»</strong>!</p>` +
+      `<p>Ваш чек: <a href="${receiptUrl}">${receiptUrl}</a></p>` +
+      `<p>Чек также доступен в личном кабинете на сайте razumeyka-school.ru.</p>`,
+  });
+}
+
 export async function sendLoginCodeEmail(to: string, code: string): Promise<void> {
   // Dev-фоллбэк: без настроенного SMTP пишем код в консоль.
   if (!isMailConfigured()) {

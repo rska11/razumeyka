@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getYooKassaPayment } from "@/lib/yookassa";
 import { extendAccess, isDirectionSlug } from "@/lib/subscription";
+import { issueReceiptForPayment } from "@/lib/receipts";
 
 export const dynamic = "force-dynamic";
 
@@ -36,6 +37,8 @@ export async function POST(req: Request) {
           });
         }
         console.info("[payments/webhook] оплачено", { paymentId: payment.id, ykId: yk.id });
+        // Чек НПД («Мой налог») + письмо клиенту. Не блокирует ответ вебхуку.
+        void issueReceiptForPayment(payment.id, payment.amount);
       }
     } else if (yk.status === "canceled") {
       if (payment.status === "pending") {

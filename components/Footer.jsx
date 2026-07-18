@@ -81,17 +81,6 @@ export function Footer() {
             <ul className="mt-5 grid gap-4">
               <li>
                 <a
-                  href="tel:+78001234567"
-                  className="flex items-center gap-3 text-sm font-bold text-white/62 transition hover:text-white"
-                >
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10 text-gold-300">
-                    <Icon name="phone" className="h-4 w-4" />
-                  </span>
-                  +7 (800) 123-45-67
-                </a>
-              </li>
-              <li>
-                <a
                   href="mailto:info@razumeyka-school.ru"
                   className="flex items-center gap-3 text-sm font-bold text-white/62 transition hover:text-white"
                 >

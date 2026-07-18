@@ -106,6 +106,8 @@ export function Program() {
                   <div className="relative h-36 overflow-hidden rounded-[18px] bg-white shadow-sm">
                     <img
                       src={step.image}
+                      loading="lazy"
+                      decoding="async"
                       alt={`${step.title}: этап программы обучения`}
                       className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.06]"
                     />

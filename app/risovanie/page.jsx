@@ -44,7 +44,28 @@ const HERO_ARTWORKS = [
   { src: '/images/drawing/hero-sky-whale.webp', title: 'Небесный кит', label: 'Цвет и настроение' },
 ];
 
-const courseSchema = { '@context': 'https://schema.org', '@type': 'Course', name: 'Правополушарное рисование для детей', description: 'Самостоятельные уроки-игры по рисованию для детей 3–10 лет.', provider: { '@type': 'Organization', name: 'Разумейка', url: 'https://razumeyka-school.ru' } };
+const courseSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Course',
+  name: 'Правополушарное рисование для детей',
+  description: 'Самостоятельные уроки-игры по рисованию для детей 3–10 лет.',
+  provider: { '@type': 'Organization', name: 'Разумейка', url: 'https://razumeyka-school.ru' },
+  inLanguage: 'ru',
+  offers: {
+    '@type': 'Offer',
+    price: drawingSubscription.price,
+    priceCurrency: 'RUB',
+    availability: 'https://schema.org/InStock',
+  },
+};
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Главная', item: 'https://razumeyka-school.ru' },
+    { '@type': 'ListItem', position: 2, name: 'Рисование для детей', item: 'https://razumeyka-school.ru/risovanie' },
+  ],
+};
 
 export default async function DrawingPage() {
   const session = await getAuthSession();
@@ -62,6 +83,7 @@ export default async function DrawingPage() {
       <Header />
       <main className="drawing-page min-h-screen">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
 
         <section className="drawing-hero px-5 pb-20 pt-36 sm:px-8 sm:pt-40 lg:px-14 lg:pb-28">
           <div className="container-pad px-0">

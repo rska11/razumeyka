@@ -187,6 +187,8 @@ export function Directions() {
                 <div className="relative h-44 overflow-hidden rounded-[24px] bg-night shadow-card">
                   <img
                     src={direction.image}
+                    loading="lazy"
+                    decoding="async"
                     alt={`${direction.displayTitle}: направление Разумейки`}
                     className={`h-full w-full object-cover transition duration-700 group-hover:scale-[1.05] ${direction.isReady ? '' : 'saturate-[0.82]'}`}
                   />

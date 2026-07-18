@@ -61,6 +61,15 @@ const skills = [
   { icon: '♥', title: 'Спокойная уверенность', text: 'Ошибка становится подсказкой, а новое задание — интересной пробой сил.', color: 'bg-brand-green/10 text-brand-green' },
 ];
 
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Главная', item: 'https://razumeyka-school.ru' },
+    { '@type': 'ListItem', position: 2, name: 'Подготовка к школе', item: 'https://razumeyka-school.ru/podgotovka-k-shkole' },
+  ],
+};
+
 const courseSchema = {
   '@context': 'https://schema.org',
   '@type': 'Course',
@@ -126,6 +135,7 @@ export default async function SchoolPrepPage() {
       <Header />
       <main className="min-h-screen overflow-hidden bg-[#FBFAF7] text-ink">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
 
         <section className="relative px-5 pb-20 pt-32 sm:px-8 sm:pt-36 lg:px-14 lg:pb-28">
           <div className="pointer-events-none absolute -left-40 top-10 h-[520px] w-[520px] rounded-full bg-brand-blue/10 blur-[110px]" />

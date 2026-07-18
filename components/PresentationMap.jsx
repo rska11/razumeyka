@@ -101,6 +101,8 @@ export function PresentationMap() {
                 <div className="relative h-28 overflow-hidden rounded-[18px] border border-white/30 bg-white/20">
                   <img
                     src={step.image}
+                    loading="lazy"
+                    decoding="async"
                     alt={`${step.title}: этап развития ребенка`}
                     className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.08]"
                   />

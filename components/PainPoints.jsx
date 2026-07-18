@@ -102,6 +102,8 @@ export function PainPoints() {
               <div className="relative h-32 overflow-hidden rounded-[8px] bg-white shadow-sm">
                 <img
                   src={item.image}
+                  loading="lazy"
+                  decoding="async"
                   alt={`${item.title}: ситуация, знакомая родителям`}
                   className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.08]"
                 />

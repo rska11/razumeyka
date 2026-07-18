@@ -80,6 +80,8 @@ export function BeforeAfter() {
             <div className="relative mt-8 overflow-hidden rounded-[8px] border-2 border-white bg-cream p-3 shadow-color">
               <img
                 src="/images/before-after-progress.webp"
+                loading="lazy"
+                decoding="async"
                 alt="Ребенок из Восточной Европы занимается онлайн и радуется прогрессу"
                 className={`h-[360px] w-full rounded-[8px] object-cover object-[52%_45%] transition duration-1000 ${
                   isVisible ? 'scale-100 opacity-100' : 'scale-[1.04] opacity-0'
@@ -133,6 +135,8 @@ export function BeforeAfter() {
                     {row.photo && (
                       <img
                         src={row.photo}
+                        loading="lazy"
+                        decoding="async"
                         alt="Ребенок практикует уверенную речь"
                         className="h-12 w-16 rounded-[8px] border border-white/40 object-cover shadow-card"
                       />

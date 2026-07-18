@@ -394,7 +394,7 @@ export const fallbackWorks = [
 ];
 
 export function ArtworkPreview({ item, className = '' }) {
-  return <img className={'drawing-real-art ' + className} src={item.imageUrl} alt={item.title} />;
+  return <img className={'drawing-real-art ' + className} src={item.imageUrl} loading="lazy" decoding="async" alt={item.title} />;
 }
 
 export function sortByLikes(items) {

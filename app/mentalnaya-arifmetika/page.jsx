@@ -44,6 +44,15 @@ const GAME_FORMATS = [
   { icon: '◎', title: 'Счёт в уме', text: 'Воображаем бусины и решаем уже без подсказки на экране.', label: 'результат' },
 ];
 
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Главная', item: 'https://razumeyka-school.ru' },
+    { '@type': 'ListItem', position: 2, name: 'Ментальная арифметика', item: 'https://razumeyka-school.ru/mentalnaya-arifmetika' },
+  ],
+};
+
 const courseSchema = {
   '@context': 'https://schema.org',
   '@type': 'Course',
@@ -80,6 +89,7 @@ export default async function MentalArithmeticPage() {
       <Header />
       <main className="mental-page mental-v3 min-h-screen overflow-hidden bg-[#F7F9FC] text-ink">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
 
         <section className="relative overflow-hidden bg-[#09152E] px-5 pb-24 pt-32 text-white sm:px-8 sm:pt-36 lg:px-14 lg:pb-28">
           <div className="pointer-events-none absolute -left-40 top-10 h-[520px] w-[520px] rounded-full bg-[#235CFF]/22 blur-[120px]" />

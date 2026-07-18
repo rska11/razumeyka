@@ -656,6 +656,8 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false }) {
                     <span className="relative h-11 w-14 overflow-hidden rounded-[13px] border border-white/14 bg-white/8">
                       <img
                         src={day.image}
+                        loading="lazy"
+                        decoding="async"
                         alt=""
                         className={`h-full w-full object-cover ${isUnlocked ? "" : "opacity-55 saturate-50"}`}
                         style={{ objectPosition: day.imagePosition }}
@@ -690,6 +692,8 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false }) {
           {currentDay.image && (
             <img
               src={currentDay.image}
+              loading="lazy"
+              decoding="async"
               alt=""
               className="pointer-events-none absolute inset-0 h-full w-full object-cover"
               style={{ objectPosition: currentDay.imagePosition }}

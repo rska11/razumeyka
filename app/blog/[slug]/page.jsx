@@ -54,6 +54,20 @@ export default async function BlogPost({ params }) {
   const post = getPostBySlug(slug);
   if (!post) notFound();
 
+  const cta = post.cta ?? {
+    title: 'Выберите курс для ребёнка',
+    text: 'Три самостоятельных направления уже открыты. Первые уроки можно попробовать бесплатно.',
+    href: '/#programs',
+    label: 'Посмотреть направления',
+    tone: 'blue',
+  };
+  const ctaThemes = {
+    blue: 'from-brand-blue to-brand-purple',
+    green: 'from-[#079A78] to-[#3B82F6]',
+    pink: 'from-brand-purple to-brand-pink',
+    orange: 'from-brand-orange to-brand-pink',
+  };
+
   const related = (post.relatedSlugs ?? [])
     .map((s) => {
       const d = getDirectionBySlug(s);
@@ -362,10 +376,10 @@ export default async function BlogPost({ params }) {
             )}
 
             {/* CTA */}
-            <div className="mt-14 overflow-hidden rounded-[28px] bg-gradient-to-br from-brand-blue to-brand-purple p-8 text-center text-white shadow-color sm:p-12">
-              <h2 className="font-display text-2xl font-extrabold sm:text-3xl">Попробуйте — первые уроки бесплатно</h2>
-              <p className="mx-auto mt-3 max-w-md text-base font-medium text-white/85">Самостоятельные уроки-игры: ребёнок занимается сам, а результат оценивает родитель. Без карты и обязательств.</p>
-              <a href="/risovanie" className="mt-7 inline-flex rounded-full bg-white px-8 py-3.5 text-base font-extrabold text-brand-blue transition hover:-translate-y-0.5">Начать бесплатно</a>
+            <div className={'mt-14 overflow-hidden rounded-[28px] bg-gradient-to-br ' + (ctaThemes[cta.tone] ?? ctaThemes.blue) + ' p-8 text-center text-white shadow-color sm:p-12'}>
+              <h2 className="font-display text-2xl font-extrabold sm:text-3xl">{cta.title}</h2>
+              <p className="mx-auto mt-3 max-w-lg text-base font-medium text-white/85">{cta.text}</p>
+              <Link href={cta.href} className="mt-7 inline-flex rounded-full bg-white px-8 py-3.5 text-base font-extrabold text-brand-blue transition hover:-translate-y-0.5">{cta.label}</Link>
             </div>
           </div>
         </article>

@@ -1,5 +1,6 @@
 import type { DefaultSession, NextAuthOptions } from "next-auth";
 import { getServerSession } from "next-auth";
+import { cookies } from "next/headers";
 import CredentialsProvider from "next-auth/providers/credentials";
 import YandexProvider from "next-auth/providers/yandex";
 import { prisma } from "@/lib/prisma";
@@ -8,6 +9,30 @@ import { isAuthDisabled } from "@/lib/settings";
 import { isAdminEmail } from "@/lib/admin";
 import { isTeacherEmail } from "@/lib/staff";
 import { isRussianEmail } from "@/lib/ru-email";
+
+// Согласие на обработку ПД (152-ФЗ). Галочка на /login обязательна для входа;
+// факт ПЕРВОГО согласия фиксируем в User.pdConsentAt (повторные входы дату не перезаписывают).
+// Для входа через Яндекс согласие передаётся короткоживущей cookie (ставится кликом по кнопке).
+export const PD_CONSENT_COOKIE = "rzm_pd_consent";
+
+/** Проставить дату согласия на обработку ПД, если её ещё нет (первое согласие). */
+async function stampPdConsent(userId: string) {
+  await prisma.user.updateMany({
+    where: { id: userId, pdConsentAt: null },
+    data: { pdConsentAt: new Date() },
+  });
+}
+
+/** Есть ли consent-cookie в текущем запросе (вход через Яндекс). */
+async function hasPdConsentCookie(): Promise<boolean> {
+  try {
+    const jar = await cookies();
+    return jar.get(PD_CONSENT_COOKIE)?.value === "1";
+  } catch {
+    // вне request-контекста cookie недоступны — считаем, что согласия нет
+    return false;
+  }
+}
 
 declare module "next-auth" {
   interface Session {
@@ -40,11 +65,15 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         email: { label: "Email", type: "email" },
         code: { label: "Code", type: "text" },
+        consent: { label: "Consent", type: "text" },
       },
       async authorize(credentials) {
         const email = credentials?.email?.trim().toLowerCase() ?? "";
         const code = credentials?.code?.trim() ?? "";
         if (!email || !code) return null;
+
+        // Без согласия на обработку ПД вход невозможен (галочка на /login)
+        if (credentials?.consent !== "true") return null;
 
         // Рубильник: при выключенной авторизации вход разрешён только персоналу (админ/препод)
         if (await isAuthDisabled()) {
@@ -64,6 +93,9 @@ export const authOptions: NextAuthOptions = {
         });
         if (!user || user.isBlocked) return null;
 
+        // Фиксируем первое согласие на обработку ПД
+        await stampPdConsent(user.id);
+
         return { id: user.id, email: user.email, name: user.name, image: user.image };
       },
     }),
@@ -74,10 +106,12 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ user, account }) {
-      // Яндекс ID: не пускаем заблокированных пользователей
+      // Яндекс ID: не пускаем заблокированных и не пускаем без согласия на обработку ПД
       if (account?.provider === "yandex") {
         const email = user.email?.toLowerCase();
         if (!email) return false;
+        // Согласие ставится cookie кликом по кнопке «Войти через Яндекс» на /login
+        if (!(await hasPdConsentCookie())) return false;
         // Рубильник: при выключенной авторизации пускаем только персонал
         if (await isAuthDisabled()) {
           const staff = isAdminEmail(email) || (await isTeacherEmail(email));
@@ -107,6 +141,8 @@ export const authOptions: NextAuthOptions = {
           create: { email, name: token.name ?? null, provider: "yandex" },
         });
         token.id = dbUser.id;
+        // Согласие подтверждено cookie (без неё signIn-callback вход не пропустил бы)
+        await stampPdConsent(dbUser.id);
       }
       return token;
     },

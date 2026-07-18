@@ -232,7 +232,18 @@ export default async function AdminPage() {
           {users.map((u) => (
             <div key={u.id} className="rounded-[16px] border border-ink/6 bg-white px-4 py-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-sm font-extrabold text-ink">{u.email}</p>
+                <div className="flex min-w-0 flex-wrap items-center gap-2">
+                  <p className="truncate text-sm font-extrabold text-ink">{u.email}</p>
+                  {u.pdConsentAt ? (
+                    <span title={`Согласие на обработку ПД: ${fmtDate(u.pdConsentAt)}`} className="shrink-0 rounded-full bg-brand-green/12 px-2.5 py-1 text-[11px] font-extrabold text-brand-green">
+                      ПД ✓ {fmtDate(u.pdConsentAt)}
+                    </span>
+                  ) : (
+                    <span title="Согласие на обработку ПД не зафиксировано (аккаунт создан до внедрения фиксации)" className="shrink-0 rounded-full bg-brand-orange/12 px-2.5 py-1 text-[11px] font-extrabold text-brand-orange">
+                      ПД: нет отметки
+                    </span>
+                  )}
+                </div>
                 <span className="text-xs font-bold text-ink/46">с {fmtDate(u.createdAt)}</span>
               </div>
               {u.children.length > 0 && (

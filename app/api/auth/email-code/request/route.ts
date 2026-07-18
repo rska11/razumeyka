@@ -10,15 +10,22 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(req: Request) {
   let email = "";
+  let consent = false;
   try {
     const body = await req.json();
     email = String(body?.email ?? "").trim().toLowerCase();
+    consent = body?.consent === true;
   } catch {
     return NextResponse.json({ error: "BAD_REQUEST" }, { status: 400 });
   }
 
   if (!EMAIL_RE.test(email)) {
     return NextResponse.json({ error: "INVALID_EMAIL" }, { status: 400 });
+  }
+
+  // Согласие на обработку ПД обязательно (152-ФЗ) — без него код не выдаём
+  if (!consent) {
+    return NextResponse.json({ error: "CONSENT_REQUIRED" }, { status: 400 });
   }
 
   // Закон РФ (с 26.06.2026): авторизация только через российскую почту.

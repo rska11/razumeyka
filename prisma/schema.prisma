@@ -17,6 +17,7 @@ model User {
   provider  String    @default("email-code")
   role      String    @default("parent") // parent | teacher
   isBlocked Boolean   @default(false)
+  pdConsentAt DateTime? // согласие на обработку ПД (152-ФЗ): дата ПЕРВОГО подтверждения галочки на /login
   accessUntil     DateTime? // LEGACY: единый доступ (до перехода на доступ по направлениям). Гейтинг теперь через Access.
   paymentMethodId String?   // сохранённый способ оплаты YooKassa — задел под автопродление
   createdAt DateTime  @default(now())

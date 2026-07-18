@@ -22,9 +22,25 @@ function LoginForm() {
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [consent, setConsent] = useState(false);
+
+  // Ошибка next-auth после редиректа (например, Яндекс отклонён signIn-callback'ом)
+  const authError = params.get("error");
+  const [error, setError] = useState<string | null>(
+    authError === "AccessDenied"
+      ? "Не удалось войти через Яндекс: нет согласия на обработку данных или аккаунт заблокирован."
+      : authError
+        ? "Не удалось войти. Попробуйте ещё раз."
+        : null,
+  );
+
+  function signInYandex() {
+    // Согласие на обработку ПД передаём серверу короткоживущей cookie:
+    // signIn-callback не пустит вход через Яндекс без неё, jwt-callback зафиксирует дату в БД.
+    document.cookie = "rzm_pd_consent=1; path=/; max-age=1800; SameSite=Lax";
+    signIn("yandex", { callbackUrl });
+  }
 
   async function requestCode(e?: React.FormEvent) {
     e?.preventDefault();
@@ -35,7 +51,7 @@ function LoginForm() {
       const res = await fetch("/api/auth/email-code/request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, consent }),
       });
       if (res.ok) {
         setStep("code");
@@ -54,7 +70,9 @@ function LoginForm() {
                 ? "Вход только с российской почты (Яндекс, Mail.ru и др.) — требование закона РФ."
                 : data.error === "AUTH_DISABLED"
                   ? "Вход временно закрыт — сайт в разработке."
-                  : "Не удалось отправить код. Попробуйте ещё раз.",
+                  : data.error === "CONSENT_REQUIRED"
+                    ? "Отметьте согласие на обработку персональных данных, чтобы продолжить."
+                    : "Не удалось отправить код. Попробуйте ещё раз.",
         );
       }
     } catch {
@@ -72,6 +90,7 @@ function LoginForm() {
       const res = await signIn("email-code", {
         email,
         code,
+        consent: consent ? "true" : "",
         redirect: false,
       });
       if (res?.ok) {
@@ -145,7 +164,7 @@ function LoginForm() {
             </div>
             <button
               type="button"
-              onClick={() => signIn("yandex", { callbackUrl })}
+              onClick={signInYandex}
               disabled={!consent}
               className="flex w-full items-center justify-center gap-2 rounded-full bg-[#fc3f1d] px-5 py-3 text-base font-extrabold text-white transition hover:brightness-95 disabled:opacity-50"
             >

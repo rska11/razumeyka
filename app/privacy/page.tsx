@@ -9,7 +9,7 @@ export const metadata = {
 const OPERATOR = "Онлайн-школа «Разумейка» (razumeyka-school.ru)";
 const OPERATOR_DETAILS = [
   "самозанятый (плательщик налога на профессиональный доход)",
-  process.env.OPERATOR_NAME || "",
+  process.env.OPERATOR_NAME || "Кагиров Руслан Рашитович",
   process.env.OPERATOR_INN ? `ИНН ${process.env.OPERATOR_INN}` : "",
 ]
   .filter(Boolean)

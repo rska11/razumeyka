@@ -8,7 +8,7 @@ export const metadata = {
 // Реквизиты берутся из env на сервере (заполняются deploy/copy-npd.sh + вручную):
 //   OPERATOR_NAME — ФИО самозанятого, OPERATOR_INN — ИНН.
 const OPERATOR = "Онлайн-школа «Разумейка» (razumeyka-school.ru)";
-const OPERATOR_NAME = process.env.OPERATOR_NAME || "";
+const OPERATOR_NAME = process.env.OPERATOR_NAME || "Кагиров Руслан Рашитович";
 const OPERATOR_INN = process.env.OPERATOR_INN || "";
 const OPERATOR_DETAILS = [
   "самозанятый (плательщик налога на профессиональный доход)",

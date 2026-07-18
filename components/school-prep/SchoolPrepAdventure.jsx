@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { SchoolPrepAudioButton } from "./SchoolPrepAudioButton.jsx";
+import { SchoolPrepAutoNarration } from "./SchoolPrepAutoNarration.jsx";
 
 const STORAGE_KEY = "razumeyka_school_prep_week1";
 
@@ -768,6 +769,7 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false }) {
         </div>
 
         <div id="school-prep-mission" className="scroll-mt-32 mt-5">
+          <SchoolPrepAutoNarration src={`/audio/school-prep/${currentDay.id}/${currentMission.id}/instruction.mp3`} />
           <MissionCard
             key={currentMission.id}
             mission={currentMission}

@@ -13,9 +13,9 @@ const READY_SLUGS = READY_DIRECTIONS;
 const cardOrder = [
   'right-brain-drawing',
   'mental-arithmetic',
+  'podgotovka-k-shkole',
   'speed-reading',
   'languages',
-  'podgotovka-k-shkole',
   'intuition',
 ];
 
@@ -123,14 +123,45 @@ export function Directions() {
           <p className="mx-auto mt-5 max-w-2xl text-lg font-semibold leading-8 text-ink/64">
             Уже можно заниматься в правополушарном рисовании, ментальной арифметике и подготовке к школе. Скорочтение, языки и интуицию запустим следующим этапом.
           </p>
-          <div className="mx-auto mt-7 flex max-w-3xl flex-col justify-center gap-3 sm:flex-row">
-            <Link href="/mentalnaya-arifmetika" className="primary-btn">
-              Попробовать ментальную арифметику
-              <Icon name="arrow" className="h-5 w-5" />
-            </Link>
-            <Link href="/risovanie" className="secondary-btn">
-              Попробовать рисование
-            </Link>
+          <div className="mx-auto mt-8 grid max-w-4xl gap-3 text-left sm:grid-cols-3">
+            {[
+              {
+                href: '/risovanie',
+                icon: 'palette',
+                eyebrow: 'Творчество',
+                title: 'Попробовать рисование',
+                className: 'from-brand-pink/18 via-white to-brand-yellow/18 text-brand-pink',
+              },
+              {
+                href: '/mentalnaya-arifmetika',
+                icon: 'abacus',
+                eyebrow: 'Счёт и внимание',
+                title: 'Попробовать ментальную арифметику',
+                className: 'from-brand-blue/16 via-white to-brand-cyan/18 text-brand-blue',
+              },
+              {
+                href: '/podgotovka-k-shkole',
+                icon: 'book',
+                eyebrow: '5–7 лет',
+                title: 'Попробовать подготовку к школе',
+                className: 'from-brand-purple/16 via-white to-brand-orange/18 text-brand-purple',
+              },
+            ].map((course) => (
+              <Link
+                key={course.href}
+                href={course.href}
+                className={'group/course flex min-h-[116px] items-center gap-3 rounded-[24px] border border-white/90 bg-gradient-to-br p-4 shadow-card transition duration-300 hover:-translate-y-1 hover:shadow-color ' + course.className}
+              >
+                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-current/10">
+                  <Icon name={course.icon} className="h-5 w-5" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[10px] font-black uppercase tracking-[0.14em] opacity-65">{course.eyebrow}</span>
+                  <span className="mt-1 block text-sm font-black leading-5 text-ink">{course.title}</span>
+                </span>
+                <Icon name="arrow" className="h-4 w-4 shrink-0 transition-transform group-hover/course:translate-x-1" />
+              </Link>
+            ))}
           </div>
         </div>
 

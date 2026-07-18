@@ -24,6 +24,7 @@ function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [consent, setConsent] = useState(false);
+  const [consentAttention, setConsentAttention] = useState(false);
 
   // Ошибка next-auth после редиректа (например, Яндекс отклонён signIn-callback'ом)
   const authError = params.get("error");
@@ -36,16 +37,26 @@ function LoginForm() {
   );
 
   function signInYandex() {
+    if (!requireConsent()) return;
     // Согласие на обработку ПД передаём серверу короткоживущей cookie:
     // signIn-callback не пустит вход через Яндекс без неё, jwt-callback зафиксирует дату в БД.
     document.cookie = "rzm_pd_consent=1; path=/; max-age=1800; SameSite=Lax";
     signIn("yandex", { callbackUrl });
   }
 
+  function requireConsent() {
+    if (consent) return true;
+    setConsentAttention(true);
+    setError("Сначала поставьте галочку согласия на обработку персональных данных.");
+    window.requestAnimationFrame(() => document.getElementById("pd-consent")?.focus());
+    return false;
+  }
+
   async function requestCode(e?: React.FormEvent) {
     e?.preventDefault();
-    setError(null);
     setNotice(null);
+    if (!requireConsent()) return;
+    setError(null);
     setLoading(true);
     try {
       const res = await fetch("/api/auth/email-code/request", {
@@ -148,15 +159,40 @@ function LoginForm() {
                 Только российская почта (Яндекс, Mail.ru и др.) — требование закона РФ.
               </p>
             </div>
-            <label className="flex items-start gap-2.5 text-xs font-medium leading-5 text-ink/60">
-              <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)}
-                className="mt-0.5 h-4 w-4 shrink-0 accent-brand-blue" />
-              <span>
-                Я соглашаюсь на обработку персональных данных и принимаю{" "}
-                <a href="/privacy" target="_blank" rel="noopener" className="font-extrabold text-brand-blue underline">Политику конфиденциальности</a>.
-              </span>
-            </label>
-            <button type="submit" disabled={loading || !consent} className="primary-btn w-full disabled:opacity-50">
+            <div
+              className={"rounded-[18px] border-2 p-4 transition " + (
+                consent
+                  ? "border-brand-green/35 bg-brand-green/[0.07]"
+                  : consentAttention
+                    ? "border-brand-red/45 bg-brand-red/[0.07] shadow-card"
+                    : "border-brand-blue/18 bg-brand-blue/[0.045]"
+              )}
+            >
+              <label htmlFor="pd-consent" className="flex cursor-pointer items-start gap-3.5">
+                <input
+                  id="pd-consent"
+                  type="checkbox"
+                  checked={consent}
+                  onChange={(e) => {
+                    setConsent(e.target.checked);
+                    setConsentAttention(false);
+                    if (e.target.checked) setError(null);
+                  }}
+                  className="mt-0.5 h-6 w-6 shrink-0 cursor-pointer accent-brand-blue"
+                />
+                <span>
+                  <span className="block text-sm font-extrabold text-ink">Обязательное согласие для входа</span>
+                  <span className="mt-1 block text-sm font-semibold leading-6 text-ink/62">
+                    Я даю согласие на обработку персональных данных для регистрации и работы личного кабинета.
+                  </span>
+                </span>
+              </label>
+              <p className="mt-3 border-t border-ink/7 pt-3 pl-9 text-xs font-medium leading-5 text-ink/48">
+                Как мы обрабатываем и защищаем данные, описано в{" "}
+                <a href="/privacy" target="_blank" rel="noopener" className="font-extrabold text-brand-blue underline">Политике конфиденциальности</a>.
+              </p>
+            </div>
+            <button type="submit" disabled={loading} className="primary-btn w-full disabled:opacity-50">
               {loading ? "Отправляем…" : "Получить код"}
             </button>
             <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.14em] text-ink/36">
@@ -165,12 +201,15 @@ function LoginForm() {
             <button
               type="button"
               onClick={signInYandex}
-              disabled={!consent}
-              className="flex w-full items-center justify-center gap-2 rounded-full bg-[#fc3f1d] px-5 py-3 text-base font-extrabold text-white transition hover:brightness-95 disabled:opacity-50"
+              disabled={loading}
+              className="flex min-h-[54px] w-full items-center justify-center gap-2 rounded-full bg-[#fc3f1d] px-5 py-3 text-base font-extrabold text-white shadow-button transition hover:-translate-y-0.5 hover:brightness-95 disabled:opacity-50"
             >
               <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white text-sm font-black text-[#fc3f1d]">Я</span>
               Войти через Яндекс
             </button>
+            <p className={"text-center text-xs font-semibold leading-5 " + (consent ? "text-ink/42" : "text-brand-red")}>
+              {consent ? "Для входа через Яндекс email вводить не нужно." : "Перед входом через Яндекс поставьте обязательную галочку выше ↑"}
+            </p>
           </form>
         ) : (
           <form onSubmit={submitCode} className="mt-6 grid gap-4">

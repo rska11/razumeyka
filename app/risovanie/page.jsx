@@ -62,7 +62,7 @@ export default async function DrawingPage() {
       <main className="drawing-page min-h-screen">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }} />
 
-        <section className="drawing-hero px-5 pb-20 pt-28 sm:px-8 sm:pt-32 lg:px-14 lg:pb-28">
+        <section className="drawing-hero px-5 pb-20 pt-36 sm:px-8 sm:pt-40 lg:px-14 lg:pb-28">
           <div className="container-pad px-0">
             <div className="grid items-center gap-12 lg:grid-cols-[1.03fr_.97fr] lg:gap-16">
               <div className="relative z-10">

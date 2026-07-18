@@ -24,7 +24,7 @@ export function SubscribeButton({ isLoggedIn, hasAccess, accessUntil, returnTo =
       return;
     }
     if (!accepted) {
-      setError('Отметьте согласие с офертой и политикой, чтобы продолжить.');
+      setError('Отметьте принятие публичной оферты, чтобы продолжить.');
       return;
     }
     setError('');
@@ -61,13 +61,11 @@ export function SubscribeButton({ isLoggedIn, hasAccess, accessUntil, returnTo =
             type="checkbox"
             checked={accepted}
             onChange={(e) => setAccepted(e.target.checked)}
-            className="mt-0.5 h-4 w-4 shrink-0 accent-brand-blue"
+            className="mt-0.5 h-5 w-5 shrink-0 accent-brand-blue"
           />
           <span>
             Я ознакомлен(а) и принимаю{' '}
-            <a href="/offer" target="_blank" rel="noopener" className="font-extrabold text-brand-blue underline">Публичную оферту</a>{' '}
-            и{' '}
-            <a href="/privacy" target="_blank" rel="noopener" className="font-extrabold text-brand-blue underline">Политику конфиденциальности</a>.
+            <a href="/offer" target="_blank" rel="noopener" className="font-extrabold text-brand-blue underline">Публичную оферту</a>.
           </span>
         </label>
       )}

@@ -16,7 +16,7 @@ import { QuizAI } from '@/components/QuizAI.jsx';
 import { Results } from '@/components/Results.jsx';
 import { Scarcity } from '@/components/Scarcity.jsx';
 import { StickyMobileCTA } from '@/components/StickyMobileCTA.jsx';
-import { Testimonials } from '@/components/Testimonials.jsx';
+
 
 // canonical только здесь: в layout он наследовался бы всеми страницами без своего canonical
 export const metadata = {
@@ -38,6 +38,7 @@ export default function HomePage() {
             description:
               "Онлайн-школа развития детей 3–10+ лет: правополушарное рисование, ментальная арифметика, скорочтение и другие направления.",
             logo: "https://razumeyka-school.ru/images/logo.png",
+            email: "info@razumeyka-school.ru",
             areaServed: "RU",
             audience: { "@type": "EducationalAudience", educationalRole: "student" },
           }),
@@ -70,7 +71,7 @@ export default function HomePage() {
         <Results />
         <Process />
         <Program />
-        <Testimonials />
+
         <Scarcity />
         <FAQ />
         <FinalCTA />

@@ -33,22 +33,26 @@ export function CookieConsent() {
       role="region"
       aria-label="Уведомление об использовании cookie"
     >
-      <div className="pointer-events-auto mx-auto flex max-w-3xl items-center gap-2.5 rounded-[16px] border border-white/14 bg-night/95 p-2.5 text-white shadow-luxe backdrop-blur-xl sm:gap-4 sm:rounded-[18px] sm:p-3.5">
-        <span aria-hidden className="grid h-9 w-9 shrink-0 place-items-center rounded-[12px] bg-white/10 text-lg">
+      {/* Светлая, компактная плашка «в характере» бренда: польза впереди,
+          подразумеваемое согласие зашито во фразу (юр-покрытие), детали про
+          аналитику — в политике. Тёмный вариант отпугивал (звучал как слежка). */}
+      <div className="pointer-events-auto mx-auto flex max-w-xl items-center gap-2.5 rounded-[14px] border border-ink/8 bg-white/95 p-2 text-ink shadow-luxe backdrop-blur-xl sm:gap-3.5 sm:rounded-[18px] sm:p-3">
+        <span aria-hidden className="hidden h-9 w-9 shrink-0 place-items-center rounded-[12px] bg-brand-blue/10 text-lg sm:grid">
           🍪
         </span>
-        <p className="min-w-0 flex-1 text-[11px] font-semibold leading-4 text-white/76 sm:text-sm sm:leading-5">
-          На сайте работает Яндекс.Метрика: она использует cookie, чтобы мы видели, что удобно, а что нужно улучшить.{' '}
-          <Link href="/privacy" className="font-extrabold text-brand-cyan underline decoration-white/30 underline-offset-2">
-            Подробнее
+        <p className="min-w-0 flex-1 text-[11px] font-semibold leading-[1.35] text-ink/64 sm:text-[13px] sm:leading-5">
+          Используем cookie, чтобы сайт был удобнее. Продолжая, вы принимаете{' '}
+          <Link href="/privacy" className="font-extrabold text-brand-blue underline decoration-brand-blue/30 underline-offset-2">
+            политику конфиденциальности
           </Link>
+          .
         </p>
         <button
           type="button"
           onClick={acknowledge}
           className="min-h-10 shrink-0 rounded-full bg-gradient-to-r from-brand-blue to-brand-purple px-4 py-2 text-xs font-extrabold text-white shadow-color transition hover:-translate-y-0.5 sm:px-5 sm:text-sm"
         >
-          Понятно
+          Хорошо
         </button>
       </div>
     </div>

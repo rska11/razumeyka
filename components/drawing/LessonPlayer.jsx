@@ -274,7 +274,7 @@ export function LessonPlayer({ lesson, nextLesson, onComplete, onNext, onClose }
           <button onClick={onClose} aria-label="Закрыть" className="grid h-9 w-9 place-items-center rounded-full border border-ink/10 text-ink/50 transition hover:bg-ink/5">✕</button>
         </div>
 
-        <div className={done ? 'overflow-y-auto px-5 py-5' : 'flex min-h-0 flex-1 flex-col px-4 py-4 sm:px-5 sm:py-5'}>
+        <div className={done ? 'flex min-h-0 flex-1 flex-col' : 'flex min-h-0 flex-1 flex-col px-4 py-4 sm:px-5 sm:py-5'}>
           {!done && (
             <>
               <div className="mb-3 flex items-center gap-2 rounded-2xl bg-cream/70 px-4 py-2.5 text-sm font-semibold text-ink/64">
@@ -413,98 +413,107 @@ export function LessonPlayer({ lesson, nextLesson, onComplete, onNext, onClose }
           )}
 
           {done && (
-            <div className="animate-softPop text-center">
-              <div className="text-6xl">🌟</div>
-              <p className="mt-3 font-display text-2xl font-extrabold text-ink">Готово! Молодец</p>
-              {lesson.coloredPreview && finalLayers && (
-                <div className="mt-4 rounded-3xl border border-brand-green/20 bg-gradient-to-br from-brand-green/8 via-white to-brand-blue/8 p-4 text-left shadow-sm">
-                  <div className="mb-3 flex items-center justify-between gap-3">
-                    <div>
-                      <p className="text-sm font-extrabold text-brand-green">Контур и пример рядом</p>
-                      <p className="mt-1 text-xs font-bold leading-5 text-ink/52">Слева то, что ребёнок рисует по шагам. Справа — один красивый вариант раскраски.</p>
-                    </div>
-                    <span className="rounded-full bg-white px-3 py-1 text-[10px] font-extrabold text-ink/45 shadow-sm">А4 горизонтально</span>
-                  </div>
-                  <div className="grid gap-4 lg:grid-cols-2">
-                    <div>
-                      <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.12em] text-ink/42">Контур</p>
-                      <div className={'grid w-full place-items-center overflow-hidden rounded-2xl bg-white shadow-sm ' + drawingFrameClass}>
-                        <svg viewBox={viewBox} className="h-full w-full p-3 text-ink">
-                          <g dangerouslySetInnerHTML={{ __html: finalLayers }} />
-                        </svg>
-                      </div>
-                    </div>
-                    <div>
-                      <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.12em] text-ink/42">Вариант раскраски</p>
-                      <div className={'grid w-full place-items-center overflow-hidden rounded-2xl bg-white shadow-sm ' + drawingFrameClass}>
-                        <svg viewBox={coloredViewBox} className="h-full w-full">
-                          <g dangerouslySetInnerHTML={{ __html: lesson.coloredPreview }} />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
+            <>
+              {/* Контент скроллится, а кнопки закреплены внизу модалки: ребёнок
+                  всегда видит «Следующая картинка» без прокрутки. */}
+              <div className="min-h-0 flex-1 animate-softPop overflow-y-auto px-5 py-3 text-center">
+                <div className="flex items-center justify-center gap-2">
+                  <span className="text-3xl">🌟</span>
+                  <p className="font-display text-2xl font-extrabold text-ink">Готово! Молодец</p>
                 </div>
-              )}
-
-
-              <div className="mt-4 rounded-2xl bg-brand-green/10 px-5 py-4 text-left">
-                <p className="text-sm font-extrabold text-brand-green">Покажи рисунок родителям 💚</p>
-                <p className="mt-1 text-sm font-semibold leading-6 text-ink/70">{lesson.parentNote}</p>
-              </div>
-
-              {lesson.storyPrompt && (
-                <div className="mt-4 rounded-2xl border border-brand-blue/15 bg-brand-blue/5 px-5 py-4 text-left">
-                  <p className="text-sm font-extrabold text-brand-blue">Сюжетный шаг: {lesson.storyStageLabel ?? 'своя картинка'}</p>
-                  <p className="mt-1 text-sm font-semibold leading-6 text-ink/70">{lesson.storyPrompt}</p>
-                  {lesson.storyMissions?.length > 0 && (
-                    <div className="mt-3 grid gap-2">
-                      {lesson.storyMissions.map((mission, i) => (
-                        <div key={mission} className="flex items-center gap-2 rounded-xl bg-white/75 px-3 py-2">
-                          <span className="grid h-6 w-6 flex-none place-items-center rounded-full bg-brand-blue/10 text-[11px] font-extrabold text-brand-blue">{i + 1}</span>
-                          <span className="text-xs font-extrabold leading-4 text-ink/68">{mission}</span>
+                {lesson.coloredPreview && finalLayers && (
+                  <div className="mt-3 rounded-3xl border border-brand-green/20 bg-gradient-to-br from-brand-green/8 via-white to-brand-blue/8 p-3 text-left shadow-sm">
+                    <div className="mb-2 flex items-center justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-extrabold text-brand-green">Контур и пример рядом</p>
+                        <p className="text-xs font-bold leading-5 text-ink/52">Слева то, что ребёнок рисует по шагам. Справа — один красивый вариант раскраски.</p>
+                      </div>
+                      <span className="rounded-full bg-white px-3 py-1 text-[10px] font-extrabold text-ink/45 shadow-sm">А4 горизонтально</span>
+                    </div>
+                    <div className="grid gap-3 lg:grid-cols-2">
+                      <div>
+                        <p className="mb-1 text-xs font-extrabold uppercase tracking-[0.12em] text-ink/42">Контур</p>
+                        <div className={'grid w-full place-items-center overflow-hidden rounded-2xl bg-white shadow-sm ' + drawingFrameClass}>
+                          <svg viewBox={viewBox} className="h-full w-full p-3 text-ink">
+                            <g dangerouslySetInnerHTML={{ __html: finalLayers }} />
+                          </svg>
                         </div>
-                      ))}
+                      </div>
+                      <div>
+                        <p className="mb-1 text-xs font-extrabold uppercase tracking-[0.12em] text-ink/42">Вариант раскраски</p>
+                        <div className={'grid w-full place-items-center overflow-hidden rounded-2xl bg-white shadow-sm ' + drawingFrameClass}>
+                          <svg viewBox={coloredViewBox} className="h-full w-full">
+                            <g dangerouslySetInnerHTML={{ __html: lesson.coloredPreview }} />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className={'mt-3 grid gap-3 text-left ' + (wideCanvas && lesson.storyPrompt ? 'lg:grid-cols-2' : '')}>
+                  <div className="rounded-2xl bg-brand-green/10 px-4 py-3">
+                    <p className="text-sm font-extrabold text-brand-green">Покажи рисунок родителям 💚</p>
+                    <p className="mt-1 text-sm font-semibold leading-6 text-ink/70">{lesson.parentNote}</p>
+                  </div>
+
+                  {lesson.storyPrompt && (
+                    <div className="rounded-2xl border border-brand-blue/15 bg-brand-blue/5 px-4 py-3">
+                      <p className="text-sm font-extrabold text-brand-blue">Сюжетный шаг: {lesson.storyStageLabel ?? 'своя картинка'}</p>
+                      <p className="mt-1 text-sm font-semibold leading-6 text-ink/70">{lesson.storyPrompt}</p>
+                      {lesson.storyMissions?.length > 0 && (
+                        <div className="mt-2 grid gap-1.5">
+                          {lesson.storyMissions.map((mission, i) => (
+                            <div key={mission} className="flex items-center gap-2 rounded-xl bg-white/75 px-3 py-1.5">
+                              <span className="grid h-6 w-6 flex-none place-items-center rounded-full bg-brand-blue/10 text-[11px] font-extrabold text-brand-blue">{i + 1}</span>
+                              <span className="text-xs font-extrabold leading-4 text-ink/68">{mission}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
-              )}
 
-              {!isGame && finalLayers && !lesson.coloredPreview && (
-                <div className="mt-4 rounded-2xl border border-brand-pink/15 bg-brand-pink/5 p-4 text-left">
-                  <div className="flex items-center gap-3">
-                    <div className="grid h-24 w-24 flex-none place-items-center rounded-2xl bg-white text-brand-pink shadow-sm">
-                      <svg viewBox={viewBox} className="h-20 w-20">
-                        <g dangerouslySetInnerHTML={{ __html: finalLayers }} />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-sm font-extrabold text-brand-pink">Теперь разукрась сюжет</p>
-                      <p className="mt-1 text-sm font-semibold leading-5 text-ink/66">
-                        {lesson.colorHint ?? 'Выбери 2–3 любимых цвета и добавь свой фон: траву, небо, точки или узоры.'}
-                      </p>
-                      <div className="mt-3 flex flex-wrap gap-1.5">
-                        {palette.map((color, i) => (
-                          <span key={`${color}-${i}`} className="inline-flex items-center gap-1 rounded-full bg-white/80 px-2 py-1 text-[10px] font-extrabold text-ink/55 shadow-sm">
-                            <span className="h-3 w-3 rounded-full border border-ink/10" style={{ backgroundColor: color }} />
-                            цвет {i + 1}
-                          </span>
-                        ))}
+                {!isGame && finalLayers && !lesson.coloredPreview && (
+                  <div className="mt-3 rounded-2xl border border-brand-pink/15 bg-brand-pink/5 p-3 text-left">
+                    <div className="flex items-center gap-3">
+                      <div className="grid h-24 w-24 flex-none place-items-center rounded-2xl bg-white text-brand-pink shadow-sm">
+                        <svg viewBox={viewBox} className="h-20 w-20">
+                          <g dangerouslySetInnerHTML={{ __html: finalLayers }} />
+                        </svg>
                       </div>
-                      {lesson.finishIdea && <p className="mt-2 text-xs font-bold leading-5 text-ink/48">{lesson.finishIdea}</p>}
+                      <div>
+                        <p className="text-sm font-extrabold text-brand-pink">Теперь разукрась сюжет</p>
+                        <p className="mt-1 text-sm font-semibold leading-5 text-ink/66">
+                          {lesson.colorHint ?? 'Выбери 2–3 любимых цвета и добавь свой фон: траву, небо, точки или узоры.'}
+                        </p>
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                          {palette.map((color, i) => (
+                            <span key={`${color}-${i}`} className="inline-flex items-center gap-1 rounded-full bg-white/80 px-2 py-1 text-[10px] font-extrabold text-ink/55 shadow-sm">
+                              <span className="h-3 w-3 rounded-full border border-ink/10" style={{ backgroundColor: color }} />
+                              цвет {i + 1}
+                            </span>
+                          ))}
+                        </div>
+                        {lesson.finishIdea && <p className="mt-2 text-xs font-bold leading-5 text-ink/48">{lesson.finishIdea}</p>}
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
 
-              {nextLesson ? (
-                <button onClick={onNext} className="primary-btn mt-5 w-full">
-                  Следующая картинка: {nextLesson.title} →
-                </button>
-              ) : (
-                <p className="mt-5 text-sm font-semibold text-ink/54">Это последняя открытая картинка в этой ступени.</p>
-              )}
-              <button onClick={onClose} className="mt-3 w-full text-sm font-extrabold text-ink/50 transition hover:text-ink">Вернуться к урокам</button>
-            </div>
+              <div className="flex-none border-t border-ink/8 px-5 py-3">
+                {nextLesson ? (
+                  <button onClick={onNext} className="primary-btn w-full">
+                    Следующая картинка: {nextLesson.title} →
+                  </button>
+                ) : (
+                  <p className="text-center text-sm font-semibold text-ink/54">Это последняя открытая картинка в этой ступени.</p>
+                )}
+                <button onClick={onClose} className="mt-2 w-full text-sm font-extrabold text-ink/50 transition hover:text-ink">Вернуться к урокам</button>
+              </div>
+            </>
           )}
         </div>
       </div>

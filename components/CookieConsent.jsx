@@ -28,17 +28,25 @@ export function CookieConsent() {
   if (!visible) return null;
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-[120] px-3 pb-3 sm:px-4 sm:pb-4">
-      <div className="mx-auto flex max-w-3xl flex-col gap-3 rounded-[18px] border border-white/80 bg-white/95 p-4 shadow-color backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between sm:gap-5">
-        <p className="text-sm font-medium leading-6 text-ink/70">
-          <span aria-hidden className="mr-1">🍪</span>
-          Мы используем cookie. Продолжая пользоваться сайтом, вы соглашаетесь с их использованием; отключить можно в настройках браузера.{' '}
-          <Link href="/privacy" className="font-extrabold text-brand-blue underline">Подробнее</Link>.
+    <div
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-[120] px-2 pb-[max(.5rem,env(safe-area-inset-bottom))] sm:px-4 sm:pb-4"
+      role="region"
+      aria-label="Уведомление об использовании cookie"
+    >
+      <div className="pointer-events-auto mx-auto flex max-w-3xl items-center gap-2.5 rounded-[16px] border border-white/14 bg-night/95 p-2.5 text-white shadow-luxe backdrop-blur-xl sm:gap-4 sm:rounded-[18px] sm:p-3.5">
+        <span aria-hidden className="grid h-9 w-9 shrink-0 place-items-center rounded-[12px] bg-white/10 text-lg">
+          🍪
+        </span>
+        <p className="min-w-0 flex-1 text-[11px] font-semibold leading-4 text-white/76 sm:text-sm sm:leading-5">
+          На сайте работает Яндекс.Метрика: она использует cookie, чтобы мы видели, что удобно, а что нужно улучшить.{' '}
+          <Link href="/privacy" className="font-extrabold text-brand-cyan underline decoration-white/30 underline-offset-2">
+            Подробнее
+          </Link>
         </p>
         <button
           type="button"
           onClick={acknowledge}
-          className="shrink-0 rounded-full bg-night px-6 py-2.5 text-sm font-extrabold text-white shadow-color transition hover:-translate-y-0.5 hover:bg-ink"
+          className="min-h-10 shrink-0 rounded-full bg-gradient-to-r from-brand-blue to-brand-purple px-4 py-2 text-xs font-extrabold text-white shadow-color transition hover:-translate-y-0.5 sm:px-5 sm:text-sm"
         >
           Понятно
         </button>

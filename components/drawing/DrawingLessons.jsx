@@ -350,11 +350,12 @@ export function DrawingLessons({ hasSubscription = false }) {
 
   const lessons = useMemo(() => lessonsByBand(band), [band]);
   const chapters = useMemo(() => groupByChapter(lessons), [lessons]);
-  // Бесплатный тизер (без подписки): первый урок каждого из первых 3 учебных дней.
+  // Бесплатный тизер (без подписки): первые 3 урока первого учебного дня —
+  // ребёнок целиком проходит ступень «1 объект» и видит связку уроков.
   // Остальная библиотека — по подписке. Позиция важнее флага free в данных.
   const freeSlugs = useMemo(() => {
     const s = new Set();
-    chapters.slice(0, 3).forEach((ch) => { if (ch.lessons[0]) s.add(ch.lessons[0].slug); });
+    chapters[0]?.lessons.slice(0, 3).forEach((l) => s.add(l.slug));
     return s;
   }, [chapters]);
   const unlocked = (l) => freeSlugs.has(l.slug) || hasSubscription;

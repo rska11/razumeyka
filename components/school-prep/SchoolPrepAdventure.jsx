@@ -38,12 +38,49 @@ function ResultMessage({ state, success, hint }) {
 function OptionContent({ option }) {
   return (
     <>
-      {option.emoji && <span className="text-3xl sm:text-4xl">{option.emoji}</span>}
+      {option.emoji && <span className="text-5xl sm:text-6xl">{option.emoji}</span>}
       {option.symbol && (
-        <span className={`text-4xl ${toneClasses[option.tone] ?? "text-ink"}`}>{option.symbol}</span>
+        <span className={`text-5xl sm:text-6xl ${toneClasses[option.tone] ?? "text-ink"}`}>{option.symbol}</span>
       )}
       <span className="text-sm font-extrabold leading-5 text-ink">{option.label}</span>
     </>
+  );
+}
+
+function MissionPrompt({ prompt, title }) {
+  const visualPattern = /\p{Extended_Pictographic}/u;
+  const introducesIskra = prompt.includes('🦊') && (prompt.includes('Искра') || title.includes('Искра'));
+  if (!visualPattern.test(prompt)) {
+    return <p className={'mt-4 text-sm font-semibold leading-6 text-ink/62 sm:text-base'}>{prompt}</p>;
+  }
+
+  const [leading, ...rest] = prompt.split('—');
+  const instruction = rest.join('—').trim();
+  const leadingIsVisual = rest.length > 0 && visualPattern.test(leading);
+
+  if (leadingIsVisual) {
+    return (
+      <div className={'mt-5 rounded-[24px] border border-brand-blue/10 bg-gradient-to-br from-brand-blue/[0.055] via-white to-brand-purple/[0.06] px-4 py-7 text-center sm:px-7 sm:py-9'}>
+        {introducesIskra && (
+          <p className={'mx-auto mb-5 inline-flex items-center rounded-full bg-brand-orange/10 px-4 py-2 text-sm font-extrabold text-brand-orange sm:text-base'}>
+            🦊 Это лисёнок Искра
+          </p>
+        )}
+        <div className={'whitespace-pre-wrap text-[68px] leading-none tracking-[0.12em] sm:text-[92px]'} aria-label={leading.trim()}>{leading.trim()}</div>
+        {instruction && <p className={'mx-auto mt-6 max-w-2xl text-base font-extrabold leading-7 text-ink/68 sm:text-lg'}>{instruction}</p>}
+      </div>
+    );
+  }
+
+  return (
+    <div className={'mt-5 rounded-[24px] border border-brand-blue/10 bg-gradient-to-br from-brand-blue/[0.055] via-white to-brand-purple/[0.06] px-5 py-7 text-center sm:px-8'}>
+      {introducesIskra && (
+        <p className={'mx-auto mb-5 inline-flex items-center rounded-full bg-brand-orange/10 px-4 py-2 text-sm font-extrabold text-brand-orange sm:text-base'}>
+          🦊 Это лисёнок Искра
+        </p>
+      )}
+      <p className={'mx-auto max-w-3xl whitespace-pre-wrap text-xl font-extrabold leading-relaxed text-ink/76 sm:text-3xl'}>{prompt}</p>
+    </div>
   );
 }
 
@@ -503,7 +540,7 @@ function MissionCard({ mission, index, done, onComplete, dayId }) {
           {done ? "Звезда получена" : "1 звезда"}
         </span>
       </div>
-      <p className="mt-4 text-sm font-semibold leading-6 text-ink/62 sm:text-base">{mission.prompt}</p>
+      <MissionPrompt prompt={mission.prompt} title={mission.title} />
       <SchoolPrepAudioButton src={`${audioBase}/instruction.mp3`} className="mt-4" />
 
       {mission.type === "choice" && <ChoiceMission mission={mission} done={done} onComplete={onComplete} />}
@@ -705,6 +742,9 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false }) {
               <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-white/68">День {currentDay.number} · {currentDay.zone}</p>
               <h3 className="mt-2 font-display text-3xl font-extrabold tracking-[-0.035em] sm:text-4xl">{currentDay.title}</h3>
               <p className="mt-3 max-w-2xl text-base font-semibold leading-7 text-white/78">{currentDay.lead}</p>
+              <p className="mt-4 inline-flex items-center rounded-full border border-white/16 bg-white/12 px-4 py-2 text-sm font-extrabold text-white/90 backdrop-blur-xl">
+                🦊 Ваш проводник — лисёнок Искра
+              </p>
             </div>
             <div className="min-w-[150px] rounded-[24px] border border-white/18 bg-[#0b1930]/48 p-4 shadow-insetline backdrop-blur-xl">
               <p className="text-[10px] font-extrabold uppercase tracking-[0.15em] text-white/52">Маршрут дня</p>

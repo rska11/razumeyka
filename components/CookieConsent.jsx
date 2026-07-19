@@ -3,7 +3,9 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
-const ACK_KEY = 'razumeyka_cookie_ack';
+// Версия ключа: подъём сбрасывает «видел» у всех, чтобы обновлённое
+// уведомление показалось заново (после переработки плашки).
+const ACK_KEY = 'razumeyka_cookie_ack_v2';
 
 export function CookieConsent() {
   const [visible, setVisible] = useState(false);
@@ -36,7 +38,7 @@ export function CookieConsent() {
       {/* Светлая, компактная плашка «в характере» бренда: польза впереди,
           подразумеваемое согласие зашито во фразу (юр-покрытие), детали про
           аналитику — в политике. Тёмный вариант отпугивал (звучал как слежка). */}
-      <div className="pointer-events-auto mx-auto flex max-w-xl items-center gap-2.5 rounded-[14px] border border-ink/8 bg-white/95 p-2 text-ink shadow-luxe backdrop-blur-xl sm:max-w-3xl sm:gap-3.5 sm:rounded-[18px] sm:p-3">
+      <div className="pointer-events-auto mx-auto flex max-w-xl items-center gap-2.5 rounded-[14px] border border-ink/8 bg-white/95 p-2 text-ink shadow-luxe backdrop-blur-xl sm:max-w-3xl sm:gap-3.5 sm:rounded-[18px] sm:p-3 lg:max-w-4xl">
         <span aria-hidden className="hidden h-9 w-9 shrink-0 place-items-center rounded-[12px] bg-brand-blue/10 text-lg sm:grid">
           🍪
         </span>

@@ -47,12 +47,15 @@ export function CookieConsent() {
           </Link>
           .
         </p>
+        {/* Тихий крестик вместо яркой кнопки: согласие зашито во фразу
+            «Продолжая…», а закрытие не читается как «на что-то подписываюсь». */}
         <button
           type="button"
           onClick={acknowledge}
-          className="min-h-10 shrink-0 rounded-full bg-gradient-to-r from-brand-blue to-brand-purple px-4 py-2 text-xs font-extrabold text-white shadow-color transition hover:-translate-y-0.5 sm:px-5 sm:text-sm"
+          aria-label="Закрыть уведомление"
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-lg leading-none text-ink/40 transition hover:bg-ink/5 hover:text-ink/70"
         >
-          Хорошо
+          <span aria-hidden>✕</span>
         </button>
       </div>
     </div>

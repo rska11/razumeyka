@@ -48,7 +48,7 @@ export function Hero() {
       <div className="container-pad grid min-h-[calc(100vh-88px)] items-center gap-10 pb-12 lg:grid-cols-[0.95fr_1.05fr]">
         <div className="relative animate-rise">
           <span className="inline-flex rounded-full border-2 border-white/80 bg-white/78 px-5 py-3 text-sm font-extrabold uppercase tracking-[0.18em] text-forest-700 shadow-color backdrop-blur-xl">
-            Разумейка · онлайн школа развития детей 3–10+ лет
+            Знайтон · онлайн-платформа для развития детей 3–10+ лет
           </span>
 
           <div className="mt-6 flex flex-wrap gap-2">
@@ -76,7 +76,7 @@ export function Hero() {
           </h1>
 
           <p className="mt-6 max-w-2xl text-[1.08rem] font-semibold leading-8 text-ink/68 sm:text-lg">
-            Онлайн занятия Разумейки развивают интеллект, уверенность и креативность через понятный результат
+            Самостоятельные занятия на платформе «Знайтон» развивают интеллект, уверенность и креативность через понятный результат
             для родителя: ребенок лучше читает, считает, говорит и не боится новых задач.
           </p>
 
@@ -138,7 +138,7 @@ export function Hero() {
               loop
               playsInline
               preload="metadata"
-              aria-label="Видео онлайн-занятий Разумейка"
+              aria-label="Видео занятий платформы «Знайтон»"
               className="h-[430px] w-full rounded-[8px] object-cover object-center sm:h-[520px] lg:h-[620px]"
             />
             <div className="pointer-events-none absolute inset-3 rounded-[8px] bg-gradient-to-t from-night/44 via-night/4 to-white/10" />

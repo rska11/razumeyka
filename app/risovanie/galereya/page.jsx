@@ -4,7 +4,7 @@ import { Footer } from '@/components/Footer.jsx';
 import { DrawingGallery } from '@/components/drawing/DrawingGallery.jsx';
 
 export const metadata = {
-  title: 'Галерея работ учеников по рисованию — Разумейка',
+  title: 'Галерея работ учеников по рисованию — Знайтон',
   description: 'Одобренные рисунки учеников, недельные итоги, лайки посетителей и загрузка свободной работы на модерацию.',
   alternates: { canonical: '/risovanie/galereya' },
 };

@@ -22,9 +22,9 @@ export async function generateMetadata({ params }) {
     openGraph: {
       type: 'article',
       locale: 'ru_RU',
-      siteName: 'Разумейка',
-      url: `https://razumeyka-school.ru/blog/${slug}`,
-      title: `${post.title} — Разумейка`,
+      siteName: 'Знайтон',
+      url: `https://znayton.ru/blog/${slug}`,
+      title: `${post.title} — Знайтон`,
       description: post.description,
       images: [
         post.cover?.image
@@ -133,16 +133,16 @@ export default async function BlogPost({ params }) {
     description: post.description,
     datePublished: post.date,
     dateModified: post.date,
-    author: { '@type': 'Organization', name: 'Разумейка' },
-    publisher: { '@type': 'Organization', name: 'Разумейка' },
-    mainEntityOfPage: `https://razumeyka-school.ru/blog/${slug}`,
+    author: { '@type': 'Organization', name: 'Знайтон' },
+    publisher: { '@type': 'Organization', name: 'Знайтон' },
+    mainEntityOfPage: `https://znayton.ru/blog/${slug}`,
   };
   const breadcrumbSchema = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Главная', item: 'https://razumeyka-school.ru' },
-      { '@type': 'ListItem', position: 2, name: 'Блог', item: 'https://razumeyka-school.ru/blog' },
+      { '@type': 'ListItem', position: 1, name: 'Главная', item: 'https://znayton.ru' },
+      { '@type': 'ListItem', position: 2, name: 'Блог', item: 'https://znayton.ru/blog' },
       { '@type': 'ListItem', position: 3, name: post.title },
     ],
   };
@@ -188,7 +188,7 @@ export default async function BlogPost({ params }) {
                   {lead && <p className="mt-6 text-lg font-semibold leading-8 text-white/70 sm:text-xl sm:leading-9">{lead.text}</p>}
                   <div className="mt-auto flex items-center gap-3 pt-8 text-xs font-bold text-white/42">
                     <span className="grid h-9 w-9 place-items-center rounded-full bg-white/10 text-lg">Р</span>
-                    <span>Редакция «Разумейки»</span>
+                    <span>Редакция платформы «Знайтон»</span>
                   </div>
                 </div>
 

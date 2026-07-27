@@ -13,7 +13,7 @@ set -euo pipefail
 
 APP_DIR=/var/www/razumeyka
 DATA_DIR=/var/www/razumeyka-data
-DOMAIN=razumeyka-school.ru
+DOMAIN=znayton.ru
 PORT=3001
 PM2_APP=razumeyka
 REPO=https://github.com/rska11/razumeyka.git
@@ -21,7 +21,7 @@ GENPIC_ENV=/var/www/magicpic/.env.local
 LE_EMAIL=admin@genpic.ai
 
 echo "==================================================="
-echo "  Разумейка — настройка сервера ($DOMAIN, порт $PORT)"
+echo "  Знайтон — настройка сервера ($DOMAIN, порт $PORT)"
 echo "==================================================="
 
 # 0. Проверки окружения
@@ -61,7 +61,7 @@ MAIL_PORT=${MP:-465}
 MAIL_SECURE=${MS:-true}
 MAIL_USER=${MU:-admin@genpic.ai}
 MAIL_PASS=${MPW:-}
-MAIL_FROM="Разумейка <noreply@$DOMAIN>"
+MAIL_FROM="Знайтон <noreply@$DOMAIN>"
 EOF
   if [ -n "${MPW:-}" ]; then echo "[env] почта взята из genpic (${MU:-admin@genpic.ai}) — письма заработают"; else
     echo "[env] ВНИМАНИЕ: не нашёл MAIL_PASS в $GENPIC_ENV — впиши пароль в $APP_DIR/.env вручную"; fi

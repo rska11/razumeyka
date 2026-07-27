@@ -5,7 +5,7 @@ set -euo pipefail
 
 APP_DIR=/var/www/razumeyka
 ENV="$APP_DIR/.env"
-DOMAIN=razumeyka-school.ru
+DOMAIN=znayton.ru
 
 # 1. Секрет для cron-эндпоинта (создаём, если нет)
 if ! grep -q '^CRON_SECRET=' "$ENV"; then

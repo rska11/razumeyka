@@ -69,16 +69,16 @@ export function LandingPage({ landing }) {
     '@type': 'Course',
     name: landing.h1,
     description: landing.description,
-    url: `https://razumeyka-school.ru/${landing.slug}`,
+    url: `https://znayton.ru/${landing.slug}`,
     inLanguage: 'ru',
-    provider: { '@type': 'Organization', name: 'Разумейка', url: 'https://razumeyka-school.ru' },
+    provider: { '@type': 'Organization', name: 'Знайтон', url: 'https://znayton.ru' },
     hasCourseInstance: { '@type': 'CourseInstance', courseMode: 'online', courseWorkload: 'PT55M' },
   };
   const breadcrumbSchema = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Главная', item: 'https://razumeyka-school.ru' },
+      { '@type': 'ListItem', position: 1, name: 'Главная', item: 'https://znayton.ru' },
       { '@type': 'ListItem', position: 2, name: landing.h1 },
     ],
   };
@@ -97,7 +97,7 @@ export function LandingPage({ landing }) {
               <div>
                 <div className="flex flex-wrap items-center gap-3">
                   <LaunchBadge />
-                  <span className={`section-kicker ${a.soft}`}>Онлайн-школа «Разумейка»</span>
+                  <span className={`section-kicker ${a.soft}`}>Развивающая платформа «Знайтон»</span>
                 </div>
                 <h1 className={`mt-6 bg-gradient-to-r font-display text-[2.4rem] font-black leading-[1.06] tracking-[-0.01em] text-transparent sm:text-5xl lg:text-[3.7rem] ${hg} bg-clip-text [-webkit-background-clip:text] [text-shadow:0_16px_38px_rgba(59,130,246,0.10)]`}>
                   {landing.h1}
@@ -292,10 +292,10 @@ export function LandingPage({ landing }) {
           </section>
         )}
 
-        {/* Почему Разумейка */}
+        {/* Почему Знайтон */}
         <section className="px-5 py-14 sm:px-8 lg:px-14">
           <div className="container-pad px-0">
-            <span className={`section-kicker ${a.soft}`}>почему разумейка</span>
+            <span className={`section-kicker ${a.soft}`}>почему знайтон</span>
             <div className="mt-9 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {whyUs.map((w) => (
                 <div key={w.t} className={`${PC} p-6`}>

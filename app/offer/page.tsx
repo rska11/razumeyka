@@ -1,13 +1,13 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Публичная оферта", // суффикс «— Разумейка» добавит title-шаблон layout
+  title: "Публичная оферта", // суффикс «— Знайтон» добавит title-шаблон layout
   robots: { index: false },
 };
 
 // Реквизиты берутся из env на сервере (заполняются deploy/copy-npd.sh + вручную):
 //   OPERATOR_NAME — ФИО самозанятого, OPERATOR_INN — ИНН.
-const OPERATOR = "Онлайн-школа «Разумейка» (razumeyka-school.ru)";
+const OPERATOR = "Развивающая платформа «Знайтон» (znayton.ru)";
 const OPERATOR_NAME = process.env.OPERATOR_NAME || "Кагиров Руслан Рашитович";
 const OPERATOR_INN = process.env.OPERATOR_INN || "";
 const OPERATOR_DETAILS = [
@@ -17,8 +17,8 @@ const OPERATOR_DETAILS = [
 ]
   .filter(Boolean)
   .join(", ");
-const CONTACT_EMAIL = "info@razumeyka-school.ru";
-const UPDATED = "18 июля 2026 г.";
+const CONTACT_EMAIL = "info@znayton.ru";
+const UPDATED = "27 июля 2026 г.";
 
 function P({ children }: { children: React.ReactNode }) {
   return <p className="mt-3 text-base leading-7 text-ink/72">{children}</p>;
@@ -41,7 +41,7 @@ export default function OfferPage() {
         <H>1. Предмет</H>
         <P>
           Настоящая оферта является официальным предложением Исполнителя заключить договор о предоставлении
-          доступа к обучающим онлайн-материалам сервиса «Разумейка» (интерактивные уроки для самостоятельных
+          доступа к обучающим онлайн-материалам сервиса «Знайтон» (интерактивные уроки для самостоятельных
           занятий детей при участии родителей) на изложенных ниже условиях. Оплата означает полное и
           безоговорочное принятие условий оферты (акцепт). Услуга не является образовательной деятельностью,
           подлежащей лицензированию: материалы предназначены для самостоятельных занятий без участия

@@ -1,11 +1,11 @@
 import nodemailer from "nodemailer";
 
 /**
- * Почта Разумейки. Через обобщённый SMTP (env MAIL_*), что позволяет
- * использовать фирменный ящик Zoho для razumeyka-school.ru:
+ * Почта платформы «Знайтон». Через обобщённый SMTP (env MAIL_*), что позволяет
+ * использовать фирменный ящик Zoho для znayton.ru:
  *   MAIL_HOST=smtp.zoho.eu  MAIL_PORT=465  MAIL_SECURE=true
- *   MAIL_USER=noreply@razumeyka-school.ru  MAIL_PASS=<app-пароль Zoho>
- *   MAIL_FROM="Разумейка <noreply@razumeyka-school.ru>"
+ *   MAIL_USER=noreply@znayton.ru  MAIL_PASS=<app-пароль Zoho>
+ *   MAIL_FROM="Знайтон <noreply@znayton.ru>"
  *
  * Если SMTP не настроен (нет MAIL_USER/MAIL_PASS) — код входа печатается
  * в консоль сервера. Это удобно для разработки без реальной почты.
@@ -21,7 +21,7 @@ export function isMailConfigured() {
 }
 
 function getFrom() {
-  return env(process.env.MAIL_FROM) ?? "Разумейка <noreply@razumeyka-school.ru>";
+  return env(process.env.MAIL_FROM) ?? "Знайтон <noreply@znayton.ru>";
 }
 
 function createTransport() {
@@ -43,38 +43,38 @@ function createTransport() {
 /** Письмо со ссылкой на чек НПД после успешной оплаты. */
 export async function sendReceiptEmail(to: string, receiptUrl: string): Promise<void> {
   if (!isMailConfigured()) {
-    console.info(`\n[Разумейка] Чек для ${to}: ${receiptUrl}\n`);
+    console.info(`\n[Знайтон] Чек для ${to}: ${receiptUrl}\n`);
     return;
   }
   const transport = createTransport();
   await transport.sendMail({
     from: getFrom(),
     to,
-    subject: "Чек об оплате — Разумейка",
+    subject: "Чек об оплате — Знайтон",
     text:
-      `Спасибо за оплату в онлайн-школе «Разумейка»!\n\n` +
+      `Спасибо за оплату на платформе «Знайтон»!\n\n` +
       `Ваш чек доступен по ссылке: ${receiptUrl}\n\n` +
-      `Чек также доступен в личном кабинете на сайте razumeyka-school.ru.`,
+      `Чек также доступен в личном кабинете на сайте znayton.ru.`,
     html:
-      `<p>Спасибо за оплату в онлайн-школе <strong>«Разумейка»</strong>!</p>` +
+      `<p>Спасибо за оплату на платформе <strong>«Знайтон»</strong>!</p>` +
       `<p>Ваш чек: <a href="${receiptUrl}">${receiptUrl}</a></p>` +
-      `<p>Чек также доступен в личном кабинете на сайте razumeyka-school.ru.</p>`,
+      `<p>Чек также доступен в личном кабинете на сайте znayton.ru.</p>`,
   });
 }
 
 export async function sendLoginCodeEmail(to: string, code: string): Promise<void> {
   // Dev-фоллбэк: без настроенного SMTP пишем код в консоль.
   if (!isMailConfigured()) {
-    console.info(`\n[Разумейка] Код входа для ${to}: ${code} (действует 10 минут)\n`);
+    console.info(`\n[Знайтон] Код входа для ${to}: ${code} (действует 10 минут)\n`);
     return;
   }
 
   const message = {
     from: getFrom(),
     to,
-    subject: `${code} — код для входа в Разумейку`,
+    subject: `${code} — код для входа в Знайтон`,
     text:
-      `Ваш код для входа в личный кабинет Разумейки: ${code}\n\n` +
+      `Ваш код для входа в личный кабинет «Знайтон»: ${code}\n\n` +
       `Код действует 10 минут. Если вы не запрашивали вход — просто игнорируйте это письмо.`,
     html: buildCodeEmail(code),
   };
@@ -100,7 +100,7 @@ export async function sendLessonReminderEmail(
   data: { childName: string; direction: string; whenText: string; topic?: string | null; joinUrl?: string | null },
 ): Promise<void> {
   if (!isMailConfigured()) {
-    console.info(`\n[Разумейка] Напоминание для ${to}: ${data.childName} · ${data.direction} · ${data.whenText} · ${data.joinUrl ?? "без ссылки"}\n`);
+    console.info(`\n[Знайтон] Напоминание для ${to}: ${data.childName} · ${data.direction} · ${data.whenText} · ${data.joinUrl ?? "без ссылки"}\n`);
     return;
   }
   const transport = createTransport();
@@ -113,7 +113,7 @@ export async function sendLessonReminderEmail(
       `Ученик: ${data.childName}\nНаправление: ${data.direction}\nКогда: ${data.whenText}\n` +
       (data.topic ? `Тема: ${data.topic}\n` : "") +
       (data.joinUrl ? `\nПодключиться: ${data.joinUrl}\n` : "") +
-      `\n— Разумейка`,
+      `\n— Знайтон`,
     html: buildReminderEmail(data),
   });
 }
@@ -126,7 +126,7 @@ function buildReminderEmail(d: { childName: string; direction: string; whenText:
 <body style="margin:0;padding:0;background:#f5fbff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Manrope,sans-serif">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5fbff"><tr><td align="center" style="padding:40px 16px">
 <table width="100%" style="max-width:480px" cellpadding="0" cellspacing="0">
-<tr><td style="padding-bottom:22px"><span style="font-size:22px;font-weight:800;color:#0b1f3a">Разумейка</span></td></tr>
+<tr><td style="padding-bottom:22px"><span style="font-size:22px;font-weight:800;color:#0b1f3a">Знайтон</span></td></tr>
 <tr><td style="background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;padding:28px 30px;box-shadow:0 18px 54px rgba(59,130,246,0.10)">
   <p style="margin:0 0 6px;font-size:16px;font-weight:800;color:#0b1f3a">Скоро занятие</p>
   <p style="margin:0 0 16px;font-size:14px;color:#64748b">${d.whenText}</p>
@@ -135,7 +135,7 @@ function buildReminderEmail(d: { childName: string; direction: string; whenText:
   ${button}
   <p style="margin:8px 0 0;font-size:13px;color:#94a3b8">Если кнопка не открывается — ссылка есть в личном кабинете.</p>
 </td></tr>
-<tr><td style="padding-top:20px;text-align:center"><p style="margin:0;font-size:12px;color:#94a3b8">Разумейка · razumeyka-school.ru</p></td></tr>
+<tr><td style="padding-top:20px;text-align:center"><p style="margin:0;font-size:12px;color:#94a3b8">Знайтон · znayton.ru</p></td></tr>
 </table></td></tr></table></body></html>`;
 }
 
@@ -148,8 +148,8 @@ function buildCodeEmail(code: string): string {
 <tr><td align="center" style="padding:48px 16px">
 <table width="100%" style="max-width:480px" cellpadding="0" cellspacing="0">
 <tr><td style="padding-bottom:28px">
-  <span style="font-size:22px;font-weight:800;color:#0b1f3a;letter-spacing:-0.5px">Разумейка</span>
-  <span style="font-size:13px;color:#64748b;margin-left:10px">онлайн-школа развития детей</span>
+  <span style="font-size:22px;font-weight:800;color:#0b1f3a;letter-spacing:-0.5px">Знайтон</span>
+  <span style="font-size:13px;color:#64748b;margin-left:10px">развивающая платформа для детей</span>
 </td></tr>
 <tr><td style="background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;padding:32px 32px 28px;box-shadow:0 18px 54px rgba(59,130,246,0.10)">
   <p style="margin:0 0 6px;font-size:15px;font-weight:700;color:#0b1f3a">Код для входа в личный кабинет</p>
@@ -163,7 +163,7 @@ function buildCodeEmail(code: string): string {
   </p>
 </td></tr>
 <tr><td style="padding-top:24px;text-align:center">
-  <p style="margin:0;font-size:12px;color:#94a3b8">Разумейка · razumeyka-school.ru</p>
+  <p style="margin:0;font-size:12px;color:#94a3b8">Знайтон · znayton.ru</p>
 </td></tr>
 </table>
 </td></tr>

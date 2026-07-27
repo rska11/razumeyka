@@ -49,7 +49,7 @@ if (ok) {
     const info = await transport.sendMail({
       from: cfg.from,
       to,
-      subject: "Тест почты Разумейки",
+      subject: "Тест почты Знайтона",
       text: "Это тестовое письмо для проверки SMTP. Если вы его видите — почта работает.",
     });
     console.log("SEND OK ->", to, "| messageId:", info.messageId, "| response:", info.response);

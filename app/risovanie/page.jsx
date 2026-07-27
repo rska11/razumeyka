@@ -15,7 +15,7 @@ export const metadata = {
   title: 'Правополушарное рисование для детей — уроки-игры онлайн',
   description: 'Самостоятельные уроки рисования для детей 3–10 лет: понятный прогресс, авторские сюжеты и красивые работы по шагам.',
   alternates: { canonical: '/risovanie' },
-  openGraph: { type: 'website', locale: 'ru_RU', siteName: 'Разумейка', url: 'https://razumeyka-school.ru/risovanie', title: 'Правополушарное рисование для детей — Разумейка', description: 'Рисуем по шагам, развиваем руку и создаём настоящее портфолио.', images: [{ url: '/images/og.png', width: 1200, height: 630, alt: 'Рисование для детей — Разумейка' }] },
+  openGraph: { type: 'website', locale: 'ru_RU', siteName: 'Знайтон', url: 'https://znayton.ru/risovanie', title: 'Правополушарное рисование для детей — Знайтон', description: 'Рисуем по шагам, развиваем руку и создаём настоящее портфолио.', images: [{ url: '/images/og.png', width: 1200, height: 630, alt: 'Рисование для детей — Знайтон' }] },
 };
 
 const WHY_ICON = { hands: '✦', eye: '◉', spark: '✺', target: '◎' };
@@ -49,7 +49,7 @@ const courseSchema = {
   '@type': 'Course',
   name: 'Правополушарное рисование для детей',
   description: 'Самостоятельные уроки-игры по рисованию для детей 3–10 лет.',
-  provider: { '@type': 'Organization', name: 'Разумейка', url: 'https://razumeyka-school.ru' },
+  provider: { '@type': 'Organization', name: 'Знайтон', url: 'https://znayton.ru' },
   inLanguage: 'ru',
   offers: {
     '@type': 'Offer',
@@ -62,8 +62,8 @@ const breadcrumbSchema = {
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
   itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Главная', item: 'https://razumeyka-school.ru' },
-    { '@type': 'ListItem', position: 2, name: 'Рисование для детей', item: 'https://razumeyka-school.ru/risovanie' },
+    { '@type': 'ListItem', position: 1, name: 'Главная', item: 'https://znayton.ru' },
+    { '@type': 'ListItem', position: 2, name: 'Рисование для детей', item: 'https://znayton.ru/risovanie' },
   ],
 };
 

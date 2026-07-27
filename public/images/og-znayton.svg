@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F7FAFF"/>
+      <stop offset="0.55" stop-color="#FFF9F2"/>
+      <stop offset="1" stop-color="#F5F0FF"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="18" stdDeviation="24" flood-color="#173B7A" flood-opacity="0.16"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="630" rx="48" fill="url(#bg)"/>
+  <circle cx="1085" cy="92" r="160" fill="#7146F5" opacity="0.08"/>
+  <circle cx="85" cy="580" r="190" fill="#12B8C8" opacity="0.09"/>
+  <g transform="translate(90 135) scale(3.65)" filter="url(#shadow)">
+    <path d="M7 20c0-4 3-7 7-7 11 0 20 3 28 10v41c-9-6-20-8-35-8V20Z" fill="#1262F3"/>
+    <path d="M69 20c0-4-3-7-7-7-11 0-20 3-28 10v41c9-6 20-8 35-8V20Z" fill="#7146F5"/>
+    <path d="M7 51c7 0 13 1 19 3v11c-6-2-12-3-19-3V51Z" fill="#12B8C8"/>
+    <path d="M27 55c4 1 7 3 11 6v8c-4-3-7-5-11-6v-8Z" fill="#FF7A18"/>
+    <path d="M39 61c5-4 10-6 16-7v10c-6 1-11 3-16 6v-9Z" fill="#24C76A"/>
+    <path d="M39 21c-9 8-15 13-18 18 9 3 14 6 18 10-5 4-9 8-12 13" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="m38 2 2.7 6.3L47 11l-6.3 2.7L38 20l-2.7-6.3L29 11l6.3-2.7L38 2Z" fill="#FFB300"/>
+  </g>
+  <text x="410" y="255" font-family="Arial, sans-serif" font-size="112" font-weight="800" letter-spacing="-5">
+    <tspan fill="#1262F3">З</tspan><tspan fill="#1647B8">н</tspan><tspan fill="#FF5A36">а</tspan><tspan fill="#7146F5">й</tspan><tspan fill="#12B8C8">т</tspan><tspan fill="#FFA70A">о</tspan><tspan fill="#102B63">н</tspan>
+  </text>
+  <g transform="translate(682 116)">
+    <path d="M3 12 31 2l28 10-28 10L3 12Z" fill="#7146F5"/>
+    <path d="M14 18v8c8 7 26 7 34 0v-8l-17 6-17-6Z" fill="#5B36D6"/>
+    <path d="M58 13v12" fill="none" stroke="#1647B8" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="58" cy="29" r="3.5" fill="#1647B8"/>
+  </g>
+  <text x="416" y="318" fill="#102B63" opacity="0.72" font-family="Arial, sans-serif" font-size="23" font-weight="700" letter-spacing="7">ПЛАТФОРМА ДЛЯ ДЕТЕЙ</text>
+  <text x="92" y="515" fill="#102B63" font-family="Arial, sans-serif" font-size="42" font-weight="700">Самостоятельные уроки-игры</text>
+  <text x="92" y="566" fill="#102B63" opacity="0.66" font-family="Arial, sans-serif" font-size="28" font-weight="500">Рисование · ментальная арифметика · подготовка к школе</text>
+  <text x="1015" y="574" fill="#1262F3" font-family="Arial, sans-serif" font-size="24" font-weight="700">znayton.ru</text>
+</svg>

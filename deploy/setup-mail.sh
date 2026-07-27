@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Переключение почты школы на ящик Timeweb info@razumeyka-school.ru.
+# Переключение почты школы на ящик Timeweb info@znayton.ru.
 # Использование (можно передать несколько паролей-кандидатов — переберёт по очереди):
 #   bash /var/www/razumeyka/deploy/setup-mail.sh 'пароль1' ['пароль2' ...]
 # Скрипт СНАЧАЛА проверяет SMTP-авторизацию и меняет .env только если пароль подошёл.
@@ -9,7 +9,7 @@ APP_DIR=/var/www/razumeyka
 ENV="$APP_DIR/.env"
 HOST=smtp.timeweb.ru
 PORT=465
-USER_ADDR=info@razumeyka-school.ru
+USER_ADDR=info@znayton.ru
 
 [ $# -ge 1 ] || { echo "Использование: bash $0 'пароль' ['пароль2' ...]"; exit 1; }
 
@@ -22,7 +22,7 @@ for PASS in "$@"; do
     const nodemailer = require("nodemailer");
     const t = nodemailer.createTransport({
       host: "smtp.timeweb.ru", port: 465, secure: true,
-      auth: { user: "info@razumeyka-school.ru", pass: process.env.MAIL_TEST_PASS },
+      auth: { user: "info@znayton.ru", pass: process.env.MAIL_TEST_PASS },
       connectionTimeout: 15000,
     });
     t.verify().then(() => { console.log("OK"); process.exit(0); })
@@ -45,7 +45,7 @@ done
   echo "MAIL_SECURE=true"
   echo "MAIL_USER=$USER_ADDR"
   echo "MAIL_PASS=$GOOD"
-  echo "MAIL_FROM=\"Разумейка <$USER_ADDR>\""
+  echo "MAIL_FROM=\"Знайтон <$USER_ADDR>\""
 } >> "$ENV"
 
 pm2 restart razumeyka --update-env >/dev/null
@@ -57,13 +57,13 @@ if [ -n "$ADMIN" ]; then
     const nodemailer = require("nodemailer");
     const t = nodemailer.createTransport({
       host: "smtp.timeweb.ru", port: 465, secure: true,
-      auth: { user: "info@razumeyka-school.ru", pass: process.env.MAIL_TEST_PASS },
+      auth: { user: "info@znayton.ru", pass: process.env.MAIL_TEST_PASS },
     });
     t.sendMail({
-      from: "Разумейка <info@razumeyka-school.ru>",
+      from: "Знайтон <info@znayton.ru>",
       to: process.env.MAIL_TEST_TO,
-      subject: "Почта Разумейки переключена на Timeweb ✓",
-      text: "Это контрольное письмо: ящик info@razumeyka-school.ru работает, отправка идёт через smtp.timeweb.ru.",
+      subject: "Почта Знайтона переключена на Timeweb ✓",
+      text: "Это контрольное письмо: ящик info@znayton.ru работает, отправка идёт через smtp.timeweb.ru.",
     }).then(() => console.log("Контрольное письмо отправлено на " + process.env.MAIL_TEST_TO))
       .catch((e) => console.log("Контрольное письмо не ушло: " + e.message));
   '

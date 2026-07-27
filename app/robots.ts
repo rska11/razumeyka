@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: ["/admin", "/teacher", "/cabinet", "/login", "/spasibo", "/api/", "/privacy", "/offer"],
     },
-    sitemap: "https://razumeyka-school.ru/sitemap.xml",
+    sitemap: "https://znayton.ru/sitemap.xml",
   };
 }

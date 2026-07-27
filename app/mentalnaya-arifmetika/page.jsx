@@ -22,8 +22,8 @@ export const metadata = {
   openGraph: {
     type: 'website',
     locale: 'ru_RU',
-    siteName: 'Разумейка',
-    url: 'https://razumeyka-school.ru/mentalnaya-arifmetika',
+    siteName: 'Знайтон',
+    url: 'https://znayton.ru/mentalnaya-arifmetika',
     title: 'Лаборатория чисел — ментальная арифметика',
     description: 'Ребёнок сначала двигает бусины, затем видит числа в уме.',
     images: [{ url: '/images/mental/hero-abacus-mind.webp', width: 1200, height: 630, alt: 'Ментальная арифметика для детей' }],
@@ -48,8 +48,8 @@ const breadcrumbSchema = {
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
   itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Главная', item: 'https://razumeyka-school.ru' },
-    { '@type': 'ListItem', position: 2, name: 'Ментальная арифметика', item: 'https://razumeyka-school.ru/mentalnaya-arifmetika' },
+    { '@type': 'ListItem', position: 1, name: 'Главная', item: 'https://znayton.ru' },
+    { '@type': 'ListItem', position: 2, name: 'Ментальная арифметика', item: 'https://znayton.ru/mentalnaya-arifmetika' },
   ],
 };
 
@@ -58,7 +58,7 @@ const courseSchema = {
   '@type': 'Course',
   name: 'Лаборатория чисел — ментальная арифметика для детей',
   description: 'Самостоятельные интерактивные занятия по ментальной арифметике для детей 4–10 лет.',
-  provider: { '@type': 'Organization', name: 'Разумейка', url: 'https://razumeyka-school.ru' },
+  provider: { '@type': 'Organization', name: 'Знайтон', url: 'https://znayton.ru' },
   offers: {
     '@type': 'Offer',
     price: mentalSubscription.price,

@@ -10,7 +10,7 @@ import { sendReceiptEmail } from "@/lib/mailer";
 
 // Наименование услуги в чеке — должно совпадать с формулировкой в оферте.
 export const RECEIPT_SERVICE_NAME =
-  "Предоставление доступа к обучающим онлайн-материалам сервиса «Разумейка»";
+  "Предоставление доступа к обучающим онлайн-материалам сервиса «Знайтон»";
 
 function isReceiptsEnabled(): boolean {
   return String(process.env.NPD_RECEIPTS_ENABLED || "").trim() === "1";
@@ -44,7 +44,7 @@ async function lknpdAuth(): Promise<{ token: string; inn: string } | null> {
         sourceDeviceId: String(process.env.NPD_DEVICE_ID || "razumeyka-server-001"),
         sourceType: "WEB",
         appVersion: "1.0.0",
-        metaDetails: { userAgent: "Razumeyka/1.0 (+https://razumeyka-school.ru)" },
+        metaDetails: { userAgent: "Znayton/1.0 (+https://znayton.ru)" },
       },
     }),
   });

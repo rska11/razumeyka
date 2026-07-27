@@ -48,7 +48,7 @@ export default async function PaymentSuccessPage({
       <section className="relative w-full max-w-2xl overflow-hidden rounded-[36px] border border-white/80 bg-white/88 p-6 shadow-luxe backdrop-blur-2xl sm:p-10">
         <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-brand-blue via-brand-purple to-brand-pink" />
         <Link href="/" className="font-display text-lg font-extrabold text-ink">
-          Разумейка
+          Знайтон
         </Link>
 
         <div className="mt-8 text-center">
@@ -105,7 +105,7 @@ export default async function PaymentSuccessPage({
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-ink/44">Ваш курс</p>
-                <p className="mt-1 font-display text-xl font-extrabold text-ink sm:text-2xl">{course?.title ?? "Разумейка"}</p>
+                <p className="mt-1 font-display text-xl font-extrabold text-ink sm:text-2xl">{course?.title ?? "Знайтон"}</p>
               </div>
               <span className="rounded-full bg-brand-green/14 px-3 py-1.5 text-xs font-extrabold text-brand-green">Оплачено</span>
             </div>

@@ -38,7 +38,7 @@ export async function POST(req: Request) {
   }
 
   const amount = directionPrice(direction);
-  const description = `«Разумейка» · доступ · ${DIRECTIONS[direction].title} · ${SUBSCRIPTION_MONTHS} мес`;
+  const description = `«Знайтон» · доступ · ${DIRECTIONS[direction].title} · ${SUBSCRIPTION_MONTHS} мес`;
 
   const payment = await prisma.payment.create({
     data: {
@@ -54,7 +54,7 @@ export async function POST(req: Request) {
     },
   });
 
-  const site = (process.env.NEXT_PUBLIC_SITE_URL || "https://razumeyka-school.ru").replace(/\/+$/, "");
+  const site = (process.env.NEXT_PUBLIC_SITE_URL || "https://znayton.ru").replace(/\/+$/, "");
 
   try {
     const yk = await createYooKassaPayment({

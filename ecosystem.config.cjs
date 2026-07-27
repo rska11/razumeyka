@@ -11,7 +11,7 @@ module.exports = {
         PORT: 3001,
         NODE_ENV: "production",
         DATABASE_URL: "file:/var/www/razumeyka-data/prod.db",
-        NEXT_PUBLIC_SITE_URL: "https://razumeyka-school.ru",
+        NEXT_PUBLIC_SITE_URL: "https://znayton.ru",
       },
     },
   ],

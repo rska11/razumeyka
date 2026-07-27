@@ -29,7 +29,7 @@ export default async function CabinetLayout({ children }: { children: React.Reac
           <div className="rounded-[26px] border border-white/80 bg-white/88 p-5 shadow-color backdrop-blur-xl">
             <Link href="/" className="flex items-center gap-2">
               <span className="flex h-9 w-9 items-center justify-center rounded-[13px] bg-gradient-to-br from-brand-blue via-brand-purple to-brand-pink text-sm font-black text-white shadow-sm">Р</span>
-              <span className="font-display text-xl font-extrabold tracking-[-0.025em] text-ink">Разумейка</span>
+              <span className="font-display text-xl font-extrabold tracking-[-0.025em] text-ink">Знайтон</span>
             </Link>
             <p className="mt-1 text-xs font-bold text-ink/46">Личный кабинет</p>
 

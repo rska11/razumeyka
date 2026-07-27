@@ -21,11 +21,11 @@ export const metadata = {
   openGraph: {
     type: 'website',
     locale: 'ru_RU',
-    siteName: 'Разумейка',
-    url: 'https://razumeyka-school.ru/podgotovka-k-shkole',
+    siteName: 'Знайтон',
+    url: 'https://znayton.ru/podgotovka-k-shkole',
     title: 'Подготовка к школе 5–7 лет — игровой онлайн-курс',
     description: 'Чтение, счёт, логика, внимание и подготовка руки к письму в коротких игровых занятиях по 20–25 минут.',
-    images: [{ url: '/images/og.png', width: 1200, height: 630, alt: 'Подготовка к школе — Разумейка' }],
+    images: [{ url: '/images/og.png', width: 1200, height: 630, alt: 'Подготовка к школе — Знайтон' }],
   },
 };
 
@@ -66,8 +66,8 @@ const breadcrumbSchema = {
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
   itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Главная', item: 'https://razumeyka-school.ru' },
-    { '@type': 'ListItem', position: 2, name: 'Подготовка к школе', item: 'https://razumeyka-school.ru/podgotovka-k-shkole' },
+    { '@type': 'ListItem', position: 1, name: 'Главная', item: 'https://znayton.ru' },
+    { '@type': 'ListItem', position: 2, name: 'Подготовка к школе', item: 'https://znayton.ru/podgotovka-k-shkole' },
   ],
 };
 
@@ -76,7 +76,7 @@ const courseSchema = {
   '@type': 'Course',
   name: 'Подготовка к школе 5–7 лет — «Экспедиция в Город знаний»',
   description: 'Игровой онлайн-курс подготовки к школе для детей 5–7 лет: речь, чтение, счёт, логика, внимание и уверенность.',
-  provider: { '@type': 'Organization', name: 'Разумейка', url: 'https://razumeyka-school.ru' },
+  provider: { '@type': 'Organization', name: 'Знайтон', url: 'https://znayton.ru' },
   educationalLevel: 'Дошкольное образование',
   timeRequired: 'P12W',
   inLanguage: 'ru',

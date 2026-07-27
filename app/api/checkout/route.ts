@@ -102,7 +102,7 @@ export async function POST(req: Request) {
     },
   });
 
-  const site = (process.env.NEXT_PUBLIC_SITE_URL || "https://razumeyka-school.ru").replace(/\/+$/, "");
+  const site = (process.env.NEXT_PUBLIC_SITE_URL || "https://znayton.ru").replace(/\/+$/, "");
 
   try {
     const yk = await createYooKassaPayment({

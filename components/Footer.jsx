@@ -31,15 +31,9 @@ export function Footer() {
       <div className="container-pad py-14 sm:py-16">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
-            <div className="flex items-center gap-4">
-              <Logo />
-              <div className="border-l border-white/16 pl-4">
-                <span className="block text-sm font-extrabold uppercase tracking-[0.18em] text-gold-300">Разумейка</span>
-                <span className="mt-1 block text-xs font-bold text-white/44">онлайн школа развития детей</span>
-              </div>
-            </div>
+            <Logo theme="dark" />
             <p className="mt-5 max-w-xs text-sm font-medium leading-7 text-white/54">
-              Онлайн школа развития детей 3–10+ лет. Правополушарное рисование, ментальная арифметика, скорочтение, интуиция и языки.
+              Онлайн-платформа для развития детей 3–10+ лет. Правополушарное рисование, ментальная арифметика, скорочтение, интуиция и языки.
             </p>
             <a
               href="/risovanie"
@@ -81,13 +75,13 @@ export function Footer() {
             <ul className="mt-5 grid gap-4">
               <li>
                 <a
-                  href="mailto:info@razumeyka-school.ru"
+                  href="mailto:info@znayton.ru"
                   className="flex items-center gap-3 text-sm font-bold text-white/62 transition hover:text-white"
                 >
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10 text-gold-300">
                     <Icon name="mail" className="h-4 w-4" />
                   </span>
-                  info@razumeyka-school.ru
+                  info@znayton.ru
                 </a>
               </li>
             </ul>
@@ -96,7 +90,7 @@ export function Footer() {
 
         <div className="mt-12 flex flex-col gap-4 border-t border-white/10 pt-8 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm font-medium text-white/38">
-            © {year} Разумейка. Все права защищены.
+            © {year} Знайтон. Все права защищены.
           </p>
           <div className="flex flex-wrap gap-5">
             <a href="/privacy" className="text-sm font-bold text-white/38 transition hover:text-white">

@@ -23,12 +23,8 @@ export function Header() {
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-3 pt-4 sm:px-6 sm:pt-5">
       <div className="mx-auto flex min-h-[96px] max-w-[1380px] items-center justify-between gap-6 rounded-[8px] border border-white/70 bg-porcelain/86 px-5 py-4 shadow-color backdrop-blur-2xl sm:px-7 lg:px-8">
-        <a href="/" className="flex items-center gap-5 pr-4" aria-label="На главную">
+        <a href="/" className="flex items-center pr-2" aria-label="Знайтон — на главную">
           <Logo />
-          <span className="hidden border-l border-ink/10 pl-5 leading-tight sm:block">
-            <span className="block text-sm font-extrabold uppercase tracking-[0.18em] text-forest-700">онлайн школа</span>
-            <span className="mt-1 block text-sm font-bold text-ink/52">развития детей</span>
-          </span>
         </a>
 
         <nav className="hidden items-center gap-2 rounded-full border border-ink/8 bg-white/58 p-1.5 text-base font-extrabold text-ink/62 shadow-sm lg:flex xl:gap-3">

@@ -16,7 +16,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <div className="mx-auto max-w-[1280px] px-4 py-6 sm:px-6 lg:py-10">
         <header className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <span className="font-display text-2xl font-extrabold text-ink">Разумейка</span>
+            <span className="font-display text-2xl font-extrabold text-ink">Знайтон</span>
             <span className="rounded-full bg-ink px-3 py-1 text-xs font-extrabold uppercase tracking-[0.14em] text-white">Админ</span>
           </div>
           <nav className="flex flex-wrap items-center gap-2 text-sm font-extrabold">

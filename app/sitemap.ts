@@ -3,7 +3,7 @@ import { directionsData } from "@/data/directions.js";
 import { landingsData } from "@/data/landings.js";
 import { blogPosts } from "@/data/blog.js";
 
-const BASE = "https://razumeyka-school.ru";
+const BASE = "https://znayton.ru";
 
 // Дата последнего содержательного обновления страниц программ.
 // Менять при реальном изменении контента, а не при каждом деплое —

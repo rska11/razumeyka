@@ -11,7 +11,7 @@ import { getAuthSession } from '@/lib/auth';
 import { reconcileUserPayments } from '@/lib/payments';
 import { getAccessUntil, hasActiveAccess } from '@/lib/subscription';
 
-export const metadata = { title: 'Ментальная арифметика для детей — уроки-игры онлайн', description: 'Интерактивный абакус, последовательные уроки и понятный прогресс в устном счёте для детей 4–10 лет.', alternates: { canonical: '/mentalnaya-arifmetika' }, openGraph: { type: 'website', locale: 'ru_RU', siteName: 'Разумейка', url: 'https://razumeyka-school.ru/mentalnaya-arifmetika', title: 'Ментальная арифметика для детей — Разумейка', description: 'Счёт в уме через интерактивный абакус и короткие уроки-игры.', images: [{ url: '/images/course-arithmetic.webp', width: 1200, height: 630, alt: 'Ментальная арифметика для детей' }] } };
+export const metadata = { title: 'Ментальная арифметика для детей — уроки-игры онлайн', description: 'Интерактивный абакус, последовательные уроки и понятный прогресс в устном счёте для детей 4–10 лет.', alternates: { canonical: '/mentalnaya-arifmetika' }, openGraph: { type: 'website', locale: 'ru_RU', siteName: 'Знайтон', url: 'https://znayton.ru/mentalnaya-arifmetika', title: 'Ментальная арифметика для детей — Знайтон', description: 'Счёт в уме через интерактивный абакус и короткие уроки-игры.', images: [{ url: '/images/course-arithmetic.webp', width: 1200, height: 630, alt: 'Ментальная арифметика для детей' }] } };
 
 const WHY_ICON = { count: '01', focus: '02', memory: '03', confidence: '04' };
 const HOW_STEPS = [
@@ -19,7 +19,7 @@ const HOW_STEPS = [
   { n: '02', title: 'Двигаем бусины', text: 'Интерактивный абакус сразу проверяет действие. Можно пробовать, ошибаться и повторять без оценки и спешки.' },
   { n: '03', title: 'Считаем без опоры', text: 'Флеш-карты и короткие цепочки постепенно переносят образ абакуса в воображение.' },
 ];
-const courseSchema = { '@context': 'https://schema.org', '@type': 'Course', name: 'Ментальная арифметика для детей', description: 'Самостоятельные уроки по ментальной арифметике для детей 4–10 лет.', provider: { '@type': 'Organization', name: 'Разумейка', url: 'https://razumeyka-school.ru' } };
+const courseSchema = { '@context': 'https://schema.org', '@type': 'Course', name: 'Ментальная арифметика для детей', description: 'Самостоятельные уроки по ментальной арифметике для детей 4–10 лет.', provider: { '@type': 'Organization', name: 'Знайтон', url: 'https://znayton.ru' } };
 
 export default async function MentalArithmeticPage() {
   const session = await getAuthSession();

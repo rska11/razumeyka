@@ -6,16 +6,16 @@ import { blogPosts } from '@/data/blog.js';
 export const metadata = {
   title: 'Блог о развитии детей',
   description:
-    'Статьи о развитии детей 4–12 лет: ментальная арифметика, чтение, подготовка к школе и советы родителям от онлайн-школы «Разумейка».',
+    'Статьи о развитии детей 4–12 лет: ментальная арифметика, чтение, подготовка к школе и советы родителям от онлайн-платформы «Знайтон».',
   alternates: { canonical: '/blog' },
   openGraph: {
     type: 'website',
     locale: 'ru_RU',
-    siteName: 'Разумейка',
-    url: 'https://razumeyka-school.ru/blog',
-    title: 'Блог о развитии детей — Разумейка',
+    siteName: 'Знайтон',
+    url: 'https://znayton.ru/blog',
+    title: 'Блог о развитии детей — Знайтон',
     description: 'Понятные статьи для родителей: развитие, чтение, счёт и подготовка к школе.',
-    images: [{ url: '/images/og.png', width: 1200, height: 630, alt: 'Разумейка — онлайн-школа развития детей' }],
+    images: [{ url: '/images/og.png', width: 1200, height: 630, alt: 'Знайтон — онлайн-платформа для развития детей' }],
   },
 };
 
@@ -148,7 +148,7 @@ export default function BlogIndex() {
         <section className="px-5 pb-20 pt-12 sm:px-8 lg:px-14 lg:pb-28">
           <div className="container-pad px-0">
             <div>
-              <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-brand-pink">Библиотека Разумейки</p>
+              <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-brand-pink">Библиотека «Знайтон»</p>
               <h2 className="mt-1 font-display text-3xl font-extrabold tracking-[-0.04em] text-ink sm:text-4xl">Все материалы</h2>
               <p className="mt-3 max-w-2xl text-base font-medium leading-7 text-ink/56">Выберите тему, которая сейчас важна вашему ребёнку.</p>
             </div>

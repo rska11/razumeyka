@@ -23,6 +23,9 @@ export const metadata: Metadata = {
     "Знайтон",
   ],
   applicationName: "Знайтон",
+  verification: {
+    yandex: "971c0aad8fe0761f",
+  },
   openGraph: {
     type: "website",
     locale: "ru_RU",

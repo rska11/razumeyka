@@ -3,8 +3,11 @@ import { Footer } from '@/components/Footer.jsx';
 import { SchoolPrepAdventure } from '@/components/school-prep/SchoolPrepAdventure.jsx';
 import { SchoolPrepIntroAudio } from '@/components/school-prep/SchoolPrepIntroAudio.jsx';
 import { SchoolPrepQuickDemo } from '@/components/school-prep/SchoolPrepQuickDemo.jsx';
+import { SchoolPrepBridgeGame } from '@/components/school-prep/SchoolPrepBridgeGame.jsx';
 import { SubscribeButton } from '@/components/drawing/SubscribeButton.jsx';
 import { CourseDiscovery } from '@/components/CourseDiscovery.jsx';
+import { GameLauncher } from '@/components/games/GameShell.jsx';
+import { gamesForWeek } from '@/data/games.js';
 import { schoolPrepProgram, schoolPrepWeekOne } from '@/data/school-prep-course.js';
 import { getAuthSession } from '@/lib/auth';
 import { reconcileUserPayments } from '@/lib/payments';
@@ -222,6 +225,10 @@ export default async function SchoolPrepPage() {
                     Пройти первое занятие бесплатно <span className="transition group-hover:translate-x-1">→</span>
                   </a>
                   <SchoolPrepIntroAudio />
+                  <a href="#igra" className="group inline-flex min-h-[58px] items-center justify-center gap-3 rounded-full bg-gradient-to-r from-[#FFB02E] to-[#FF7A45] px-6 py-4 text-sm font-extrabold text-[#19213A] shadow-[0_18px_38px_rgba(255,150,52,.22)] transition hover:-translate-y-1">
+                    <span className="grid h-8 w-8 place-items-center rounded-full bg-white/75 text-xs transition group-hover:scale-110">▶</span>
+                    Играть: «Мост через реку»
+                  </a>
                 </div>
                 <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-[11px] font-extrabold text-ink/48 sm:text-xs">
                   <span>● Без карты</span>
@@ -279,6 +286,8 @@ export default async function SchoolPrepPage() {
         </section>
 
         <SchoolPrepQuickDemo />
+
+        <SchoolPrepBridgeGame hasAccess={hasAccess} />
 
         <section id="volume" className="px-5 pb-24 sm:px-8 lg:px-14">
           <div className="container-pad px-0">
@@ -440,6 +449,18 @@ export default async function SchoolPrepPage() {
                       </div>
                       <p className="mt-2 text-[10px] font-bold text-ink/42">20–25 минут в день</p>
                     </div>
+                    {/* Тренажёр недели появляется сам, если игра для этого навыка
+                        есть в data/games.js. Нет игры — карточка как прежде. */}
+                    {gamesForWeek(week.week).map((game) => (
+                      <GameLauncher
+                        key={game.id}
+                        gameId={game.id}
+                        hasAccess={hasAccess}
+                        className="mt-3 inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full bg-ink px-4 text-xs font-extrabold text-white transition hover:-translate-y-0.5"
+                      >
+                        🎮 Тренажёр недели · {game.title}
+                      </GameLauncher>
+                    ))}
                   </article>
                 ))}
               </div>

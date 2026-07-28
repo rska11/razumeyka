@@ -8,7 +8,8 @@ const tasks = [
     id: 'd1-number-line',
     skill: 'Числовой ряд',
     title: 'Верни плиту на мост',
-    visual: '2 · 3 · 4 · ? · 6',
+    scene: 'Мост через реку сложен из плит с числами. Одна плита выпала.',
+    slabs: ['2', '3', '4', '?', '6'],
     prompt: 'Какого числа не хватает?',
     options: [
       { id: '5', label: '5', tone: 'bg-brand-blue' },
@@ -23,6 +24,7 @@ const tasks = [
     id: 'd1-pattern-color',
     skill: 'Закономерности',
     title: 'Следующий кристалл',
+    scene: 'Кристаллы на воротах лежат повторяющимся узором.',
     visual: '🔵  🔵  🟡   ·   🔵  🔵  🟡   ·   ?',
     prompt: 'Какой цвет продолжит узор?',
     options: [
@@ -38,6 +40,7 @@ const tasks = [
     id: 'd1-space',
     skill: 'Пространственное мышление',
     title: 'Где стоит Искра?',
+    scene: 'Посмотри, что находится слева и справа от лисёнка.',
     visual: '🏠       🦊       🌳',
     characterNote: '🦊 Это лисёнок Искра',
     prompt: 'Выбери самое точное описание.',
@@ -107,7 +110,31 @@ export function SchoolPrepQuickDemo() {
                     {task.characterNote}
                   </p>
                 )}
-                <div className={'font-display text-4xl font-extrabold tracking-[0.04em] text-ink sm:text-6xl'}>{task.visual}</div>
+                {task.scene && (
+                  <p className={'mx-auto mb-5 max-w-sm text-xs font-bold leading-5 text-ink/52 sm:text-sm'}>{task.scene}</p>
+                )}
+                {task.slabs ? (
+                  <div>
+                    <div className={'flex items-end justify-center gap-1.5 sm:gap-2.5'}>
+                      {task.slabs.map((slab, slabIndex) => (
+                        <div
+                          key={task.id + '-slab-' + slabIndex}
+                          className={
+                            'flex h-14 w-9 items-center justify-center rounded-[14px] font-display text-2xl font-extrabold sm:h-20 sm:w-16 sm:text-4xl ' +
+                            (slab === '?'
+                              ? 'border-2 border-dashed border-brand-blue/45 bg-brand-blue/[0.05] text-brand-blue/55'
+                              : 'border border-ink/10 bg-white text-ink shadow-[0_8px_18px_rgba(4,10,28,.09)]')
+                          }
+                        >
+                          {slab}
+                        </div>
+                      ))}
+                    </div>
+                    <div className={'mx-auto mt-2 h-1.5 w-[92%] rounded-full bg-gradient-to-r from-brand-blue/25 via-brand-blue/40 to-brand-blue/25'} />
+                  </div>
+                ) : (
+                  <div className={'font-display text-4xl font-extrabold tracking-[0.04em] text-ink sm:text-6xl'}>{task.visual}</div>
+                )}
                 <p className={'mt-4 text-sm font-extrabold text-ink/64 sm:text-base'}>{task.prompt}</p>
                 <SchoolPrepAudioButton src={'/audio/school-prep/day-1/' + task.id + '/instruction.mp3'} label={'Послушать задание'} className={'mt-4'} />
               </div>

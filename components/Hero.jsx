@@ -80,13 +80,17 @@ export function Hero() {
             для родителя: ребенок лучше читает, считает, говорит и не боится новых задач.
           </p>
 
-          <div className="mt-9 flex flex-col gap-4 sm:flex-row">
+          <div className="mt-9 flex flex-col gap-4 sm:flex-row sm:flex-wrap">
             <a href="#programs" className="primary-btn">
               <span className="relative">Начать бесплатно</span>
               <Icon name="arrow" className="relative h-5 w-5" />
             </a>
             <a href="#programs" className="secondary-btn">
               Посмотреть направления
+            </a>
+            <a href="#games" className="group inline-flex min-h-[58px] items-center justify-center gap-2 rounded-full bg-gradient-to-r from-brand-blue via-brand-purple to-brand-pink px-6 py-4 text-sm font-extrabold text-white shadow-color transition hover:-translate-y-1">
+              <span className="grid h-7 w-7 place-items-center rounded-full bg-white/20 text-[10px] transition group-hover:scale-110">▶</span>
+              Играть бесплатно
             </a>
           </div>
 

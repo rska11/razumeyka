@@ -114,6 +114,10 @@ export default async function MentalArithmeticPage() {
                     Открыть бесплатные уроки <span className="text-lg">→</span>
                   </a>
                   <MentalIntroAudio className="mental-audio-dark" src="/audio/mental/method/intro-hero-v1.mp3" />
+                  <a href="#igra" className="group inline-flex min-h-[58px] items-center justify-center gap-3 rounded-full border border-[#75E5C1]/35 bg-[#75E5C1]/12 px-6 py-4 text-sm font-extrabold text-[#9AF3D6] shadow-[0_18px_46px_rgba(0,0,0,.16)] backdrop-blur-xl transition hover:-translate-y-1 hover:bg-[#75E5C1]/20">
+                    <span className="grid h-8 w-8 place-items-center rounded-full bg-[#75E5C1] text-xs text-[#09152E] transition group-hover:scale-110">▶</span>
+                    Играть: «Звёздный абакус»
+                  </a>
                 </div>
                 <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-xs font-bold text-white/46">
                   <span>✓ Без покупки счётов</span>
@@ -231,12 +235,8 @@ export default async function MentalArithmeticPage() {
           <div className="container-pad px-0">
             <div className="max-w-3xl">
               <span className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-brand-blue">Игра · можно прямо сейчас</span>
-              <h2 className="mt-5 font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.05em] sm:text-5xl">Попробуйте абакус в игре — без регистрации</h2>
-              <p className="mt-5 text-base font-semibold leading-7 text-ink/56">
-                «Путь Искры» — двенадцать уровней на японском абакусе (соробане). Ребёнок набирает числа бусинами,
-                учится узнавать их с одного взгляда, удерживать в памяти мелькнувшее число и решать примеры.
-                Первые три уровня открыты всем.
-              </p>
+              <h2 className="mt-5 font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.05em] sm:text-5xl">Настоящая аркада, где числа управляют полётом</h2>
+              <p className="mt-5 text-base font-semibold leading-7 text-ink/56">«Звёздный абакус» — ребёнок ведёт корабль по трём воздушным трассам, ловит правильные числовые кристаллы и уклоняется от неверных. Здесь есть движение, жизни, комбо и ускорение, а первые три миссии открыты всем.</p>
             </div>
 
             <div className="mt-10">
@@ -245,9 +245,9 @@ export default async function MentalArithmeticPage() {
 
             <div className="mt-10 grid gap-4 md:grid-cols-3">
               {[
-                ['Образ числа', 'Ребёнок перестаёт пересчитывать по одному и видит число целиком — как картинку из бусин. Это база устного счёта.'],
-                ['Разряды', 'Левая колонка — десятки, правая — единицы. На поздних уровнях ребёнок работает с двузначными числами сразу в двух разрядах.'],
-                ['Друзья десятки', 'Пары чисел, дающие в сумме 10, — приём, на котором держится всё быстрое сложение и вычитание в уме.'],
+                ['Образ числа', 'Перед полётом ребёнок видит число на абакусе, а затем узнаёт его в движении — без пересчёта по одной бусине.'],
+                ['Внимание и память', 'Во вспышках числовой образ исчезает: нужно удержать его в памяти и успеть перестроить маршрут корабля.'],
+                ['Решение в действии', 'Примеры и друзья десятки становятся частью управления: правильный результат открывает безопасную воздушную трассу.'],
               ].map(([title, text]) => (
                 <div key={title} className="rounded-[22px] border border-ink/8 bg-white p-6 shadow-card">
                   <h3 className="font-display text-lg font-extrabold text-ink">{title}</h3>

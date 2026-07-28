@@ -451,7 +451,7 @@ export default async function SchoolPrepPage() {
                     </div>
                     {/* Тренажёр недели появляется сам, если игра для этого навыка
                         есть в data/games.js. Нет игры — карточка как прежде. */}
-                    {gamesForWeek(week.week).map((game) => (
+                    {gamesForWeek(week.week, SCHOOL_PREP_DIRECTION).map((game) => (
                       <GameLauncher
                         key={game.id}
                         gameId={game.id}

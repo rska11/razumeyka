@@ -1,92 +1,117 @@
-// Единый список игр платформы — как launch.js для дат запуска.
+// Единый каталог игр платформы. Здесь хранятся только данные, а клиентские
+// загрузчики компонентов находятся в components/games/registry.client.js.
 //
-// Здесь ТОЛЬКО данные: ни компонентов, ни функций-загрузчиков. Файл читают и
-// серверные страницы (бейджи в программе, будущая страница /igry, разметка для
-// поиска), и клиентские компоненты, а функции из серверного компонента в
-// клиентский передавать нельзя. Сами компоненты игр подключаются в
-// components/games/registry.client.js по тому же id.
-//
-// Чтобы добавить игру: дописать сюда объект и загрузчик в registry.client.js.
-// Бейдж в нужной неделе курса, карточка на странице игр и ссылка в направлении
-// появятся сами.
+// ready        — игра технически готова к запуску;
+// featured     — показываем в публичном «Игровом зале»;
+// weekTrainer  — автоматически показываем в карточке недели курса.
+// Эти флаги разделены намеренно: готовый внутренний тренажёр можно спокойно
+// проверить и только потом выводить на витрину.
 
 export const GAMES = [
   {
     id: 'bridge',
+    aliases: ['most', 'most-cherez-reku'],
     title: 'Мост через реку',
     kicker: 'Числовой ряд',
     note: 'Веди лисёнка по камням — выбирай следующее число',
     skill: 'Прямой и обратный счёт, счёт двойками',
     direction: 'podgotovka-k-shkole',
-    // Недели курса «Подготовка к школе», навык которых игра тренирует:
-    // 3 — «Числовая мастерская», 13 — бонусная «Первые шаги к умножению».
     weeks: [3, 13],
     ages: '5–7 лет',
     free: true,
     ready: true,
+    featured: true,
+    weekTrainer: true,
   },
   {
     id: 'firefly',
+    aliases: ['svetlyachok'],
     title: 'Светлячок',
     kicker: 'Рука к письму',
     note: 'Веди светлячка по дорожке до домика',
     skill: 'Графомоторика, плавность и точность движения',
     direction: 'podgotovka-k-shkole',
-    // 6 — «Мастерская умной руки».
     weeks: [6],
     ages: '5–7 лет',
     free: true,
     ready: true,
+    featured: false,
+    weekTrainer: false,
   },
   {
     id: 'mental-quest',
-    title: 'Путь Искры',
-    kicker: 'Абакус',
-    note: 'Двенадцать уровней на счёт с бусинами',
-    skill: 'Состав числа, счёт в уме, память',
+    aliases: ['mental', 'abacus', 'zvezdnyy-abakus'],
+    title: 'Звёздный абакус',
+    kicker: 'Ментальная арифметика',
+    note: 'Управляй полётом и проходи восемь числовых миссий',
+    skill: 'Образ числа на абакусе, устный счёт, внимание и память',
     direction: 'mentalnaya-arifmetika',
     weeks: [],
     ages: '4–10 лет',
     free: true,
     ready: true,
+    featured: true,
+    weekTrainer: false,
   },
   {
     id: 'symmetry',
+    aliases: ['simmetriya'],
     title: 'Волшебная симметрия',
     kicker: 'Рисование',
     note: 'Дорисуй вторую половину картинки',
-    skill: 'Глазомер, координация, симметрия',
+    skill: 'Глазомер, координация и чувство симметрии',
     direction: 'risovanie',
     weeks: [],
     ages: '5–10 лет',
     free: true,
     ready: true,
+    featured: false,
+    weekTrainer: false,
   },
   {
     id: 'schulte',
+    aliases: ['shulte'],
     title: 'Таблица Шульте',
     kicker: 'Внимание',
     note: 'Найди числа по порядку как можно быстрее',
-    skill: 'Концентрация, поле зрения, переключение',
+    skill: 'Концентрация, поле зрения и переключение внимания',
     direction: null,
-    // 4 — «Лаборатория внимания».
     weeks: [4],
     ages: '6–10 лет',
     free: true,
     ready: true,
+    featured: false,
+    weekTrainer: false,
   },
 ];
 
-/** Игры, тренирующие навык конкретной недели курса подготовки к школе. */
-export function gamesForWeek(week) {
-  return GAMES.filter((game) => game.ready && game.weeks.includes(week));
+/** Тренажёры конкретной недели и конкретного направления. */
+export function gamesForWeek(week, direction) {
+  return GAMES.filter((game) =>
+    game.ready
+    && game.weekTrainer
+    && game.weeks.includes(week)
+    && (!direction || game.direction === direction));
 }
 
-/** Игры направления (для карточек направлений и страниц курсов). */
+/** Все технически готовые игры направления. */
 export function gamesForDirection(slug) {
   return GAMES.filter((game) => game.ready && game.direction === slug);
 }
 
+/** Игры, одобренные для публичного игрового зала. */
+export function featuredGames() {
+  return GAMES.filter((game) => game.ready && game.featured);
+}
+
 export function getGame(id) {
   return GAMES.find((game) => game.id === id) || null;
+}
+
+/** Поддерживает короткие рекламные ссылки вроде /igry?game=most. */
+export function resolveGameId(value) {
+  const normalized = String(value || '').trim().toLowerCase();
+  if (!normalized) return null;
+  const game = GAMES.find((item) => item.id === normalized || item.aliases?.includes(normalized));
+  return game?.id || null;
 }

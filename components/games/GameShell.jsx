@@ -85,8 +85,8 @@ export function GameOverlay({ title, onClose, fill = false, restoreFocusTo, chil
   );
 }
 
-export function GameLauncher({ gameId, hasAccess = false, className, children, onOpen }) {
-  const [open, setOpen] = useState(false);
+export function GameLauncher({ gameId, hasAccess = false, className, children, onOpen, defaultOpen = false }) {
+  const [open, setOpen] = useState(Boolean(defaultOpen));
   const [mounted, setMounted] = useState(false);
   const buttonRef = useRef(null);
 
@@ -99,7 +99,7 @@ export function GameLauncher({ gameId, hasAccess = false, className, children, o
   const game = getGame(gameId);
   const entry = gameEntry(gameId);
   // Игры нет в реестре — кнопку не рисуем вовсе, чтобы не вести в пустоту.
-  if (!game || !entry) return null;
+  if (!game || !game.ready || !entry) return null;
   const { Comp, fill } = entry;
 
   return (

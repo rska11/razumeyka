@@ -8,6 +8,7 @@ import { AccountButton } from './auth/AccountButton.jsx';
 const nav = [
   ['Возраст', '/#age'],
   ['Направления', '/#programs'],
+  ['Игры', '/igry'],
   ['Результаты', '/#results'],
   ['Тарифы', '/tarify'],
 

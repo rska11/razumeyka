@@ -70,16 +70,19 @@ export default function HomePage() {
               <div className="max-w-3xl">
                 <span className="comic-label">можно играть прямо сейчас</span>
                 <h2 id="home-games-title" className="mt-5 font-display text-3xl font-extrabold leading-[1.03] tracking-[-0.045em] text-ink sm:text-5xl">
-                  Две настоящие игры — каждая внутри своего курса
+                  Обучение, в которое ребёнку хочется играть
                 </h2>
               </div>
-              <p className="max-w-xl text-sm font-semibold leading-6 text-ink/56 sm:text-base">
-                Ребёнок не просто выбирает ответ: он управляет героем, проходит уровни и тренирует навык в действии. Игры бесплатны и запускаются без регистрации.
-              </p>
+              <div className="max-w-xl">
+                <p className="text-sm font-semibold leading-6 text-ink/56 sm:text-base">
+                  Ребёнок не просто выбирает ответ: он управляет героем, проходит уровни и тренирует навык в действии. Игровой зал будет постепенно пополняться.
+                </p>
+                <Link href="/igry" className="mt-4 inline-flex items-center gap-2 text-sm font-extrabold text-brand-blue transition hover:translate-x-1">Открыть игровой зал →</Link>
+              </div>
             </div>
 
             <div className="mt-8 grid gap-4 lg:grid-cols-2">
-              <Link href="/mentalnaya-arifmetika#igra" className="group relative min-h-[230px] overflow-hidden rounded-[32px] bg-gradient-to-br from-[#09152E] via-[#143568] to-[#126D75] p-6 text-white shadow-luxe transition duration-300 hover:-translate-y-1.5 hover:shadow-color sm:p-8">
+              <Link href="/igry?game=mental" className="group relative min-h-[230px] overflow-hidden rounded-[32px] bg-gradient-to-br from-[#09152E] via-[#143568] to-[#126D75] p-6 text-white shadow-luxe transition duration-300 hover:-translate-y-1.5 hover:shadow-color sm:p-8">
                 <div className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full bg-[#75E5C1]/20 blur-3xl" />
                 <div className="relative flex h-full flex-col">
                   <span className="inline-flex w-fit rounded-full border border-white/14 bg-white/[0.08] px-3 py-2 text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#9AF3D6]">
@@ -96,7 +99,7 @@ export default function HomePage() {
                 </div>
               </Link>
 
-              <Link href="/podgotovka-k-shkole#igra" className="group relative min-h-[230px] overflow-hidden rounded-[32px] bg-gradient-to-br from-[#211848] via-[#58317A] to-[#C75C57] p-6 text-white shadow-luxe transition duration-300 hover:-translate-y-1.5 hover:shadow-color sm:p-8">
+              <Link href="/igry?game=most" className="group relative min-h-[230px] overflow-hidden rounded-[32px] bg-gradient-to-br from-[#211848] via-[#58317A] to-[#C75C57] p-6 text-white shadow-luxe transition duration-300 hover:-translate-y-1.5 hover:shadow-color sm:p-8">
                 <div className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full bg-[#FFCF68]/22 blur-3xl" />
                 <div className="relative flex h-full flex-col">
                   <span className="inline-flex w-fit rounded-full border border-white/14 bg-white/[0.08] px-3 py-2 text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#FFE19B]">

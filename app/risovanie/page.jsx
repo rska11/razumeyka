@@ -198,7 +198,7 @@ export default async function DrawingPage() {
           <div className="container-pad px-0">
             <div className="drawing-price-card">
               <div className="drawing-price-copy"><span>Полный доступ к мастерской</span><h2>Месяц, который останется<br />в детском портфолио</h2><p>Все уроки, пошаговый плеер, творческие задания и новые работы без ограничений.</p><ul>{drawingSubscription.perks.map((perk) => <li key={perk}><i>✓</i>{perk}</li>)}</ul></div>
-              <div className="drawing-price-box"><p>Стоимость доступа</p><strong>{drawingSubscription.price}<small> ₽ / {drawingSubscription.period}</small></strong><span>Первые уроки бесплатно · без карты</span><SubscribeButton isLoggedIn={Boolean(session?.user?.id)} hasAccess={hasSub} accessUntil={accessUntilLabel} /><small>После оплаты доступ открывается сразу на 30 дней</small></div>
+              <div className="drawing-price-box"><p>Стоимость доступа</p><del className="mt-3 block text-lg font-extrabold text-ink/35">{drawingSubscription.oldPrice} ₽</del><strong>{drawingSubscription.price}<small> ₽ / {drawingSubscription.period}</small></strong><span>Первые уроки бесплатно · без карты</span><SubscribeButton isLoggedIn={Boolean(session?.user?.id)} hasAccess={hasSub} accessUntil={accessUntilLabel} /><small>После оплаты доступ открывается сразу на 30 дней</small></div>
             </div>
             <CourseDiscovery current="risovanie" />
           </div>

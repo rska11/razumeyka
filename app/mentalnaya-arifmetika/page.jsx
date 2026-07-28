@@ -291,6 +291,7 @@ export default async function MentalArithmeticPage() {
                 </div>
                 <div className="rounded-[30px] bg-white p-6 text-ink shadow-[0_30px_80px_rgba(0,0,0,.3)] sm:p-8">
                   <p className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-brand-blue">Стоимость доступа</p>
+                  <del className="mt-4 block text-lg font-extrabold text-ink/35">{mentalSubscription.oldPrice} ₽</del>
                   <div className="mt-4 flex items-end gap-2">
                     <strong className="font-display text-6xl font-extrabold tracking-[-0.06em]">{mentalSubscription.price}</strong>
                     <span className="pb-2 text-lg font-extrabold text-ink/44">₽</span>

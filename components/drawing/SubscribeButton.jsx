@@ -5,7 +5,7 @@ import { useState } from 'react';
 // Кнопка оформления доступа к направлению self-study (раздельно по направлениям).
 // Не залогинен → на вход; залогинен → принимает оферту, создаём платёж и уходим на ЮKassa.
 // returnTo определяет направление и страницу возврата после оплаты; после первого входа показываем витрину кабинета.
-export function SubscribeButton({ isLoggedIn, hasAccess, accessUntil, returnTo = '/risovanie' }) {
+export function SubscribeButton({ isLoggedIn, hasAccess, accessUntil = '', returnTo = '/risovanie', buttonLabel = 'Оформить доступ', loginCallback = '/cabinet' }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [accepted, setAccepted] = useState(false);
@@ -20,7 +20,7 @@ export function SubscribeButton({ isLoggedIn, hasAccess, accessUntil, returnTo =
 
   async function go() {
     if (!isLoggedIn) {
-      window.location.href = '/login?callbackUrl=/cabinet';
+      window.location.href = `/login?callbackUrl=${encodeURIComponent(loginCallback)}`;
       return;
     }
     if (!accepted) {
@@ -74,7 +74,7 @@ export function SubscribeButton({ isLoggedIn, hasAccess, accessUntil, returnTo =
         disabled={loading || (isLoggedIn && !accepted)}
         className="primary-btn mt-4 w-full disabled:opacity-50"
       >
-        {loading ? 'Создаём оплату…' : isLoggedIn ? 'Оформить доступ' : 'Войти и оформить'}
+        {loading ? 'Создаём оплату…' : isLoggedIn ? buttonLabel : 'Войти и оформить'}
       </button>
       {error && <p className="mt-2 text-xs font-bold text-brand-red">{error}</p>}
     </>

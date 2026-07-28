@@ -306,7 +306,7 @@ function DaySection({ chapter, dayNumber, doneSet, unlocked, onOpen, onLocked })
                 </div>
                 <h5 className={open ? 'text-ink' : 'text-ink/48'}>{l.title}</h5>
                 <p>{l.skill ?? l.theme}</p>
-                <span className={open ? 'text-brand-pink' : 'text-ink/40'}>{open ? (isDone ? 'Повторить урок ↗' : 'Открыть урок ↗') : 'Доступ по подписке'}</span>
+                <span className={open ? 'text-brand-pink' : 'text-ink/40'}>{open ? (isDone ? 'Повторить урок ↗' : 'Открыть урок ↗') : 'Полный доступ'}</span>
               </div>
             </button>
           );

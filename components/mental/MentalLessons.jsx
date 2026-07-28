@@ -170,7 +170,7 @@ function DaySection({ day, doneSet, unlocked, onOpen, onLocked }) {
                 <span className={'mental-lesson-pill ' + kind.tone}>{kind.label}</span>
                 <h5 className={open ? 'text-ink' : 'text-ink/48'}>{l.title}</h5>
                 <p>{l.skill}</p>
-                <span className={open ? 'text-brand-blue' : 'text-ink/40'}>{open ? (isDone ? 'Повторить урок ↗' : 'Открыть урок ↗') : 'Доступ по подписке'}</span>
+                <span className={open ? 'text-brand-blue' : 'text-ink/40'}>{open ? (isDone ? 'Повторить урок ↗' : 'Открыть урок ↗') : 'Полный доступ'}</span>
               </div>
             </button>
           );

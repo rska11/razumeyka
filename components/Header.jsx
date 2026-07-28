@@ -9,6 +9,7 @@ const nav = [
   ['Возраст', '/#age'],
   ['Направления', '/#programs'],
   ['Результаты', '/#results'],
+  ['Тарифы', '/tarify'],
 
   ['Блог', '/blog'],
 ];
@@ -37,7 +38,7 @@ export function Header() {
 
         <div className="flex items-center gap-3">
           <AccountButton className="hidden lg:inline-flex" />
-          <a href="/risovanie" className="primary-btn hidden min-h-[54px] px-7 py-3 text-base shadow-color hover:scale-105 md:inline-flex">
+          <a href="/#programs" className="primary-btn hidden min-h-[54px] px-7 py-3 text-base shadow-color hover:scale-105 md:inline-flex">
             Начать бесплатно
             <Icon name="arrow" className="relative h-5 w-5" />
           </a>
@@ -75,7 +76,7 @@ export function Header() {
               </a>
             ))}
             <a
-              href="/risovanie"
+              href="/#programs"
               onClick={closeMenu}
               className="primary-btn mt-3 justify-center"
             >

@@ -6,7 +6,7 @@ import { Icon } from './Icon.jsx';
 const stats = [
   ['бесплатно', 'первые уроки'],
   ['3–10+', 'лет'],
-  ['от 490 ₽', 'доступ в месяц'],
+  ['490 ₽', 'доступ в месяц'],
 ];
 
 const benefits = ['интеллект', 'уверенность', 'креативность'];
@@ -81,7 +81,7 @@ export function Hero() {
           </p>
 
           <div className="mt-9 flex flex-col gap-4 sm:flex-row">
-            <a href="/risovanie" className="primary-btn">
+            <a href="#programs" className="primary-btn">
               <span className="relative">Начать бесплатно</span>
               <Icon name="arrow" className="relative h-5 w-5" />
             </a>
@@ -91,14 +91,21 @@ export function Hero() {
           </div>
 
           <div className="mt-9 grid max-w-2xl grid-cols-3 gap-3">
-            {stats.map(([value, label], index) => (
-              <div key={label} className="group rounded-[22px] border border-white/80 bg-white/78 p-4 shadow-card backdrop-blur-xl transition hover:-translate-y-1 hover:shadow-color">
-                <p className={`font-display text-2xl font-bold sm:text-3xl ${index === 0 ? 'text-brand-blue' : index === 1 ? 'text-brand-pink' : 'text-brand-orange'}`}>
-                  {value}
-                </p>
-                <p className="mt-1 text-xs font-extrabold leading-5 text-ink/58 sm:text-sm">{label}</p>
-              </div>
-            ))}
+            {stats.map(([value, label], index) => {
+              const Card = index === 2 ? 'a' : 'div';
+              return (
+                <Card
+                  key={label}
+                  {...(index === 2 ? { href: '/tarify', 'aria-label': 'Посмотреть тарифы курсов' } : {})}
+                  className="group rounded-[22px] border border-white/80 bg-white/78 p-4 shadow-card backdrop-blur-xl transition hover:-translate-y-1 hover:shadow-color"
+                >
+                  <p className={`font-display text-2xl font-bold sm:text-3xl ${index === 0 ? 'text-brand-blue' : index === 1 ? 'text-brand-pink' : 'text-brand-orange'}`}>
+                    {value}
+                  </p>
+                  <p className="mt-1 text-xs font-extrabold leading-5 text-ink/58 sm:text-sm">{label}</p>
+                </Card>
+              );
+            })}
           </div>
         </div>
 
@@ -134,7 +141,7 @@ export function Hero() {
               src="/images/video1.mp4"
               poster="/images/video-poster.webp"
               autoPlay
-              muted
+              muted={isMuted}
               loop
               playsInline
               preload="metadata"

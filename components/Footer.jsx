@@ -9,7 +9,8 @@ const navLinks = [
   ['Результаты', '/#results'],
 
   ['Блог', '/blog'],
-  ['Начать', '/risovanie'],
+  ['Тарифы', '/tarify'],
+  ['Начать', '/#programs'],
 ];
 
 const directions = [
@@ -36,7 +37,7 @@ export function Footer() {
               Онлайн-платформа для развития детей 3–10+ лет. Правополушарное рисование, ментальная арифметика, скорочтение, интуиция и языки.
             </p>
             <a
-              href="/risovanie"
+              href="/#programs"
               className="mt-6 inline-flex items-center gap-2 rounded-full bg-gold-300 px-5 py-3 text-sm font-extrabold text-forest-900 shadow-luxe transition hover:-translate-y-0.5 hover:bg-white"
             >
               Начать бесплатно

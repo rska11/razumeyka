@@ -11,7 +11,7 @@ export function Scarcity() {
           <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-white/72">Начните сегодня</p>
           <h2 className="mt-3 font-display text-4xl font-bold leading-tight sm:text-5xl">Первые уроки — бесплатно, без карты</h2>
           <p className="mt-4 max-w-2xl text-lg font-medium leading-8 text-white/78">
-            Открывайте рисование когда удобно — новые уроки-игры добавляем каждую неделю. Понравится — вся мастерская по подписке.
+            Открывайте рисование когда удобно — новые уроки-игры добавляем каждую неделю. Понравится — вся мастерская на 30 дней без автосписаний.
           </p>
         </div>
         <a href="/risovanie" className="relative mt-8 inline-flex min-h-[54px] items-center justify-center gap-3 rounded-full bg-white px-7 py-3.5 font-extrabold text-ink shadow-luxe transition hover:-translate-y-0.5 lg:mt-0">

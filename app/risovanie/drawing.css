@@ -2459,3 +2459,21 @@
   margin-top: 8px;
   padding: 0 10px;
 }
+
+/* Подтверждение выбора возраста уроков. */
+.drawing-age-tab { position: relative; overflow: hidden; }
+.drawing-age-choice { position: absolute; top: 15px; right: 15px; z-index: 2; border: 1px solid rgba(21,35,61,.08); border-radius: 999px; padding: 6px 9px; color: rgba(21,35,61,.42); background: rgba(255,255,255,.72); font-size: 8px; font-weight: 900; letter-spacing: .08em; line-height: 1; text-transform: uppercase; }
+.drawing-age-choice-active { border-color: rgba(255,143,128,.35); color: #ffd8d2; background: rgba(255,143,128,.13); }
+.drawing-age-confirm { display: flex; align-items: center; gap: 14px; margin-top: 14px; border: 1px solid rgba(255,143,128,.2); border-radius: 22px; padding: 14px 15px; background: linear-gradient(135deg,rgba(255,255,255,.96),rgba(255,241,237,.92)); box-shadow: 0 14px 36px rgba(21,35,61,.07); }
+.drawing-age-confirm-icon { display: grid; width: 42px; height: 42px; flex: none; place-items: center; border-radius: 50%; color: #fff; background: linear-gradient(135deg,#ff7d70,#f04f91); box-shadow: 0 10px 24px rgba(240,79,145,.22); font-size: 18px; font-weight: 900; }
+.drawing-age-confirm-kicker { color: var(--draw-coral); font-size: 8px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+.drawing-age-confirm-title { margin-top: 3px; color: var(--draw-ink); font-family: 'Plus Jakarta Sans',sans-serif; font-size: 17px; font-weight: 850; }
+.drawing-age-confirm-note { margin-top: 2px; color: rgba(21,35,61,.53); font-size: 11px; font-weight: 650; line-height: 1.45; }
+.drawing-age-confirm-action { min-height: 44px; flex: none; border-radius: 999px; padding: 0 17px; color: #fff; background: var(--draw-ink); box-shadow: 0 10px 24px rgba(21,35,61,.18); font-size: 11px; font-weight: 850; transition: .2s ease; }
+.drawing-age-confirm-action:hover { transform: translateY(-2px); background: #26395f; }
+@media (max-width: 719px) {
+  .drawing-age-choice { top: 12px; right: 12px; }
+  .drawing-age-confirm { align-items: flex-start; flex-wrap: wrap; padding: 13px; }
+  .drawing-age-confirm-icon { width: 36px; height: 36px; }
+  .drawing-age-confirm-action { width: 100%; }
+}

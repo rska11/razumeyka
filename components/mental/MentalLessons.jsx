@@ -122,7 +122,7 @@ function NextWeeksPreview() {
   );
 }
 
-function DaySection({ day, doneSet, unlocked, onOpen, onLocked }) {
+function DaySection({ day, doneSet, unlocked, freeSlugs, onOpen, onLocked }) {
   const dayDone = day.lessons.filter((l) => doneSet.has(l.slug)).length;
   const guide = mentalDayGuides[day.n] ?? mentalDayGuides.default;
   const isWarmup = day.n === 0;
@@ -163,6 +163,7 @@ function DaySection({ day, doneSet, unlocked, onOpen, onLocked }) {
               <div className="mental-lesson-visual">
                 <LessonVisual lesson={l} />
                 <span className="mental-lesson-index">{String(index + 1).padStart(2, '0')}</span>
+                {freeSlugs?.has(l.slug) && <span className="mental-lesson-free">бесплатно</span>}
                 {isDone && <span className="mental-lesson-done">✓</span>}
                 {!open && <span className="mental-lesson-lock">🔒</span>}
               </div>
@@ -215,15 +216,14 @@ export function MentalLessons({ hasSubscription = false }) {
   const days = useMemo(() => mentalLessonsByDay(), []);
   const daysByN = useMemo(() => new Map(days.map((d) => [d.n, d])), [days]);
   const activeBand = mentalAgeBands.find((b) => b.key === band) ?? mentalAgeBands[1];
-  // Бесплатный тизер (без подписки): день 0 — только 1-й урок; день 1 — 1-й и 2-й.
+  // Бесплатный маршрут: 5 подготовительных уроков и 3 урока на абакусе.
   // Остальное (в т.ч. день 2 и дальше) — по подписке. Позиция важнее флага free в данных.
   const freeSlugs = useMemo(() => {
     const s = new Set();
     const d0 = daysByN.get(0);
-    if (d0?.lessons[0]) s.add(d0.lessons[0].slug);
+    d0?.lessons.slice(0, 5).forEach((lesson) => s.add(lesson.slug));
     const d1 = daysByN.get(1);
-    if (d1?.lessons[0]) s.add(d1.lessons[0].slug);
-    if (d1?.lessons[1]) s.add(d1.lessons[1].slug);
+    d1?.lessons.slice(0, 3).forEach((lesson) => s.add(lesson.slug));
     return s;
   }, [daysByN]);
   const unlocked = (l) => freeSlugs.has(l.slug) || hasSubscription;
@@ -250,15 +250,30 @@ export function MentalLessons({ hasSubscription = false }) {
           return (
             <button
               key={b.key}
+              type="button"
+              aria-pressed={on}
               onClick={() => selectBand(b.key)}
               className={'mental-age-tab ' + (on ? 'mental-age-tab-active' : '')}
             >
+              <span className={'mental-age-choice ' + (on ? 'mental-age-choice-active' : '')}>{on ? '✓ Выбрано' : 'Выбрать'}</span>
               <p className="mental-age-tag">{b.tag}</p>
               <p className="mental-age-label">{b.label}</p>
               <p className="mt-1 text-sm font-semibold leading-5 text-ink/56">{b.note}</p>
             </button>
           );
         })}
+      </div>
+
+      <div key={band} className="mental-age-confirm animate-rise" aria-live="polite">
+        <span className="mental-age-confirm-icon" aria-hidden="true">✓</span>
+        <div className="min-w-0 flex-1">
+          <p className="mental-age-confirm-kicker">Режим выбран</p>
+          <p className="mental-age-confirm-title">{activeBand.tag} · {activeBand.label}</p>
+          <p className="mental-age-confirm-note">{activeBand.note}. Карточки и темп заданий уже переключены.</p>
+        </div>
+        <button type="button" onClick={() => document.getElementById('mental-lessons-start')?.scrollIntoView({ behavior: 'smooth', block: 'start' })} className="mental-age-confirm-action">
+          Перейти к занятиям ↓
+        </button>
       </div>
 
       <MonthRoadmap readyDays={days.filter((d) => d.n >= 1).length} />
@@ -285,12 +300,13 @@ export function MentalLessons({ hasSubscription = false }) {
         </div>
       </div>
 
-      <div className="mental-days-list">
+      <div id="mental-lessons-start" className="mental-days-list scroll-mt-28">
         {daysByN.has(0) && (
           <DaySection
             day={daysByN.get(0)}
             doneSet={doneSet}
             unlocked={unlocked}
+            freeSlugs={freeSlugs}
             onOpen={setActive}
             onLocked={goSubscribe}
           />
@@ -305,6 +321,7 @@ export function MentalLessons({ hasSubscription = false }) {
                   day={day}
                   doneSet={doneSet}
                   unlocked={unlocked}
+                  freeSlugs={freeSlugs}
                   onOpen={setActive}
                   onLocked={goSubscribe}
                 />

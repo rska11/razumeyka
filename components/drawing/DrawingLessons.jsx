@@ -384,15 +384,30 @@ export function DrawingLessons({ hasSubscription = false }) {
           return (
             <button
               key={b.key}
+              type="button"
+              aria-pressed={on}
               onClick={() => selectBand(b.key)}
               className={'drawing-age-tab ' + (on ? 'drawing-age-tab-active' : '')}
             >
+              <span className={'drawing-age-choice ' + (on ? 'drawing-age-choice-active' : '')}>{on ? '✓ Выбрано' : 'Выбрать'}</span>
               <p className="drawing-age-tag">{b.tag}</p>
               <p className="drawing-age-label">{b.label}</p>
               <p className="mt-1 text-sm font-semibold leading-5 text-ink/56">{b.note}</p>
             </button>
           );
         })}
+      </div>
+
+      <div key={band} className="drawing-age-confirm animate-rise" aria-live="polite">
+        <span className="drawing-age-confirm-icon" aria-hidden="true">✓</span>
+        <div className="min-w-0 flex-1">
+          <p className="drawing-age-confirm-kicker">Возраст выбран</p>
+          <p className="drawing-age-confirm-title">{activeBand?.tag} · {activeBand?.label}</p>
+          <p className="drawing-age-confirm-note">{activeBand?.note}. Сюжеты и сложность уроков уже переключены.</p>
+        </div>
+        <button type="button" onClick={() => document.getElementById('drawing-lessons-start')?.scrollIntoView({ behavior: 'smooth', block: 'start' })} className="drawing-age-confirm-action">
+          Перейти к урокам ↓
+        </button>
       </div>
 
       <MonthRoadmap readyDays={Math.min(chapters.length, MONTH_DAYS)} />
@@ -416,7 +431,7 @@ export function DrawingLessons({ hasSubscription = false }) {
         </div>
       </div>
 
-      <div className="drawing-days-list">
+      <div id="drawing-lessons-start" className="drawing-days-list scroll-mt-28">
         {Array.from({ length: MONTH_DAYS }).map((_, dayIndex) => {
           const dayNumber = dayIndex + 1;
           const chapter = chapters[dayIndex];

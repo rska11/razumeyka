@@ -3,6 +3,7 @@ import { Header } from '@/components/Header.jsx';
 import { Footer } from '@/components/Footer.jsx';
 import { MentalIntroAudio } from '@/components/mental/MentalIntroAudio.jsx';
 import { MentalLessons } from '@/components/mental/MentalLessons.jsx';
+import { MentalNumberGame } from '@/components/mental/MentalNumberGame.jsx';
 import { SorobanDemo } from '@/components/mental/SorobanDemo.jsx';
 import { SubscribeButton } from '@/components/drawing/SubscribeButton.jsx';
 import { CourseDiscovery } from '@/components/CourseDiscovery.jsx';
@@ -225,6 +226,38 @@ export default async function MentalArithmeticPage() {
           </div>
         </section>
 
+        {/* Игра-тизер: удерживает на странице, показывает абакус вживую и ведёт к курсу. */}
+        <section id="igra" className="scroll-mt-24 px-5 py-20 sm:px-8 lg:px-14 lg:py-24">
+          <div className="container-pad px-0">
+            <div className="max-w-3xl">
+              <span className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-brand-blue">Игра · можно прямо сейчас</span>
+              <h2 className="mt-5 font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.05em] sm:text-5xl">Попробуйте абакус в игре — без регистрации</h2>
+              <p className="mt-5 text-base font-semibold leading-7 text-ink/56">
+                «Путь Искры» — двенадцать уровней на японском абакусе (соробане). Ребёнок набирает числа бусинами,
+                учится узнавать их с одного взгляда, удерживать в памяти мелькнувшее число и решать примеры.
+                Первые три уровня открыты всем.
+              </p>
+            </div>
+
+            <div className="mt-10">
+              <MentalNumberGame hasSubscription={hasSub} />
+            </div>
+
+            <div className="mt-10 grid gap-4 md:grid-cols-3">
+              {[
+                ['Образ числа', 'Ребёнок перестаёт пересчитывать по одному и видит число целиком — как картинку из бусин. Это база устного счёта.'],
+                ['Разряды', 'Левая колонка — десятки, правая — единицы. На поздних уровнях ребёнок работает с двузначными числами сразу в двух разрядах.'],
+                ['Друзья десятки', 'Пары чисел, дающие в сумме 10, — приём, на котором держится всё быстрое сложение и вычитание в уме.'],
+              ].map(([title, text]) => (
+                <div key={title} className="rounded-[22px] border border-ink/8 bg-white p-6 shadow-card">
+                  <h3 className="font-display text-lg font-extrabold text-ink">{title}</h3>
+                  <p className="mt-2 text-sm font-semibold leading-6 text-ink/58">{text}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         <section id="uroki" className="scroll-mt-24 bg-gradient-to-b from-[#EAF2FF] to-[#F7F9FC] px-5 py-24 sm:px-8 lg:px-14 lg:py-32">
           <div className="container-pad px-0">
             <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
@@ -301,7 +334,7 @@ export default async function MentalArithmeticPage() {
                   <div className="space-y-3 text-sm font-semibold text-ink/62">
                     <p className="flex justify-between gap-4"><span>Маршрут месяца</span><strong className="text-ink">200 миссий</strong></p>
                     <p className="flex justify-between gap-4"><span>Игровая практика</span><strong className="text-ink">1 000+ заданий</strong></p>
-                    <p className="flex justify-between gap-4"><span>Бесплатный старт</span><strong className="text-brand-green">3 урока</strong></p>
+                    <p className="flex justify-between gap-4"><span>Бесплатный старт</span><strong className="text-brand-green">8 уроков</strong></p>
                   </div>
                   <SubscribeButton isLoggedIn={Boolean(session?.user?.id)} hasAccess={hasSub} accessUntil={accessUntilLabel} returnTo="/mentalnaya-arifmetika" />
                   <p className="mt-4 text-center text-[11px] font-semibold leading-5 text-ink/38">Доступ открывается сразу после оплаты. Автоматического продления нет.</p>

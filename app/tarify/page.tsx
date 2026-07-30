@@ -1,3 +1,4 @@
+import { canonical } from '@/lib/seo';
 import Link from "next/link";
 import { Footer } from "@/components/Footer.jsx";
 import { Header } from "@/components/Header.jsx";
@@ -5,7 +6,6 @@ import { SubscribeButton } from "@/components/drawing/SubscribeButton.jsx";
 import { getAuthSession } from "@/lib/auth";
 import { reconcileUserPayments } from "@/lib/payments";
 import {
-import { canonical } from '@/lib/seo';
   DIRECTION_COMPARE_PRICE,
   directionPrice,
   getAccessMap,

@@ -1,3 +1,4 @@
+import { canonical } from '@/lib/seo';
 import './mental.css';
 import { Header } from '@/components/Header.jsx';
 import { Footer } from '@/components/Footer.jsx';
@@ -8,7 +9,6 @@ import { SorobanDemo } from '@/components/mental/SorobanDemo.jsx';
 import { SubscribeButton } from '@/components/drawing/SubscribeButton.jsx';
 import { CourseDiscovery } from '@/components/CourseDiscovery.jsx';
 import {
-import { canonical } from '@/lib/seo';
   mentalIntro,
   mentalSubscription,
   whyBlocks,

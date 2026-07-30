@@ -1,20 +1,17 @@
-// Headless-проверка движка «Моста через реку»: node scripts/test-bridge-game.mjs
-//
-// Канвас в автоматической проверке не рисуется (нет DOM), поэтому правила
-// проверяем симуляцией игры, а отрисовку — прогоном draw() на мок-контексте:
-// это ловит опечатки и падения, хотя и не оценивает красоту.
-
 import {
   FOX_X,
   LANE_Y,
   LEVELS,
   MAX_DOTS,
+  MAX_PARTICLES,
   SLABS_PER_LEVEL,
   STEP,
+  WORLD_H,
+  WORLD_W,
+  createChallenge,
   createGame,
   drainEvents,
-  moveLane,
-  nextTarget,
+  selectLane,
   starsFor,
   update,
 } from '../components/school-prep/bridge/engine.js';
@@ -22,9 +19,8 @@ import { draw } from '../components/school-prep/bridge/render.js';
 
 let failures = 0;
 function check(name, condition, extra) {
-  if (condition) {
-    console.log('  ok   ' + name);
-  } else {
+  if (condition) console.log('  ok   ' + name);
+  else {
     failures += 1;
     console.log('  FAIL ' + name + (extra === undefined ? '' : ' → ' + JSON.stringify(extra)));
   }
@@ -32,165 +28,144 @@ function check(name, condition, extra) {
 
 function perfectPlayer(game) {
   if (!game.group || game.group.resolved) return;
-  const slot = game.group.slots.find((s) => s.value === game.target);
-  if (!slot) return;
-  const delta = slot.lane - game.fox.lane;
-  if (delta !== 0) moveLane(game, delta > 0 ? 1 : -1);
+  const slot = game.group.slots.find((item) => item.value === game.challenge.answer);
+  if (slot) selectLane(game, slot.lane);
 }
 
-// Важно вставать именно на ЗАНЯТУЮ неверную плиту, а не в пустую дорожку:
-// иначе проверка «плита краснеет» проходит вхолостую — краснеть нечему.
 function wrongPlayer(game) {
   if (!game.group || game.group.resolved) return;
-  const wrong = game.group.slots.find((s) => s.value !== game.target);
-  if (!wrong || game.fox.lane === wrong.lane) return;
-  moveLane(game, game.fox.lane < wrong.lane ? 1 : -1);
+  const slot = game.group.slots.find((item) => item.value !== game.challenge.answer);
+  if (slot) selectLane(game, slot.lane);
 }
 
-function run(game, player, maxSeconds) {
-  const steps = Math.round(maxSeconds / STEP);
-  const seen = [];
+function run(game, player, maxSeconds = 180) {
   const events = [];
-  for (let i = 0; i < steps; i += 1) {
+  const challenges = [];
+  let lastId = null;
+  for (let index = 0; index < Math.round(maxSeconds / STEP); index += 1) {
     player(game);
     update(game, STEP);
+    if (game.challenge && game.challenge.id !== lastId) {
+      lastId = game.challenge.id;
+      challenges.push(game.challenge);
+    }
     const batch = drainEvents(game);
     if (batch) events.push(...batch);
-    if (game.group && !game.group.resolved && seen[seen.length - 1] !== game.target) {
-      seen.push(game.target);
-    }
     if (game.status === 'done') break;
   }
-  return { seen, events };
+  return { events, challenges };
 }
 
-console.log('\n1. Идеальное прохождение каждого из ' + LEVELS.length + ' уровней');
-for (let i = 0; i < LEVELS.length; i += 1) {
-  const game = createGame(i, 12345 + i);
-  const out = run(game, perfectPlayer, 140);
-  check(
-    'уровень ' + LEVELS[i].id + ' (' + LEVELS[i].title + ') пройден без ошибок',
-    game.status === 'done' && game.collected === SLABS_PER_LEVEL && game.misses === 0,
-    { status: game.status, collected: game.collected, misses: game.misses },
-  );
-  check('  событие done ровно одно', out.events.filter((e) => e === 'done').length === 1);
-  check('  ok-событий столько же, сколько плит', out.events.filter((e) => e === 'ok').length === SLABS_PER_LEVEL);
+function seeded(seed) {
+  let value = seed >>> 0;
+  return () => {
+    value = (value * 1664525 + 1013904223) >>> 0;
+    return value / 4294967296;
+  };
 }
 
-console.log('\n2. Ряд чисел соответствует настройкам уровня');
-for (let i = 0; i < LEVELS.length; i += 1) {
-  const level = LEVELS[i];
-  const want = [];
-  let value = level.from;
-  for (let n = 0; n < SLABS_PER_LEVEL; n += 1) {
-    want.push(value);
-    value = nextTarget(level, value);
+console.log('\n1. Идеальное прохождение всех миссий');
+for (let index = 0; index < LEVELS.length; index += 1) {
+  const game = createGame(index, 1200 + index);
+  const out = run(game, perfectPlayer);
+  check(`миссия ${LEVELS[index].id} (${LEVELS[index].title}) пройдена`, game.status === 'done' && game.collected === SLABS_PER_LEVEL && game.misses === 0, { status: game.status, collected: game.collected, misses: game.misses });
+  check('  десять осмысленных решений', out.events.filter((event) => event === 'ok').length === SLABS_PER_LEVEL);
+  check('  событие done ровно одно', out.events.filter((event) => event === 'done').length === 1);
+}
+
+console.log('\n2. Учебная программа и сложность заданий');
+{
+  const kinds = new Set();
+  let invalid = 0;
+  for (const level of LEVELS) {
+    const rng = seeded(9000 + level.id);
+    for (let round = 0; round < SLABS_PER_LEVEL; round += 1) {
+      const item = createChallenge(level, round, rng);
+      kinds.add(item.kind);
+      const unique = new Set(item.options);
+      const oneAnswer = item.options.filter((value) => value === item.answer).length === 1;
+      const valid = level.challengeKinds.includes(item.kind) && item.prompt.includes('?') || ['neighbor-after', 'neighbor-before', 'between', 'quantity-more', 'quantity-less'].includes(item.kind);
+      if (!(Number.isInteger(item.answer) && item.answer >= 0 && item.answer <= 20 && item.options.length === 3 && unique.size === 3 && oneAnswer && item.prompt.length >= 5 && item.explanation.includes(String(item.answer)) && valid)) invalid += 1;
+    }
   }
-  const game = createGame(i, 777 + i);
-  const out = run(game, perfectPlayer, 140);
-  const row = out.seen.slice(0, SLABS_PER_LEVEL);
-  check('уровень ' + level.id + ': ' + row.join(','), JSON.stringify(row) === JSON.stringify(want), { got: row, want });
+  check('каждое задание имеет три разных варианта и один верный', invalid === 0, { invalid });
+  check('используется не меньше 15 разных типов мышления', kinds.size >= 15, [...kinds]);
+  check('финал смешивает минимум 7 типов задач', new Set(LEVELS[7].challengeKinds).size >= 7, LEVELS[7].challengeKinds);
+  check('простое узнавание готового числа не является механикой', LEVELS.every((level) => !level.challengeKinds.includes('find-number')));
 }
 
-console.log('\n3. Правила выбора плит');
+console.log('\n3. Генерация камней');
 {
   let groups = 0;
-  let bad = 0;
+  let invalid = 0;
   let dotsSeen = 0;
-  for (let i = 0; i < LEVELS.length; i += 1) {
-    const game = createGame(i, 4242 + i);
+  for (let index = 0; index < LEVELS.length; index += 1) {
+    const game = createGame(index, 4200 + index);
     let lastGroup = null;
-    for (let s = 0; s < 90 / STEP; s += 1) {
+    for (let step = 0; step < 170 / STEP && game.status !== 'done'; step += 1) {
       perfectPlayer(game);
       update(game, STEP);
       if (game.group && game.group !== lastGroup) {
         lastGroup = game.group;
         groups += 1;
-        const values = game.group.slots.map((x) => x.value);
-        const correct = game.group.slots.filter((x) => x.value === game.target).length;
-        const unique = new Set(values).size === values.length;
-        const positive = values.every((v) => v >= 1);
-        const lanes = new Set(game.group.slots.map((x) => x.lane)).size === game.group.slots.length;
-        const count = game.group.slots.length === game.level.choices;
-        const dotsOk = game.group.slots.every((x) => x.kind !== 'dots' || x.value <= MAX_DOTS);
-        dotsSeen += game.group.slots.filter((x) => x.kind === 'dots').length;
-        if (!(correct === 1 && unique && positive && lanes && count && dotsOk)) bad += 1;
+        const values = game.group.slots.map((slot) => slot.value);
+        const lanes = game.group.slots.map((slot) => slot.lane);
+        const correct = values.filter((value) => value === game.challenge.answer).length;
+        const dotsOk = game.group.slots.every((slot) => slot.kind !== 'dots' || slot.value <= MAX_DOTS);
+        dotsSeen += game.group.slots.filter((slot) => slot.kind === 'dots').length;
+        if (!(values.length === 3 && new Set(values).size === 3 && new Set(lanes).size === 3 && correct === 1 && dotsOk)) invalid += 1;
       }
-      if (game.status === 'done') break;
     }
   }
-  check('в каждой группе одна верная плита, числа не повторяются, ≥ 1 (' + groups + ' групп)', bad === 0, { bad });
-  check('точками показываются только числа до ' + MAX_DOTS + ' (' + dotsSeen + ' таких плит)', dotsSeen > 0);
+  check(`в ${groups} группах по три дорожки, один ответ и без дублей`, invalid === 0, { invalid });
+  check('в финале встречается перевод количества в число', dotsSeen > 0, { dotsSeen });
 }
 
-console.log('\n4. Ошибка показана явно и не наказывает');
+console.log('\n4. Ошибка объясняет, но не обрывает игру');
 {
-  const game = createGame(0, 999);
-  let before = null;
-  let speedBefore = null;
+  const game = createGame(4, 999);
   let group = null;
-  for (let s = 0; s < 20 / STEP; s += 1) {
+  let challenge = null;
+  for (let step = 0; step < 30 / STEP; step += 1) {
     wrongPlayer(game);
     if (game.group && !game.group.resolved) {
-      before = game.target;
-      speedBefore = game.speed;
       group = game.group;
+      challenge = game.challenge;
     }
     update(game, STEP);
     if (game.misses > 0) break;
   }
-  const chosen = group.slots.find((s) => s.lane === game.fox.lane);
-  const right = group.slots.find((s) => s.lane === group.correctLane);
-  check('промах засчитан', game.misses === 1, { misses: game.misses });
-  check('лисёнок стоял именно на плите, а не в пустой дорожке', Boolean(chosen), {
-    lane: game.fox.lane,
-    lanes: group.slots.map((s) => s.lane),
-  });
-  check('выбранная плита помечена как ошибочная (красная)', Boolean(chosen) && chosen.state === 'wrong', {
-    state: chosen && chosen.state,
-  });
-  check('верная плита подсвечена (зелёная с галочкой)', right.state === 'reveal' || right.state === 'ok', {
-    state: right.state,
-  });
-  check('нужное число не изменилось', game.target === before, { before, after: game.target });
-  check('скорость снизилась, а не выросла', game.speed < speedBefore);
-  check('включились тряска и красная вспышка', game.shake > 0 && Boolean(game.flash) && game.flash.kind === 'bad');
-  check('игра продолжается — game over нет', game.status === 'run');
+  const wrong = group.slots.find((slot) => slot.lane === game.fox.lane);
+  const right = group.slots.find((slot) => slot.value === challenge.answer);
+  check('промах засчитан', game.misses === 1);
+  check('выбранный камень красный', wrong?.state === 'wrong', wrong);
+  check('верный камень показан зелёным', ['reveal', 'ok'].includes(right?.state), right);
+  check('есть короткое объяснение решения', game.feedback?.kind === 'bad' && game.feedback.detail === challenge.explanation, game.feedback);
+  check('тот же навык можно попробовать снова', game.challenge.id === challenge.id && game.status === 'run');
 }
 
-console.log('\n5. Подсказка после двух промахов');
+console.log('\n5. Адаптивная помощь');
 {
-  const game = createGame(0, 31337);
+  const game = createGame(5, 31337);
   let guard = 0;
-  while (game.misses < 2 && guard < 120 / STEP) {
+  while (game.misses < 2 && guard < 160 / STEP) {
     wrongPlayer(game);
     update(game, STEP);
     guard += 1;
   }
-  check('после двух промахов hint = true', game.misses >= 2 && game.hint === true, {
-    misses: game.misses,
-    hint: game.hint,
-  });
-  check('игра всё ещё идёт', game.status === 'run');
+  check('после двух промахов включается золотая подсветка', game.misses >= 2 && game.hint === true, { misses: game.misses, hint: game.hint });
+  game.bonus = { x: FOX_X + 80, lane: game.fox.lane, taken: false };
+  for (let step = 0; step < 5 / STEP && !game.bonus.taken; step += 1) update(game, STEP);
+  check('бонус снимает один промах', game.misses === 1, { misses: game.misses });
+  check('после восстановления помощь снова выключена', game.hint === false);
 }
 
-console.log('\n6. Фонарик возвращает потерянный фонарь');
+console.log('\n6. Прямой выбор дорожки');
 {
-  const game = createGame(0, 5150);
-  game.misses = 2;
-  game.hint = true;
-  game.bonus = { x: FOX_X + 120, lane: game.fox.lane, taken: false };
-  let events = [];
-  for (let s = 0; s < 5 / STEP; s += 1) {
-    update(game, STEP);
-    const batch = drainEvents(game);
-    if (batch) events = events.concat(batch);
-    if (game.bonus && game.bonus.taken) break;
-  }
-  check('фонарик пойман', Boolean(game.bonus && game.bonus.taken));
-  check('промах списан обратно', game.misses === 1, { misses: game.misses });
-  check('подсказка выключилась', game.hint === false);
-  check('событие bonus отправлено', events.includes('bonus'));
+  const game = createGame(0, 33);
+  check('можно сразу выбрать верхнюю дорожку', selectLane(game, 0) && game.fox.lane === 0);
+  check('можно сразу выбрать нижнюю дорожку', selectLane(game, 2) && game.fox.lane === 2);
+  check('индекс безопасно ограничивается', selectLane(game, 99) === false && game.fox.lane === 2);
 }
 
 console.log('\n7. Звёзды');
@@ -198,82 +173,67 @@ check('0 ошибок → 3 звезды', starsFor(0) === 3);
 check('2 ошибки → 2 звезды', starsFor(2) === 2);
 check('5 ошибок → 1 звезда', starsFor(5) === 1);
 
-console.log('\n8. Случайный игрок не ломает движок');
+console.log('\n8. Случайная игра не ломает движок');
 {
-  let seed = 5;
-  const rnd = () => {
-    seed = (seed * 1103515245 + 12345) % 2147483648;
-    return seed / 2147483648;
-  };
-  let crashed = null;
-  try {
-    for (let i = 0; i < LEVELS.length; i += 1) {
-      const game = createGame(i, 606 + i);
-      run(game, (g) => (rnd() < 0.03 ? moveLane(g, rnd() < 0.5 ? -1 : 1) : null), 180);
-      if (game.particles.length > 110) crashed = 'частиц больше лимита: ' + game.particles.length;
-      if (game.trail.length > 40) crashed = 'хвост моста не чистится: ' + game.trail.length;
-    }
-  } catch (error) {
-    crashed = error.message;
-  }
-  check('180 секунд случайной игры на каждом уровне без исключений и утечек', crashed === null, crashed);
-}
-
-console.log('\n9. Отрисовка не падает (мок-контекст)');
-{
-  const calls = { fillText: [] };
-  const noop = () => {};
-  const ctx = new Proxy(
-    {
-      canvas: { width: 960, height: 540 },
-      fillText: (text) => calls.fillText.push(String(text)),
-      createLinearGradient: () => ({ addColorStop: noop }),
-      setLineDash: noop,
-      measureText: () => ({ width: 10 }),
-    },
-    {
-      get(target, prop) {
-        if (prop in target) return target[prop];
-        return noop;
-      },
-      set() {
-        return true;
-      },
-    },
-  );
-
+  const random = seeded(5);
   let error = null;
   try {
-    for (let i = 0; i < LEVELS.length; i += 1) {
-      // и удачная игра, и провальная — чтобы отрисовались все состояния плит
-      for (const player of [perfectPlayer, wrongPlayer]) {
-        const game = createGame(i, 2024 + i);
-        game.bonus = { x: 900, lane: 0, taken: false };
-        for (let s = 0; s < 40 / STEP; s += 1) {
-          player(game);
-          update(game, STEP);
-          if (s % 5 === 0) draw(ctx, game);
-          if (game.status === 'done') break;
-        }
-        draw(ctx, game);
-      }
+    for (let index = 0; index < LEVELS.length; index += 1) {
+      const game = createGame(index, 600 + index);
+      run(game, (state) => (random() < 0.035 ? selectLane(state, Math.floor(random() * 3)) : null), 180);
+      if (game.particles.length > MAX_PARTICLES) throw new Error('частицы вышли за лимит');
+      if (game.trail.length > 40) throw new Error('старые части моста не удаляются');
     }
-  } catch (err) {
-    error = err.message;
+  } catch (caught) {
+    error = caught.message;
   }
-  check('draw() отработал на всех уровнях', error === null, error);
-  check('числа выводятся на камни', calls.fillText.some((t) => /^\d+$/.test(t)));
-  check('в подсказке нет текста — только цифры', calls.fillText.every((t) => /^\d+$/.test(t)), {
-    words: calls.fillText.filter((t) => !/^\d+$/.test(t)).slice(0, 5),
-  });
+  check('180 секунд на каждой миссии без исключений и утечек', error === null, error);
 }
 
-console.log('\n10. Геометрия и конфигурация');
-check('три дорожки', LANE_Y.length === 3);
-check('лисёнок левее точки появления плит', FOX_X < 960);
-check('nextTarget зацикливается на границе', nextTarget(LEVELS[0], 10) === 1);
-check('у каждого уровня есть режим плит', LEVELS.every((l) => ['digits', 'dots', 'mixed'].includes(l.mode)));
-check('у каждого уровня есть подсказка', LEVELS.every((l) => typeof l.tip === 'string' && l.tip.length > 0));
+console.log('\n9. Отрисовка');
+{
+  const calls = { fillText: 0, drawImage: 0 };
+  const noop = () => {};
+  const gradient = () => ({ addColorStop: noop });
+  const ctx = new Proxy({
+    canvas: { width: WORLD_W, height: WORLD_H },
+    fillText: () => { calls.fillText += 1; },
+    drawImage: () => { calls.drawImage += 1; },
+    createLinearGradient: gradient,
+    createRadialGradient: gradient,
+    setLineDash: noop,
+  }, {
+    get(target, property) {
+      if (property in target) return target[property];
+      return noop;
+    },
+    set() { return true; },
+  });
+  let error = null;
+  try {
+    for (let index = 0; index < LEVELS.length; index += 1) {
+      const game = createGame(index, 2000 + index);
+      for (let step = 0; step < 45 / STEP; step += 1) {
+        perfectPlayer(game);
+        update(game, STEP);
+        if (step % 8 === 0) draw(ctx, game);
+        if (game.status === 'done') break;
+      }
+      draw(ctx, game);
+    }
+  } catch (caught) {
+    error = caught.message;
+  }
+  check('canvas-отрисовка всех состояний не падает', error === null, error);
+  check('варианты ответа действительно рисуются', calls.fillText > 0, calls);
+}
 
-console.log(failures === 0 ? '\nВСЁ ЗЕЛЁНОЕ\n' : '\nПРОВАЛОВ: ' + failures + '\n');
+console.log('\n10. Конфигурация продукта');
+check('восемь миссий и десять решений в каждой', LEVELS.length === 8 && SLABS_PER_LEVEL === 10);
+check('три дорожки', LANE_Y.length === 3);
+check('герой расположен до зоны появления камней', FOX_X < WORLD_W / 2);
+check('у каждой миссии есть навык, акт и отдельная сцена', LEVELS.every((level) => level.skill && level.act && ['day', 'sunset', 'night'].includes(level.scene)));
+check('скорость растёт умеренно, а не заменяет сложность', LEVELS.every((level) => level.speed <= 250 && level.speedUp <= 5));
+
+console.log(failures === 0 ? '\nВСЁ ЗЕЛЁНОЕ\n' : `\nПРОВАЛОВ: ${failures}\n`);
 process.exit(failures === 0 ? 0 : 1);

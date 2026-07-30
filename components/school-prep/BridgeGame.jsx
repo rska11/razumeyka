@@ -1,18 +1,10 @@
 'use client';
 
-// Оболочка мини-игры «Мост через реку»: канвас, игровой цикл, ввод и экраны.
-// Вся логика правил живёт в ./bridge/engine.js, вся отрисовка — в ./bridge/render.js.
-// Здесь только то, что действительно относится к браузеру:
-//  · цикл с ФИКСИРОВАННЫМ шагом (физика не зависит от частоты экрана: на 120 Гц
-//    игра идёт с той же скоростью, что на 60 Гц);
-//  · размер канваса с учётом devicePixelRatio, чтобы цифры не мылились;
-//  · пауза при уходе со вкладки — иначе ребёнок вернётся к проигранному уровню;
-//  · управление тремя способами: тап по половине экрана, свайп, клавиши.
-
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { reachGoal } from '@/lib/metrika';
 import {
   LEVELS,
+  LANE_Y,
   SLABS_PER_LEVEL,
   STEP,
   WORLD_H,
@@ -20,6 +12,7 @@ import {
   createGame,
   drainEvents,
   moveLane,
+  selectLane,
   starsFor,
   update,
 } from './bridge/engine.js';
@@ -27,33 +20,98 @@ import { draw } from './bridge/render.js';
 import { playSound, setMuted, unlockAudio } from '@/components/games/audio.js';
 
 const STORAGE_KEY = 'znayton_bridge_v1';
-// Первые четыре пролёта открыты всем — это витрина. Остальные идут с курсом,
-// как и уровни в игре по ментальной арифметике.
 const FREE_LEVELS = 4;
-
-const MODE_LABEL = {
-  digits: 'Цифры',
-  dots: 'Точки',
-  mixed: 'Цифры и точки',
+const ASSET_SOURCES = {
+  day: '/images/games/bridge/bridge-day-v2.webp',
+  sunset: '/images/games/bridge/bridge-sunset-v2.webp',
+  night: '/images/games/bridge/bridge-night-v2.webp',
+  fox: '/images/games/bridge/bridge-fox-run-v3.webp',
 };
 
-function Stars({ count, size }) {
-  const box = size === 'lg' ? 'text-3xl' : 'text-lg';
+function StarIcon({ active = true, className = 'h-5 w-5' }) {
   return (
-    <span className={'inline-flex gap-1 ' + box} aria-label={'Звёзд: ' + count + ' из 3'}>
-      {[1, 2, 3].map((n) => (
-        <span key={n} className={n <= count ? 'text-brand-yellow' : 'text-white/22'} aria-hidden>
-          ★
-        </span>
+    <svg viewBox={'0 0 24 24'} aria-hidden className={className}>
+      <path
+        d={'m12 2.8 2.72 5.51 6.08.89-4.4 4.28 1.04 6.05L12 16.67l-5.44 2.86 1.04-6.05L3.2 9.2l6.08-.89L12 2.8Z'}
+        fill={active ? '#FFD467' : 'rgba(255,255,255,.18)'}
+      />
+    </svg>
+  );
+}
+
+function LockIcon({ className = 'h-4 w-4' }) {
+  return (
+    <svg viewBox={'0 0 24 24'} fill={'none'} aria-hidden className={className}>
+      <rect x={'5'} y={'10'} width={'14'} height={'11'} rx={'3'} stroke={'currentColor'} strokeWidth={'2'} />
+      <path d={'M8 10V7a4 4 0 0 1 8 0v3'} stroke={'currentColor'} strokeWidth={'2'} strokeLinecap={'round'} />
+    </svg>
+  );
+}
+
+function CompassIcon({ className = 'h-7 w-7' }) {
+  return (
+    <svg viewBox={'0 0 32 32'} fill={'none'} aria-hidden className={className}>
+      <circle cx={'16'} cy={'16'} r={'13'} fill={'rgba(98,227,255,.13)'} stroke={'#77E5FF'} strokeWidth={'2'} />
+      <path d={'m20.7 10.4-3.1 7.2-6.3 4 3.1-7.2 6.3-4Z'} fill={'#FFD467'} stroke={'#fff'} strokeWidth={'1.4'} strokeLinejoin={'round'} />
+    </svg>
+  );
+}
+
+function SoundIcon({ on }) {
+  return (
+    <svg viewBox={'0 0 24 24'} fill={'none'} aria-hidden className={'h-5 w-5'}>
+      <path d={'M4 10v4h4l5 4V6L8 10H4Z'} fill={'currentColor'} />
+      {on ? (
+        <path d={'M16 9a5 5 0 0 1 0 6M18.5 6.5a8.5 8.5 0 0 1 0 11'} stroke={'currentColor'} strokeWidth={'1.8'} strokeLinecap={'round'} />
+      ) : (
+        <path d={'m17 9 5 6m0-6-5 6'} stroke={'currentColor'} strokeWidth={'1.8'} strokeLinecap={'round'} />
+      )}
+    </svg>
+  );
+}
+
+function Stars({ count, large = false }) {
+  return (
+    <span className={'inline-flex gap-1'} aria-label={`Звёзд: ${count} из 3`}>
+      {[1, 2, 3].map((number) => (
+        <StarIcon key={number} active={number <= count} className={large ? 'h-10 w-10' : 'h-5 w-5'} />
       ))}
     </span>
   );
 }
 
+function DotsClue({ count }) {
+  return (
+    <span className={'grid grid-cols-5 gap-2 rounded-[20px] border border-[#77E5FF]/20 bg-[#77E5FF]/10 px-4 py-3'} aria-label={`Точек: ${count}`}>
+      {Array.from({ length: count }).map((_, index) => (
+        <span key={index} className={'h-3.5 w-3.5 rounded-full bg-[#FFD467] shadow-[0_0_14px_rgba(255,212,103,.7)] sm:h-4 sm:w-4'} />
+      ))}
+    </span>
+  );
+}
+
+function preloadAssets(target) {
+  const cleanups = [];
+  for (const [key, src] of Object.entries(ASSET_SOURCES)) {
+    const image = new window.Image();
+    image.decoding = 'async';
+    image.src = src;
+    image.onload = () => {
+      target.current[key] = image;
+    };
+    cleanups.push(() => {
+      image.onload = null;
+    });
+  }
+  return () => cleanups.forEach((cleanup) => cleanup());
+}
+
 export function BridgeGame({ hasAccess = false, onExit }) {
   const canvasRef = useRef(null);
   const wrapRef = useRef(null);
+  const mapRef = useRef(null);
   const gameRef = useRef(null);
+  const assetsRef = useRef({});
   const pausedRef = useRef(false);
   const pointerRef = useRef(null);
 
@@ -64,11 +122,12 @@ export function BridgeGame({ hasAccess = false, onExit }) {
   const [paused, setPaused] = useState(false);
   const [soundOn, setSoundOn] = useState(true);
   const [result, setResult] = useState(null);
-  const [hud, setHud] = useState({ target: 1, collected: 0, misses: 0, hint: false });
+  const [hud, setHud] = useState({ challenge: null, collected: 0, misses: 0, hint: false, feedback: null, lane: 1 });
 
   const level = LEVELS[levelIndex] || LEVELS[0];
 
-  // ── Прогресс ───────────────────────────────────────────────────────────────
+  useEffect(() => preloadAssets(assetsRef), []);
+
   useEffect(() => {
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
@@ -78,7 +137,7 @@ export function BridgeGame({ hasAccess = false, onExit }) {
         if (parsed && typeof parsed.soundOn === 'boolean') setSoundOn(parsed.soundOn);
       }
     } catch {
-      // повреждённый или недоступный localStorage не должен ломать игру
+      // The game remains usable when storage is unavailable.
     }
     setReady(true);
   }, []);
@@ -88,38 +147,43 @@ export function BridgeGame({ hasAccess = false, onExit }) {
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ stars, soundOn }));
     } catch {
-      // приватный режим — прогресс просто не сохранится
+      // Private mode can block storage; progress then lives only in this session.
     }
   }, [ready, stars, soundOn]);
 
+  useEffect(() => setMuted(!soundOn), [soundOn]);
   useEffect(() => {
-    setMuted(!soundOn);
-  }, [soundOn]);
-
+    if (view !== 'map' || !mapRef.current) return undefined;
+    const frame = window.requestAnimationFrame(() => mapRef.current?.scrollTo({ top: 0, behavior: 'instant' }));
+    return () => window.cancelAnimationFrame(frame);
+  }, [view]);
   useEffect(() => {
     pausedRef.current = paused;
   }, [paused]);
 
-  // ── Экраны ─────────────────────────────────────────────────────────────────
   const syncHud = useCallback((game) => {
-    setHud((prev) => {
-      if (
-        prev.target === game.target &&
-        prev.collected === game.collected &&
-        prev.misses === game.misses &&
-        prev.hint === game.hint
-      ) {
-        return prev;
-      }
-      return { target: game.target, collected: game.collected, misses: game.misses, hint: game.hint };
+    const feedback = game.feedback
+      ? { kind: game.feedback.kind, title: game.feedback.title, detail: game.feedback.detail }
+      : null;
+    setHud((previous) => {
+      const same =
+        previous.challenge?.id === game.challenge?.id &&
+        previous.collected === game.collected &&
+        previous.misses === game.misses &&
+        previous.hint === game.hint &&
+        previous.lane === game.fox.lane &&
+        previous.feedback?.kind === feedback?.kind &&
+        previous.feedback?.detail === feedback?.detail;
+      if (same) return previous;
+      return { challenge: game.challenge, collected: game.collected, misses: game.misses, hint: game.hint, feedback, lane: game.fox.lane };
     });
   }, []);
 
   const finishLevel = useCallback((game) => {
     const earned = starsFor(game.misses);
     const id = game.level.id;
-    setStars((prev) => (prev[id] >= earned ? prev : { ...prev, [id]: earned }));
-    setResult({ id, earned, misses: game.misses });
+    setStars((previous) => (previous[id] >= earned ? previous : { ...previous, [id]: earned }));
+    setResult({ id, earned, misses: game.misses, bestStreak: game.bestStreak });
     setView('win');
     reachGoal('prep_game_level', { level: id, stars: earned });
   }, []);
@@ -133,7 +197,6 @@ export function BridgeGame({ hasAccess = false, onExit }) {
     reachGoal('prep_game_start', { level: LEVELS[index]?.id ?? index + 1 });
   }, []);
 
-  // ── Игровой цикл ───────────────────────────────────────────────────────────
   useEffect(() => {
     if (view !== 'play') return undefined;
     const canvas = canvasRef.current;
@@ -144,7 +207,7 @@ export function BridgeGame({ hasAccess = false, onExit }) {
 
     const game = createGame(levelIndex);
     gameRef.current = game;
-    setHud({ target: game.target, collected: 0, misses: 0, hint: false });
+    setHud({ challenge: game.challenge, collected: 0, misses: 0, hint: false, feedback: null, lane: 1 });
 
     const camera = { scale: 1, dx: 0, dy: 0 };
     const resize = () => {
@@ -153,10 +216,10 @@ export function BridgeGame({ hasAccess = false, onExit }) {
       const dpr = Math.min(2, window.devicePixelRatio || 1);
       canvas.width = Math.round(rect.width * dpr);
       canvas.height = Math.round(rect.height * dpr);
-      const scale = Math.min(rect.width / WORLD_W, rect.height / WORLD_H);
-      camera.scale = scale * dpr;
-      camera.dx = ((rect.width - WORLD_W * scale) / 2) * dpr;
-      camera.dy = ((rect.height - WORLD_H * scale) / 2) * dpr;
+      const cssScale = Math.min(rect.width / WORLD_W, rect.height / WORLD_H);
+      camera.scale = cssScale * dpr;
+      camera.dx = ((rect.width - WORLD_W * cssScale) / 2) * dpr;
+      camera.dy = ((rect.height - WORLD_H * cssScale) / 2) * dpr;
     };
 
     const observer = new ResizeObserver(resize);
@@ -165,32 +228,27 @@ export function BridgeGame({ hasAccess = false, onExit }) {
 
     let raf = 0;
     let last = performance.now();
-    let acc = 0;
+    let accumulator = 0;
     let finishAt = 0;
-
     const frame = (now) => {
       raf = window.requestAnimationFrame(frame);
       const dt = Math.min(0.25, (now - last) / 1000);
       last = now;
-
       if (!pausedRef.current) {
-        acc += dt;
+        accumulator += dt;
         let guard = 0;
-        while (acc >= STEP && guard < 6) {
+        while (accumulator >= STEP && guard < 6) {
           update(game, STEP);
-          acc -= STEP;
+          accumulator -= STEP;
           guard += 1;
         }
-        // Вкладка подтормозила и накопился долг — досчитывать его вредно:
-        // мост «прыгнет» вперёд. Просто теряем лишнее время.
-        if (acc > STEP) acc = 0;
-
+        if (accumulator > STEP) accumulator = 0;
         const events = drainEvents(game);
         if (events) {
           for (const name of events) {
             if (name === 'done') {
               playSound('done');
-              finishAt = now + 1400;
+              finishAt = now + 1450;
             } else {
               playSound(name);
             }
@@ -202,13 +260,11 @@ export function BridgeGame({ hasAccess = false, onExit }) {
           finishLevel(game);
         }
       }
-
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.setTransform(camera.scale, 0, 0, camera.scale, camera.dx, camera.dy);
-      draw(ctx, game);
+      draw(ctx, game, assetsRef.current);
     };
-
     raf = window.requestAnimationFrame(frame);
 
     return () => {
@@ -218,42 +274,49 @@ export function BridgeGame({ hasAccess = false, onExit }) {
     };
   }, [view, levelIndex, syncHud, finishLevel]);
 
-  // ── Ввод ───────────────────────────────────────────────────────────────────
-  const jump = useCallback((direction) => {
+  const shiftLane = useCallback((direction) => {
     const game = gameRef.current;
     if (!game || pausedRef.current) return;
     moveLane(game, direction);
   }, []);
 
+  const chooseLane = useCallback((lane) => {
+    const game = gameRef.current;
+    if (!game || pausedRef.current) return;
+    selectLane(game, lane);
+  }, []);
+
   useEffect(() => {
     if (view !== 'play') return undefined;
     const onKey = (event) => {
-      const key = event.key;
-      if (key === 'ArrowUp' || key === 'w' || key === 'W' || key === 'ц' || key === 'Ц') {
+      if (event.key === 'ArrowUp' || event.key === 'w' || event.key === 'W') {
         event.preventDefault();
-        jump(-1);
-      } else if (key === 'ArrowDown' || key === 's' || key === 'S' || key === 'ы' || key === 'Ы') {
+        shiftLane(-1);
+      } else if (event.key === 'ArrowDown' || event.key === 's' || event.key === 'S') {
         event.preventDefault();
-        jump(1);
-      } else if (key === ' ') {
+        shiftLane(1);
+      } else if (event.key === '1' || event.key === '2' || event.key === '3') {
+        event.preventDefault();
+        chooseLane(Number(event.key) - 1);
+      } else if (event.key === ' ') {
         event.preventDefault();
         setPaused((value) => !value);
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [view, jump]);
+  }, [view, shiftLane, chooseLane]);
 
   useEffect(() => {
     if (view !== 'play') return undefined;
-    const onHidden = () => {
+    const pauseWhenHidden = () => {
       if (document.hidden) setPaused(true);
     };
-    document.addEventListener('visibilitychange', onHidden);
-    window.addEventListener('blur', onHidden);
+    document.addEventListener('visibilitychange', pauseWhenHidden);
+    window.addEventListener('blur', pauseWhenHidden);
     return () => {
-      document.removeEventListener('visibilitychange', onHidden);
-      window.removeEventListener('blur', onHidden);
+      document.removeEventListener('visibilitychange', pauseWhenHidden);
+      window.removeEventListener('blur', pauseWhenHidden);
     };
   }, [view]);
 
@@ -267,334 +330,200 @@ export function BridgeGame({ hasAccess = false, onExit }) {
     pointerRef.current = null;
     if (!start || paused) return;
     const delta = event.clientY - start.y;
-    if (Math.abs(delta) > 26) {
-      jump(delta < 0 ? -1 : 1);
+    if (Math.abs(delta) > 34) {
+      shiftLane(delta < 0 ? -1 : 1);
       return;
     }
     const rect = event.currentTarget.getBoundingClientRect();
-    jump(event.clientY < rect.top + rect.height / 2 ? -1 : 1);
+    const scale = Math.min(rect.width / WORLD_W, rect.height / WORLD_H);
+    const offsetY = (rect.height - WORLD_H * scale) / 2;
+    const worldY = (event.clientY - rect.top - offsetY) / scale;
+    let nearest = 0;
+    for (let index = 1; index < LANE_Y.length; index += 1) {
+      if (Math.abs(LANE_Y[index] - worldY) < Math.abs(LANE_Y[nearest] - worldY)) nearest = index;
+    }
+    chooseLane(nearest);
   }
 
-  // ── Карта пролётов ─────────────────────────────────────────────────────────
   if (view === 'map') {
-    const total = Object.values(stars).reduce((sum, n) => sum + n, 0);
+    const total = Object.values(stars).reduce((sum, count) => sum + count, 0);
     const maxStars = LEVELS.length * 3;
-    const progress = Math.round((total / maxStars) * 100);
+    const completed = LEVELS.filter((item) => (stars[item.id] || 0) > 0).length;
     return (
-      <div className={'flex h-full flex-col gap-5 overflow-y-auto'}>
-        <div className={'flex flex-wrap items-end justify-between gap-4'}>
-          <div>
-            <span className={'text-[10px] font-extrabold uppercase tracking-[0.18em] text-brand-cyan'}>
-              Игра · бесплатно · без регистрации
-            </span>
-            <h3 className={'mt-2 font-display text-3xl font-extrabold tracking-[-0.03em] text-white sm:text-4xl'}>
-              Мост через реку
-            </h3>
-            <p className={'mt-2 max-w-xl text-sm font-semibold leading-6 text-white/60'}>
-              Лисёнок Искра перебирается через реку по камням. Прыгай на камень со следующим
-              числом — из камней за спиной вырастает мост.
-            </p>
+      <div ref={mapRef} className={'flex h-full flex-col overflow-y-auto text-white'}>
+        <div className={'relative shrink-0 overflow-hidden rounded-[30px] border border-white/10 bg-[linear-gradient(135deg,#101F48_0%,#172659_54%,#321F57_100%)] p-5 sm:p-7'}>
+          <div className={'pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full bg-[#77E5FF]/14 blur-3xl'} />
+          <div className={'relative flex flex-wrap items-end justify-between gap-5'}>
+            <div className={'max-w-2xl'}>
+              <span className={'inline-flex rounded-full border border-[#77E5FF]/25 bg-[#77E5FF]/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-[.16em] text-[#8BEAFF]'}>
+                Экспедиция по математической реке
+              </span>
+              <h3 className={'mt-3 font-display text-3xl font-black tracking-[-.04em] sm:text-5xl'}>Мост через реку</h3>
+              <p className={'mt-3 text-sm font-semibold leading-6 text-white/65 sm:text-base'}>
+                Здесь уже нельзя просто узнать нужную цифру. Ребёнок восстанавливает ряды, ищет соседей числа,
+                сравнивает, складывает и вычитает — а верный ответ становится новым звеном моста.
+              </p>
+            </div>
+            <div className={'grid min-w-[210px] grid-cols-2 gap-2'}>
+              <div className={'rounded-[20px] border border-white/10 bg-white/[.07] p-3'}>
+                <p className={'text-[10px] font-black uppercase tracking-[.12em] text-white/42'}>Миссии</p>
+                <p className={'mt-1 font-display text-2xl font-black'}>{completed}<span className={'text-white/35'}>/{LEVELS.length}</span></p>
+              </div>
+              <div className={'rounded-[20px] border border-white/10 bg-white/[.07] p-3'}>
+                <p className={'text-[10px] font-black uppercase tracking-[.12em] text-white/42'}>Звёзды</p>
+                <p className={'mt-1 font-display text-2xl font-black'}>{ready ? total : 0}<span className={'text-white/35'}>/{maxStars}</span></p>
+              </div>
+            </div>
           </div>
-          <div className={'text-right'}>
-            <p className={'text-[10px] font-extrabold uppercase tracking-[0.16em] text-white/45'}>Звёзды</p>
-            <p className={'font-display text-2xl font-extrabold text-white'}>
-              {ready ? total : 0} <span className={'text-white/45'}>/ {maxStars}</span>
-            </p>
-          </div>
-        </div>
-
-        {/* Прогресс — не абстрактные проценты, а «сколько моста построено»:
-            ребёнку понятнее, а родителю видно движение. */}
-        <div>
-          <div className={'flex items-center justify-between text-[11px] font-extrabold text-white/60'}>
-            <span>Мост построен</span>
-            <span>{progress}%</span>
-          </div>
-          <div className={'mt-2 h-2.5 w-full overflow-hidden rounded-full bg-white/12'}>
-            <div
-              className={'h-full rounded-full bg-brand-cyan transition-all duration-500'}
-              style={{ width: progress + '%' }}
-            />
+          <div className={'relative mt-5 h-3 overflow-hidden rounded-full bg-white/10'}>
+            <div className={'h-full rounded-full bg-gradient-to-r from-[#77E5FF] via-[#7EF0C4] to-[#FFD467] transition-all duration-500'} style={{ width: `${(completed / LEVELS.length) * 100}%` }} />
           </div>
         </div>
 
-        <div className={'grid gap-3 sm:grid-cols-2 lg:grid-cols-3'}>
+        <div className={'mt-5 grid shrink-0 gap-3 sm:grid-cols-2'}>
           {LEVELS.map((item, index) => {
             const paywalled = index + 1 > FREE_LEVELS && !hasAccess;
-            // Пролёты открываются по очереди: следующий доступен, когда пройден
-            // предыдущий. Это и есть ощущение продвижения по мосту.
             const previousDone = index === 0 || (stars[LEVELS[index - 1].id] || 0) > 0;
             const locked = paywalled || !previousDone;
             const earned = stars[item.id] || 0;
+            const tone = item.scene === 'night' ? 'from-[#27214F] to-[#151E46]' : item.scene === 'sunset' ? 'from-[#402652] to-[#1C2B55]' : 'from-[#173A62] to-[#15264E]';
             return (
               <button
                 key={item.id}
                 type={'button'}
                 onClick={() => (locked ? null : startLevel(index))}
                 disabled={locked}
-                className={
-                  'rounded-[24px] border p-4 text-left transition ' +
-                  (locked
-                    ? 'cursor-not-allowed border-white/10 bg-white/[0.04] text-white/45'
-                    : 'border-white/16 bg-white/[0.08] text-white hover:-translate-y-0.5 hover:border-brand-cyan/60 hover:bg-white/[0.13]')
-                }
+                className={`group relative min-h-[170px] overflow-hidden rounded-[26px] border p-5 text-left transition ${locked ? 'cursor-not-allowed border-white/8 bg-white/[.035] text-white/42' : `border-white/12 bg-gradient-to-br ${tone} text-white hover:-translate-y-1 hover:border-[#77E5FF]/45 hover:shadow-[0_18px_45px_rgba(5,16,44,.3)]`}`}
               >
-                <div className={'flex items-center justify-between gap-2'}>
-                  <span className={'font-display text-lg font-extrabold'}>
-                    {locked ? '🔒 ' : ''}Уровень {item.id}
+                <div className={'flex items-start justify-between gap-3'}>
+                  <span className={'inline-flex items-center gap-2 rounded-full bg-white/[.08] px-3 py-1.5 text-[10px] font-black uppercase tracking-[.12em]'}>
+                    {locked && <LockIcon />}
+                    {item.act} · {item.id}
                   </span>
                   {!locked && <Stars count={earned} />}
                 </div>
-                <p className={'mt-2 font-display text-base font-extrabold'}>{item.title}</p>
-                <p className={'mt-1 text-xs font-semibold leading-5 text-white/60'}>{item.note}</p>
-                <p className={'mt-3 inline-flex rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.12em] text-white/70'}>
-                  {MODE_LABEL[item.mode]}
-                </p>
-                {paywalled && <p className={'mt-2 text-xs font-bold text-brand-yellow'}>Открывается с курсом</p>}
-                {!paywalled && !previousDone && (
-                  <p className={'mt-2 text-xs font-bold text-white/50'}>Сначала уровень {LEVELS[index - 1].id}</p>
-                )}
+                <p className={'mt-4 font-display text-xl font-black leading-tight'}>{item.title}</p>
+                <p className={'mt-2 text-xs font-semibold leading-5 text-white/58'}>{item.note}</p>
+                <div className={'mt-4 flex items-center justify-between gap-3'}>
+                  <span className={'rounded-full bg-[#77E5FF]/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-[.1em] text-[#8BEAFF]'}>{item.skill}</span>
+                  {!locked && <span className={'text-sm font-black text-[#FFD467] transition group-hover:translate-x-1'}>Начать →</span>}
+                </div>
+                {paywalled && <p className={'mt-3 text-xs font-bold text-[#FFD467]'}>Открывается вместе с курсом</p>}
+                {!paywalled && !previousDone && <p className={'mt-3 text-xs font-bold text-white/44'}>Сначала завершите миссию {LEVELS[index - 1].id}</p>}
               </button>
             );
           })}
         </div>
 
-        <div className={'mt-auto flex flex-wrap items-center justify-between gap-3 pt-2'}>
-          <button
-            type={'button'}
-            onClick={() => setSoundOn((value) => !value)}
-            aria-pressed={soundOn}
-            className={'rounded-full border border-white/14 px-4 py-2 text-xs font-extrabold text-white/70 transition hover:border-white/30'}
-          >
-            {soundOn ? '🔊 Звук включён' : '🔇 Без звука'}
+        <div className={'mt-5 flex shrink-0 flex-wrap items-center justify-between gap-3'}>
+          <button type={'button'} onClick={() => setSoundOn((value) => !value)} className={'inline-flex min-h-[46px] items-center gap-2 rounded-full border border-white/14 px-4 text-xs font-black text-white/70 transition hover:border-white/30'}>
+            <SoundIcon on={soundOn} /> {soundOn ? 'Звук включён' : 'Звук выключен'}
           </button>
-          {onExit && (
-            <button
-              type={'button'}
-              onClick={onExit}
-              className={'rounded-full bg-white/10 px-5 py-2 text-xs font-extrabold text-white transition hover:bg-white/16'}
-            >
-              Закрыть игру
-            </button>
-          )}
+          {onExit && <button type={'button'} onClick={onExit} className={'min-h-[46px] rounded-full bg-white/10 px-5 text-xs font-black transition hover:bg-white/16'}>Закрыть игру</button>}
         </div>
       </div>
     );
   }
 
-  // ── Уровень пройден ────────────────────────────────────────────────────────
   if (view === 'win') {
-    const earned = result ? result.earned : 3;
+    const earned = result?.earned || 3;
     const nextIndex = levelIndex + 1;
     const hasNext = nextIndex < LEVELS.length;
     const nextLocked = nextIndex + 1 > FREE_LEVELS && !hasAccess;
     return (
-      <div className={'flex h-full flex-col items-center justify-center gap-4 text-center'}>
-        <p className={'text-5xl'} aria-hidden>
-          🦊
-        </p>
-        <h3 className={'font-display text-3xl font-extrabold tracking-[-0.03em] text-white sm:text-4xl'}>
-          Ты перебрался на тот берег!
-        </h3>
-        <Stars count={earned} size={'lg'} />
-        <p className={'max-w-md text-sm font-semibold leading-6 text-white/62'}>
-          {earned === 3
-            ? 'Ни одного промаха. Числовой ряд ты знаешь на отлично.'
-            : earned === 2
-              ? 'Почти без ошибок. Пройди ещё раз чисто — будет три звезды.'
-              : 'Берег твой! Попробуй ещё раз: чем меньше ошибок, тем больше звёзд.'}
+      <div className={'flex h-full flex-col items-center justify-center gap-4 text-center text-white'}>
+        <span className={'flex h-20 w-20 items-center justify-center rounded-[28px] border border-[#77E5FF]/25 bg-[#77E5FF]/10'}><CompassIcon className={'h-12 w-12'} /></span>
+        <p className={'text-xs font-black uppercase tracking-[.16em] text-[#8BEAFF]'}>Миссия {level.id} завершена</p>
+        <h3 className={'font-display text-3xl font-black tracking-[-.04em] sm:text-5xl'}>Пролёт моста построен</h3>
+        <Stars count={earned} large />
+        <p className={'max-w-lg text-sm font-semibold leading-6 text-white/62'}>
+          {earned === 3 ? 'Все задачи решены точно. Новый навык закреплён без подсказок.' : earned === 2 ? 'Сильное прохождение. Ещё одна попытка поможет взять три звезды.' : 'Миссия выполнена. Повтори её спокойно — объяснения уже показали сложные места.'}
         </p>
         <div className={'mt-2 flex flex-wrap items-center justify-center gap-2'}>
-          {hasNext && !nextLocked && (
-            <button
-              type={'button'}
-              onClick={() => startLevel(nextIndex)}
-              className={'min-h-[52px] rounded-full bg-brand-cyan px-6 text-sm font-extrabold text-[#0A1226] transition hover:-translate-y-0.5'}
-            >
-              Уровень {LEVELS[nextIndex].id} →
-            </button>
-          )}
-          {hasNext && nextLocked && (
-            <a
-              href={'#podpiska'}
-              onClick={onExit}
-              className={'inline-flex min-h-[52px] items-center rounded-full bg-brand-cyan px-6 text-sm font-extrabold text-[#0A1226] transition hover:-translate-y-0.5'}
-            >
-              Открыть остальные уровни →
-            </a>
-          )}
-          <button
-            type={'button'}
-            onClick={() => startLevel(levelIndex)}
-            className={'min-h-[52px] rounded-full border border-white/16 px-6 text-sm font-extrabold text-white transition hover:border-white/32'}
-          >
-            Ещё раз
-          </button>
-          <button
-            type={'button'}
-            onClick={() => setView('map')}
-            className={'min-h-[52px] rounded-full border border-white/16 px-6 text-sm font-extrabold text-white transition hover:border-white/32'}
-          >
-            К уровням
-          </button>
+          {hasNext && !nextLocked && <button type={'button'} onClick={() => startLevel(nextIndex)} className={'min-h-[54px] rounded-full bg-[#77E5FF] px-7 text-sm font-black text-[#0A1838] transition hover:-translate-y-0.5'}>Следующая миссия →</button>}
+          {hasNext && nextLocked && <a href={'#podpiska'} onClick={onExit} className={'inline-flex min-h-[54px] items-center rounded-full bg-[#77E5FF] px-7 text-sm font-black text-[#0A1838]'}>Открыть полную экспедицию →</a>}
+          <button type={'button'} onClick={() => startLevel(levelIndex)} className={'min-h-[54px] rounded-full border border-white/16 px-6 text-sm font-black transition hover:border-white/35'}>Пройти ещё раз</button>
+          <button type={'button'} onClick={() => setView('map')} className={'min-h-[54px] rounded-full border border-white/16 px-6 text-sm font-black transition hover:border-white/35'}>К миссиям</button>
         </div>
       </div>
     );
   }
 
-  // ── Уровень ────────────────────────────────────────────────────────────────
-  // Игроку 5–7 лет читать ещё рано, поэтому состояние показано значками:
-  // сердца — попытки, дорожка камешков — сколько пройдено. Крупно, потому что
-  // играют пальцем на телефоне и смотрят издалека.
-  const lives = Math.max(0, 3 - hud.misses);
+  const predictedStars = starsFor(hud.misses);
   return (
-    <div className={'flex h-full flex-col gap-3'}>
+    <div className={'flex h-full flex-col gap-3 text-white'}>
       <div className={'flex flex-wrap items-center justify-between gap-2'}>
-        <div className={'flex items-center gap-3'}>
-          <button
-            type={'button'}
-            onClick={() => setView('map')}
-            aria-label={'Вернуться к выбору уровня'}
-            className={'rounded-full border border-white/20 px-4 py-2 text-base font-extrabold text-white transition hover:border-white/40'}
-          >
-            ←
-          </button>
-          <div>
-            <p className={'font-display text-base font-extrabold text-white'}>{level.title}</p>
-            <p className={'text-[11px] font-bold text-white/50'}>{level.note}</p>
+        <div className={'flex min-w-0 items-center gap-3'}>
+          <button type={'button'} onClick={() => setView('map')} aria-label={'К карте миссий'} className={'flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/18 text-lg font-black transition hover:border-white/40'}>←</button>
+          <div className={'min-w-0'}>
+            <p className={'truncate font-display text-base font-black sm:text-lg'}>{level.title}</p>
+            <p className={'truncate text-[11px] font-bold text-white/48'}>Миссия {level.id} · {level.skill}</p>
           </div>
         </div>
         <div className={'flex items-center gap-2'}>
-          <div
-            className={'flex items-center gap-1.5 rounded-full bg-white/10 px-4 py-2'}
-            aria-label={'Сердец осталось: ' + lives}
-          >
-            {[0, 1, 2].map((index) => (
-              <span
-                key={index}
-                aria-hidden
-                className={'text-2xl leading-none ' + (index < lives ? 'text-[#FF5A5A]' : 'text-white/20')}
-              >
-                ♥
-              </span>
-            ))}
-          </div>
-          <button
-            type={'button'}
-            onClick={() => setPaused((value) => !value)}
-            aria-label={paused ? 'Продолжить игру' : 'Пауза'}
-            className={'rounded-full border border-white/20 px-4 py-2 text-lg leading-none text-white transition hover:border-white/40'}
-          >
-            {paused ? '▶' : '⏸'}
-          </button>
-          <button
-            type={'button'}
-            onClick={() => setSoundOn((value) => !value)}
-            aria-pressed={soundOn}
-            aria-label={soundOn ? 'Выключить звук' : 'Включить звук'}
-            className={'rounded-full border border-white/20 px-4 py-2 text-lg leading-none text-white transition hover:border-white/40'}
-          >
-            {soundOn ? '🔊' : '🔇'}
-          </button>
+          <div className={'hidden items-center gap-1 rounded-full bg-white/[.08] px-3 py-2 sm:flex'}><Stars count={predictedStars} /></div>
+          <button type={'button'} onClick={() => setPaused((value) => !value)} aria-label={paused ? 'Продолжить' : 'Пауза'} className={'flex h-11 min-w-11 items-center justify-center rounded-full border border-white/18 px-3 text-base font-black transition hover:border-white/40'}>{paused ? '▶' : 'Ⅱ'}</button>
+          <button type={'button'} onClick={() => setSoundOn((value) => !value)} aria-label={soundOn ? 'Выключить звук' : 'Включить звук'} className={'flex h-11 w-11 items-center justify-center rounded-full border border-white/18 transition hover:border-white/40'}><SoundIcon on={soundOn} /></button>
         </div>
       </div>
 
-      <div className={'flex items-center gap-3 rounded-[20px] bg-white/[0.08] px-4 py-3'}>
-        <span className={'text-2xl leading-none'} aria-hidden>
-          🦊
-        </span>
-        <div className={'flex flex-1 items-center gap-1.5'} aria-hidden>
-          {Array.from({ length: SLABS_PER_LEVEL }).map((_, index) => (
-            <span
-              key={index}
-              className={
-                'h-4 flex-1 rounded-full transition-colors duration-300 ' +
-                (index < hud.collected ? 'bg-brand-cyan' : 'bg-white/15')
-              }
-            />
-          ))}
+      <div className={'grid gap-3 rounded-[24px] border border-[#77E5FF]/16 bg-[linear-gradient(135deg,rgba(119,229,255,.11),rgba(255,255,255,.055))] p-4 sm:grid-cols-[1fr_auto] sm:items-center sm:p-5'}>
+        <div>
+          <p className={'text-[10px] font-black uppercase tracking-[.18em] text-[#8BEAFF]'}>{hud.challenge?.label || 'Задание моста'}</p>
+          <p className={'mt-1.5 font-display text-2xl font-black leading-tight tracking-[-.025em] sm:text-3xl'}>{hud.challenge?.prompt || 'Готовим маршрут…'}</p>
+          <p className={'mt-2 text-xs font-bold text-white/52'}>{hud.hint ? 'Подсказка включена: верный камень светится золотым.' : 'Выбери ответ на одном из трёх камней. Сам ответ заранее не показывается.'}</p>
         </div>
-        <span className={'font-display text-xl font-extrabold text-white'}>
-          {hud.collected}
-          <span className={'text-white/45'}>/{SLABS_PER_LEVEL}</span>
-        </span>
+        {hud.challenge?.visual?.type === 'dots' && <DotsClue count={hud.challenge.visual.count} />}
+      </div>
+
+      <div className={'flex items-center gap-3 rounded-[18px] bg-white/[.065] px-4 py-2.5'}>
+        <CompassIcon className={'h-6 w-6 shrink-0'} />
+        <div className={'flex flex-1 items-center gap-1.5'} aria-hidden>
+          {Array.from({ length: SLABS_PER_LEVEL }).map((_, index) => <span key={index} className={`h-2.5 flex-1 rounded-full transition ${index < hud.collected ? 'bg-gradient-to-r from-[#77E5FF] to-[#7EF0C4]' : 'bg-white/13'}`} />)}
+        </div>
+        <span className={'font-display text-lg font-black'}>{hud.collected}<span className={'text-white/40'}>/{SLABS_PER_LEVEL}</span></span>
       </div>
 
       <div
         ref={wrapRef}
         onPointerDown={handlePointerDown}
         onPointerUp={handlePointerUp}
-        onPointerCancel={() => {
-          pointerRef.current = null;
-        }}
-        className={'relative min-h-0 w-full flex-1 cursor-pointer overflow-hidden rounded-[24px]'}
-        style={{ touchAction: 'none', background: '#0B1226' }}
+        onPointerCancel={() => { pointerRef.current = null; }}
+        className={'relative aspect-video min-h-0 w-full flex-none cursor-pointer overflow-hidden rounded-[26px] border border-white/10 bg-[#0B1635] sm:aspect-auto sm:min-h-[430px] sm:flex-1'}
+        style={{ touchAction: 'none' }}
       >
         <canvas ref={canvasRef} className={'h-full w-full'} />
-
-        <div className={'pointer-events-none absolute inset-x-0 top-0 flex flex-col items-center gap-1 p-2'}>
-          <span
-            className={'rounded-full px-3 py-1 text-[11px] font-extrabold text-white'}
-            style={{ backgroundColor: 'rgba(7, 14, 32, 0.72)' }}
-          >
-            {level.tip}
-          </span>
-          <span
-            className={'rounded-full px-3 py-1 text-[10px] font-bold text-white/75'}
-            style={{ backgroundColor: 'rgba(7, 14, 32, 0.55)' }}
-          >
-            ▲ вверх · ▼ вниз — тап по половине экрана, свайп или стрелки
+        <div className={'pointer-events-none absolute inset-x-0 top-0 flex justify-center p-3'}>
+          <span className={'rounded-full border border-white/15 bg-[#07142E]/76 px-4 py-2 text-[10px] font-black uppercase tracking-[.12em] text-white/78 shadow-lg backdrop-blur-md'}>
+            Тапни прямо по дорожке с ответом · клавиши 1, 2, 3
           </span>
         </div>
 
+        {hud.feedback && (
+          <div className={`pointer-events-none absolute bottom-4 left-1/2 w-[min(92%,560px)] -translate-x-1/2 rounded-[22px] border px-5 py-4 text-center shadow-2xl backdrop-blur-xl ${hud.feedback.kind === 'bad' ? 'border-[#FF8A90]/55 bg-[#421D33]/92' : hud.feedback.kind === 'bonus' ? 'border-[#FFD467]/55 bg-[#3B321C]/92' : 'border-[#7EF0C4]/55 bg-[#113C3B]/92'}`} aria-live={'polite'}>
+            <p className={'font-display text-lg font-black'}>{hud.feedback.title}</p>
+            <p className={'mt-1 text-xs font-bold leading-5 text-white/78'}>{hud.feedback.detail}</p>
+          </div>
+        )}
+
         {paused && (
-          <div
-            className={'absolute inset-0 flex flex-col items-center justify-center gap-3'}
-            style={{ backgroundColor: 'rgba(7, 14, 32, 0.88)' }}
-          >
-            <p className={'font-display text-2xl font-extrabold text-white'}>Пауза</p>
-            <button
-              type={'button'}
-              onClick={() => setPaused(false)}
-              className={'min-h-[48px] rounded-full bg-brand-cyan px-6 text-sm font-extrabold text-[#0A1226]'}
-            >
-              Продолжить
-            </button>
+          <div className={'absolute inset-0 flex flex-col items-center justify-center gap-4 bg-[#07142E]/92 backdrop-blur-sm'}>
+            <p className={'font-display text-3xl font-black'}>Пауза</p>
+            <button type={'button'} onClick={() => setPaused(false)} className={'min-h-[52px] rounded-full bg-[#77E5FF] px-7 text-sm font-black text-[#0A1838]'}>Продолжить</button>
           </div>
         )}
       </div>
 
-      {/* На телефоне мир 16:9 не занимает весь экран — свободное место внизу
-          отдаём под крупные кнопки, по которым легко попасть детской рукой. */}
-      <div className={'grid shrink-0 grid-cols-2 gap-2 sm:hidden'}>
-        <button
-          type={'button'}
-          onClick={() => {
-            unlockAudio();
-            jump(-1);
-          }}
-          aria-label={'Прыгнуть на дорожку выше'}
-          className={'min-h-[62px] rounded-[20px] border border-white/16 bg-white/8 text-2xl font-extrabold text-white transition active:bg-white/20'}
-        >
-          ▲
-        </button>
-        <button
-          type={'button'}
-          onClick={() => {
-            unlockAudio();
-            jump(1);
-          }}
-          aria-label={'Прыгнуть на дорожку ниже'}
-          className={'min-h-[62px] rounded-[20px] border border-white/16 bg-white/8 text-2xl font-extrabold text-white transition active:bg-white/20'}
-        >
-          ▼
-        </button>
+      <div className={'grid shrink-0 grid-cols-3 gap-2 sm:hidden'}>
+        {['Верх', 'Середина', 'Низ'].map((label, index) => (
+          <button key={label} type={'button'} onClick={() => { unlockAudio(); chooseLane(index); }} aria-pressed={hud.lane === index} className={`min-h-[58px] rounded-[18px] border text-xs font-black transition ${hud.lane === index ? 'border-[#77E5FF] bg-[#77E5FF] text-[#0A1838]' : 'border-white/16 bg-white/[.07] text-white'}`}>{index + 1}<span className={'mt-0.5 block text-[9px] uppercase tracking-[.08em] opacity-70'}>{label}</span></button>
+        ))}
       </div>
 
-      <p className={'shrink-0 text-center text-xs font-bold text-white/50'} aria-live={'polite'}>
-        {hud.hint ? 'Подсказка: нужный камень подсвечен. ' : ''}
-        Нужен камень с числом {hud.target}
-      </p>
+      <div className={'flex items-center justify-between gap-3 text-[11px] font-bold text-white/45'}>
+        <span>Промахи: {hud.misses} · игра не обрывается</span>
+        <span>{hud.hint ? 'Золотое свечение показывает ответ' : 'Сложность растёт через задачи, не через спешку'}</span>
+      </div>
     </div>
   );
 }

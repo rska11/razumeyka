@@ -7,10 +7,14 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test:games": "node scripts/test-bridge-game.mjs && node scripts/test-firefly-game.mjs && node scripts/test-house-game.mjs && node scripts/test-academy-game.mjs && node scripts/test-mental-number-game.mjs",
     "test:bridge": "node scripts/test-bridge-game.mjs",
     "test:firefly": "node scripts/test-firefly-game.mjs",
     "audio:drawing": "node scripts/generate-drawing-audio.mjs",
-    "audio:school-prep": "node scripts/generate-school-prep-audio.mjs"
+    "audio:school-prep": "node scripts/generate-school-prep-audio.mjs",
+    "test:house": "node scripts/test-house-game.mjs",
+    "test:academy": "node scripts/test-academy-game.mjs",
+    "test:mental-game": "node scripts/test-mental-number-game.mjs"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",

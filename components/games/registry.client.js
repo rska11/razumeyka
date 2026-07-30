@@ -19,6 +19,18 @@ export const GAME_COMPONENTS = {
       import('@/components/school-prep/BridgeGame.jsx').then((mod) => ({ default: mod.BridgeGame })),
     ),
   },
+  house: {
+    fill: true,
+    Comp: lazy(() =>
+      import('@/components/school-prep/HouseGame.jsx').then((mod) => ({ default: mod.HouseGame })),
+    ),
+  },
+  academy: {
+    fill: true,
+    Comp: lazy(() =>
+      import('@/components/school-prep/AcademyGame.jsx').then((mod) => ({ default: mod.AcademyGame })),
+    ),
+  },
   firefly: {
     fill: true,
     Comp: lazy(() =>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./mentalnaya-arifmetika/mental.css";
 import { Providers } from "./providers";
 import { CookieConsent } from "@/components/CookieConsent.jsx";
 import { YandexMetrika } from "@/components/analytics/YandexMetrika.jsx";

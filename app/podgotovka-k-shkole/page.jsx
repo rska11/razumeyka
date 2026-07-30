@@ -225,10 +225,14 @@ export default async function SchoolPrepPage() {
                     Пройти первое занятие бесплатно <span className="transition group-hover:translate-x-1">→</span>
                   </a>
                   <SchoolPrepIntroAudio />
-                  <a href="#igra" className="group inline-flex min-h-[58px] items-center justify-center gap-3 rounded-full bg-gradient-to-r from-[#FFB02E] to-[#FF7A45] px-6 py-4 text-sm font-extrabold text-[#19213A] shadow-[0_18px_38px_rgba(255,150,52,.22)] transition hover:-translate-y-1">
+                  <GameLauncher
+                    gameId="academy"
+                    hasAccess={hasAccess}
+                    className="group inline-flex min-h-[58px] items-center justify-center gap-3 rounded-full bg-gradient-to-r from-[#FFB02E] to-[#FF7A45] px-6 py-4 text-sm font-extrabold text-[#19213A] shadow-[0_18px_38px_rgba(255,150,52,.22)] transition hover:-translate-y-1"
+                  >
                     <span className="grid h-8 w-8 place-items-center rounded-full bg-white/75 text-xs transition group-hover:scale-110">▶</span>
-                    Играть: «Мост через реку»
-                  </a>
+                    Играть: «Механическая академия»
+                  </GameLauncher>
                 </div>
                 <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-[11px] font-extrabold text-ink/48 sm:text-xs">
                   <span>● Без карты</span>

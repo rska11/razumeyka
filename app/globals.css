@@ -225,3 +225,38 @@
     font-family: 'Plus Jakarta Sans', Manrope, Arial, sans-serif;
   }
 }
+
+/* BRIDGE FOX RUNNER V3 */
+.bridge-fox-runner {
+  position: absolute;
+  bottom: 4%;
+  left: 0;
+  z-index: 10;
+  display: block;
+  width: clamp(180px, 34%, 245px);
+  aspect-ratio: .9;
+  overflow: hidden;
+  filter: drop-shadow(0 16px 22px rgba(4,18,46,.48));
+  pointer-events: none;
+}
+
+.bridge-fox-runner-sheet {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 400%;
+  max-width: none;
+  height: 100%;
+  object-fit: fill;
+  animation: bridgeFoxRun .72s steps(1, end) infinite;
+}
+
+@keyframes bridgeFoxRun {
+  0%, 24.99% { transform: translateX(0); }
+  25%, 49.99% { transform: translateX(-25%); }
+  50%, 74.99% { transform: translateX(-50%); }
+  75%, 100% { transform: translateX(-75%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bridge-fox-runner-sheet { animation: none; }
+}

@@ -20,6 +20,15 @@ export const metadata = {
 };
 
 const gameView = {
+  academy: {
+    icon: '🧭',
+    directionLabel: 'Подготовка к школе',
+    directionHref: '/podgotovka-k-shkole',
+    gradient: 'from-[#07152E] via-[#173F72] to-[#7862CF]',
+    glow: 'bg-[#FFD75F]/24',
+    accent: 'bg-[#FFD75F] text-[#07152E]',
+    text: 'text-[#83F4D8]',
+  },
   bridge: {
     icon: '🦊',
     directionLabel: 'Подготовка к школе',

@@ -236,7 +236,7 @@ export default async function MentalArithmeticPage() {
             <div className="max-w-3xl">
               <span className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-brand-blue">Игра · можно прямо сейчас</span>
               <h2 className="mt-5 font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.05em] sm:text-5xl">Настоящая аркада, где числа управляют полётом</h2>
-              <p className="mt-5 text-base font-semibold leading-7 text-ink/56">«Звёздный абакус» — ребёнок ведёт корабль по трём воздушным трассам, ловит правильные числовые кристаллы и уклоняется от неверных. Здесь есть движение, жизни, комбо и ускорение, а первые три миссии открыты всем.</p>
+              <p className="mt-5 text-base font-semibold leading-7 text-ink/56">«Звёздный абакус» — ребёнок ведёт исследовательский корабль по трём воздушным трассам и решает задачи прямо в полёте: читает абакус, сравнивает числа, находит соседей, продолжает ряды и разбирает десятки с единицами. Ошибка не обрывает миссию — правильный ход сразу объясняется. Первые три миссии открыты всем.</p>
             </div>
 
             <div className="mt-10">

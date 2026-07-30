@@ -47,6 +47,9 @@ function instructionText(mission) {
   if (mission.type === 'sort') {
     parts.push(`Предметы: ${labels(mission.items)}. Зоны: ${labels(mission.groups)}.`);
   }
+  if (mission.type === 'recall') {
+    parts.push(`Запомни: ${labels(mission.study)}. Варианты ответа: ${labels(mission.options)}.`);
+  }
   return clean(parts.join(' '));
 }
 

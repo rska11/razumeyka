@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { SchoolPrepAudioButton } from "./SchoolPrepAudioButton.jsx";
 import { SchoolPrepAutoNarration } from "./SchoolPrepAutoNarration.jsx";
+import { SchoolPrepScene, SchoolPrepShape, SchoolPrepVisual } from "./SchoolPrepVisual.jsx";
 
 const STORAGE_KEY = "razumeyka_school_prep_week1";
 
@@ -38,20 +39,40 @@ function ResultMessage({ state, success, hint }) {
 function OptionContent({ option }) {
   return (
     <>
+      {option.pattern && (
+        <span className="flex flex-wrap items-center justify-center gap-1.5">
+          {option.pattern.map((item, index) => (
+            item.visual
+              ? <SchoolPrepVisual key={index} name={item.visual} compact />
+              : <SchoolPrepShape key={index} shape={item.shape} color={item.color} size="small" />
+          ))}
+        </span>
+      )}
+      {option.visual && <SchoolPrepVisual name={option.visual} label={option.label} />}
+      {option.shape && <SchoolPrepShape shape={option.shape} color={option.color} size={option.size} />}
       {option.emoji && <span className="text-5xl sm:text-6xl">{option.emoji}</span>}
       {option.symbol && (
         <span className={`text-5xl sm:text-6xl ${toneClasses[option.tone] ?? "text-ink"}`}>{option.symbol}</span>
       )}
-      <span className="text-sm font-extrabold leading-5 text-ink">{option.label}</span>
+      <span className="text-base font-extrabold leading-6 text-ink">{option.label}</span>
     </>
   );
 }
+function MissionPrompt({ mission }) {
+  const { prompt, title, scene } = mission;
+  if (scene) {
+    return (
+      <div className="mt-5 rounded-[26px] border border-brand-blue/10 bg-gradient-to-br from-brand-blue/[0.055] via-white to-brand-purple/[0.07] px-4 py-6 text-center sm:px-7 sm:py-8">
+        <SchoolPrepScene scene={scene} />
+        <p className="mx-auto mt-6 max-w-3xl text-lg font-extrabold leading-8 text-ink/78 sm:text-2xl sm:leading-9">{prompt}</p>
+      </div>
+    );
+  }
 
-function MissionPrompt({ prompt, title }) {
   const visualPattern = /\p{Extended_Pictographic}/u;
   const introducesIskra = prompt.includes('🦊') && (prompt.includes('Искра') || title.includes('Искра'));
   if (!visualPattern.test(prompt)) {
-    return <p className={'mt-4 text-sm font-semibold leading-6 text-ink/62 sm:text-base'}>{prompt}</p>;
+    return <p className="mt-4 text-base font-semibold leading-7 text-ink/66 sm:text-lg sm:leading-8">{prompt}</p>;
   }
 
   const [leading, ...rest] = prompt.split('—');
@@ -60,26 +81,18 @@ function MissionPrompt({ prompt, title }) {
 
   if (leadingIsVisual) {
     return (
-      <div className={'mt-5 rounded-[24px] border border-brand-blue/10 bg-gradient-to-br from-brand-blue/[0.055] via-white to-brand-purple/[0.06] px-4 py-7 text-center sm:px-7 sm:py-9'}>
-        {introducesIskra && (
-          <p className={'mx-auto mb-5 inline-flex items-center rounded-full bg-brand-orange/10 px-4 py-2 text-sm font-extrabold text-brand-orange sm:text-base'}>
-            🦊 Это лисёнок Искра
-          </p>
-        )}
-        <div className={'whitespace-pre-wrap text-[68px] leading-none tracking-[0.12em] sm:text-[92px]'} aria-label={leading.trim()}>{leading.trim()}</div>
-        {instruction && <p className={'mx-auto mt-6 max-w-2xl text-base font-extrabold leading-7 text-ink/68 sm:text-lg'}>{instruction}</p>}
+      <div className="mt-5 rounded-[24px] border border-brand-blue/10 bg-gradient-to-br from-brand-blue/[0.055] via-white to-brand-purple/[0.06] px-4 py-7 text-center sm:px-7 sm:py-9">
+        {introducesIskra && <p className="mx-auto mb-5 inline-flex items-center rounded-full bg-brand-orange/10 px-4 py-2 text-sm font-extrabold text-brand-orange sm:text-base">Это лисёнок Искра</p>}
+        <div className="whitespace-pre-wrap text-[68px] leading-none tracking-[0.12em] sm:text-[92px]" aria-label={leading.trim()}>{leading.trim()}</div>
+        {instruction && <p className="mx-auto mt-6 max-w-2xl text-base font-extrabold leading-7 text-ink/68 sm:text-lg">{instruction}</p>}
       </div>
     );
   }
 
   return (
-    <div className={'mt-5 rounded-[24px] border border-brand-blue/10 bg-gradient-to-br from-brand-blue/[0.055] via-white to-brand-purple/[0.06] px-5 py-7 text-center sm:px-8'}>
-      {introducesIskra && (
-        <p className={'mx-auto mb-5 inline-flex items-center rounded-full bg-brand-orange/10 px-4 py-2 text-sm font-extrabold text-brand-orange sm:text-base'}>
-          🦊 Это лисёнок Искра
-        </p>
-      )}
-      <p className={'mx-auto max-w-3xl whitespace-pre-wrap text-xl font-extrabold leading-relaxed text-ink/76 sm:text-3xl'}>{prompt}</p>
+    <div className="mt-5 rounded-[24px] border border-brand-blue/10 bg-gradient-to-br from-brand-blue/[0.055] via-white to-brand-purple/[0.06] px-5 py-7 text-center sm:px-8">
+      {introducesIskra && <p className="mx-auto mb-5 inline-flex items-center rounded-full bg-brand-orange/10 px-4 py-2 text-sm font-extrabold text-brand-orange sm:text-base">Это лисёнок Искра</p>}
+      <p className="mx-auto max-w-3xl whitespace-pre-wrap text-xl font-extrabold leading-relaxed text-ink/76 sm:text-3xl">{prompt}</p>
     </div>
   );
 }
@@ -110,7 +123,7 @@ function ChoiceMission({ mission, done, onComplete }) {
 
   return (
     <>
-      <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
+      <div className={`mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 ${mission.options.length >= 7 ? "lg:grid-cols-4" : ""}`}>
         {mission.options.map((option) => {
           const active = selected.includes(option.id);
           return (
@@ -118,7 +131,7 @@ function ChoiceMission({ mission, done, onComplete }) {
               key={option.id}
               type="button"
               onClick={() => toggle(option.id)}
-              className={`flex min-h-[112px] flex-col items-center justify-center gap-2 rounded-[20px] border px-3 py-4 text-center transition duration-200 ${
+              className={`flex min-h-[142px] flex-col items-center justify-center gap-3 rounded-[22px] border px-3 py-5 text-center transition duration-200 ${
                 active
                   ? "border-brand-blue bg-brand-blue/[0.08] shadow-[0_0_0_3px_rgba(59,130,246,0.1)]"
                   : "border-ink/8 bg-white hover:-translate-y-0.5 hover:border-brand-blue/24 hover:shadow-card"
@@ -142,6 +155,64 @@ function ChoiceMission({ mission, done, onComplete }) {
   );
 }
 
+function RecallMission({ mission, done, onComplete }) {
+  const [studying, setStudying] = useState(!done);
+  const [selected, setSelected] = useState(done ? mission.correct : []);
+  const [result, setResult] = useState(done ? "success" : "");
+
+  function choose(id) {
+    setSelected([id]);
+    setResult("");
+  }
+
+  function check() {
+    if (sameAnswers(selected, mission.correct)) {
+      setResult("success");
+      onComplete();
+    } else {
+      setResult("hint");
+    }
+  }
+
+  return (
+    <>
+      {studying ? (
+        <div className="mt-5 rounded-[26px] border border-brand-purple/16 bg-gradient-to-br from-brand-purple/[0.08] via-white to-brand-blue/[0.07] p-5 text-center sm:p-7">
+          <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-brand-purple">Запомни, затем спрячь</p>
+          <div className="mt-5 flex flex-wrap items-start justify-center gap-4 sm:gap-6">
+            {mission.study.map((item, index) => (
+              <div key={item.label} className="w-[116px]">
+                <SchoolPrepVisual name={item.visual} label={item.label} />
+                <p className="mt-3 text-sm font-extrabold leading-5 text-ink/72"><span className="text-brand-purple">{index + 1}.</span> {item.label}</p>
+              </div>
+            ))}
+          </div>
+          <button type="button" onClick={() => { setStudying(false); setSelected([]); setResult(""); }} className="mt-6 inline-flex min-h-[52px] items-center justify-center rounded-full bg-ink px-7 py-3 text-sm font-extrabold text-white">
+            Запомнил — скрыть код
+          </button>
+        </div>
+      ) : (
+        <>
+          <div className="mt-5 grid gap-3 sm:grid-cols-3">
+            {mission.options.map((option) => {
+              const active = selected.includes(option.id);
+              return (
+                <button key={option.id} type="button" onClick={() => choose(option.id)} className={`flex min-h-[150px] flex-col items-center justify-center gap-3 rounded-[22px] border bg-white p-4 text-center transition ${active ? "border-brand-purple shadow-[0_0_0_3px_rgba(121,87,232,.1)]" : "border-ink/8 hover:-translate-y-0.5 hover:border-brand-purple/28"}`}>
+                  <OptionContent option={option} />
+                </button>
+              );
+            })}
+          </div>
+          <div className="mt-5 flex flex-wrap gap-2">
+            <button type="button" onClick={check} disabled={!selected.length} className="inline-flex min-h-[50px] items-center justify-center rounded-full bg-ink px-6 py-3 text-sm font-extrabold text-white disabled:opacity-35">Проверить код</button>
+            <button type="button" onClick={() => { setStudying(true); setResult(""); }} className="inline-flex min-h-[50px] items-center justify-center rounded-full border border-ink/10 bg-white px-5 py-3 text-sm font-extrabold text-ink/60">Посмотреть ещё раз</button>
+          </div>
+        </>
+      )}
+      <ResultMessage state={result} success={mission.success} hint={mission.hint} />
+    </>
+  );
+}
 function SequenceMission({ mission, done, onComplete }) {
   const [sequence, setSequence] = useState([]);
   const [result, setResult] = useState(done ? "success" : "");
@@ -171,7 +242,10 @@ function SequenceMission({ mission, done, onComplete }) {
             const option = mission.options.find((item) => item.id === id);
             return (
               <span key={id} className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-2 text-xs font-extrabold text-ink shadow-sm">
-                <b className="text-brand-purple">{index + 1}</b> {option?.emoji} {option?.label}
+                <b className="text-brand-purple">{index + 1}</b>
+                {option?.visual && <SchoolPrepVisual name={option.visual} compact />}
+                {option?.shape && <SchoolPrepShape shape={option.shape} color={option.color} size="small" />}
+                {option?.emoji} {option?.label}
               </span>
             );
           })}
@@ -187,7 +261,7 @@ function SequenceMission({ mission, done, onComplete }) {
               type="button"
               disabled={used}
               onClick={() => add(option.id)}
-              className="flex min-h-[104px] flex-col items-center justify-center gap-2 rounded-[18px] border border-ink/8 bg-white px-3 py-4 transition hover:-translate-y-0.5 hover:border-brand-purple/28 hover:shadow-card disabled:opacity-30"
+              className="flex min-h-[132px] flex-col items-center justify-center gap-3 rounded-[20px] border border-ink/8 bg-white px-3 py-4 transition hover:-translate-y-0.5 hover:border-brand-purple/28 hover:shadow-card disabled:opacity-30"
             >
               <OptionContent option={option} />
             </button>
@@ -265,7 +339,11 @@ function MemoryMission({ mission, done, onComplete }) {
               }`}
               aria-label={visible ? card.label : "Закрытая карточка"}
             >
-              {visible ? card.emoji : "?"}
+              {visible
+                ? card.visual
+                  ? <SchoolPrepVisual name={card.visual} label={card.label} compact />
+                  : card.emoji
+                : "?"}
             </button>
           );
         })}
@@ -319,6 +397,8 @@ function QuizMission({ mission, done, onComplete, audioBase }) {
         <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-brand-green">
           Вопрос {index + 1} из {mission.questions.length}
         </p>
+        {question.visual && <div className="mt-4 flex justify-center"><SchoolPrepVisual name={question.visual} label={question.prompt} /></div>}
+        {question.scene && <div className="mt-4"><SchoolPrepScene scene={question.scene} /></div>}
         <p className="mt-3 font-display text-xl font-extrabold leading-tight text-ink sm:text-2xl">{question.prompt}</p>
         <SchoolPrepAudioButton src={`${audioBase}/question-${index + 1}.mp3`} label="Послушать вопрос" className="mt-4" />
         <div className="mt-4 grid gap-2">
@@ -327,7 +407,7 @@ function QuizMission({ mission, done, onComplete, audioBase }) {
               key={option.id}
               type="button"
               onClick={() => answer(option.id)}
-              className={`rounded-[16px] border px-4 py-3 text-left text-sm font-extrabold transition ${
+              className={`flex min-h-[62px] items-center gap-3 rounded-[18px] border px-4 py-3 text-left text-base font-extrabold transition ${
                 selected === option.id
                   ? option.id === question.correct
                     ? "border-brand-green/30 bg-brand-green/[0.08] text-forest-700"
@@ -335,7 +415,9 @@ function QuizMission({ mission, done, onComplete, audioBase }) {
                   : "border-ink/8 bg-white text-ink hover:border-brand-green/24"
               }`}
             >
-              {option.label}
+              {option.visual && <SchoolPrepVisual name={option.visual} label={option.label} compact />}
+              {option.shape && <SchoolPrepShape shape={option.shape} color={option.color} size="small" />}
+              <span>{option.label}</span>
             </button>
           ))}
         </div>
@@ -397,7 +479,9 @@ function SortMission({ mission, done, onComplete }) {
         </div>
         {current ? (
           <div className="mt-5 text-center">
-            <span className="text-6xl" aria-hidden="true">{current.emoji}</span>
+            {current.visual
+              ? <SchoolPrepVisual name={current.visual} label={current.label} />
+              : <span className="text-6xl" aria-hidden="true">{current.emoji}</span>}
             <p className="mt-2 font-display text-xl font-extrabold text-ink">{current.label}</p>
             <p className="mt-1 text-xs font-bold text-ink/42">В какую зону отправить?</p>
           </div>
@@ -409,7 +493,10 @@ function SortMission({ mission, done, onComplete }) {
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           {mission.groups.map((group) => (
             <button key={group.id} type="button" onClick={() => place(group.id)} className="flex min-h-[82px] items-center justify-center gap-3 rounded-[18px] border border-ink/8 bg-white px-4 py-3 text-sm font-extrabold text-ink transition hover:-translate-y-0.5 hover:border-brand-cyan/30 hover:shadow-card">
-              <span className="text-3xl">{group.emoji}</span>{group.label}
+              {group.visual
+                ? <SchoolPrepVisual name={group.visual} label={group.label} compact />
+                : <span className="text-3xl">{group.emoji}</span>}
+              {group.label}
             </button>
           ))}
         </div>
@@ -420,21 +507,34 @@ function SortMission({ mission, done, onComplete }) {
 }
 
 function PathMission({ mission, done, onComplete }) {
+  const checkpointKeys = (mission.checkpoints || []).map(([row, col]) => `${row}-${col}`);
   const [position, setPosition] = useState(done ? mission.goal : mission.start);
+  const [visited, setVisited] = useState(done ? checkpointKeys : []);
   const [result, setResult] = useState(done ? "success" : "");
   const blocked = new Set(mission.blocked.map(([row, col]) => `${row}-${col}`));
 
   function move(rowDelta, colDelta) {
     const next = [position[0] + rowDelta, position[1] + colDelta];
+    const nextKey = `${next[0]}-${next[1]}`;
     const outside = next[0] < 0 || next[0] >= mission.rows || next[1] < 0 || next[1] >= mission.cols;
-    if (outside || blocked.has(`${next[0]}-${next[1]}`)) {
+    if (outside || blocked.has(nextKey)) {
       setResult("hint");
       return;
     }
+
+    const nextVisited = checkpointKeys.includes(nextKey) && !visited.includes(nextKey)
+      ? [...visited, nextKey]
+      : visited;
+    setVisited(nextVisited);
     setPosition(next);
+
     if (next[0] === mission.goal[0] && next[1] === mission.goal[1]) {
-      setResult("success");
-      onComplete();
+      if (checkpointKeys.every((key) => nextVisited.includes(key))) {
+        setResult("success");
+        onComplete();
+      } else {
+        setResult("hint");
+      }
     } else {
       setResult("");
     }
@@ -442,43 +542,63 @@ function PathMission({ mission, done, onComplete }) {
 
   function restart() {
     setPosition(mission.start);
+    setVisited([]);
     setResult("");
   }
 
   return (
     <>
-      <div className="mt-5 grid gap-5 rounded-[24px] border border-brand-purple/16 bg-brand-purple/[0.035] p-5 sm:grid-cols-[1fr_auto] sm:items-center">
-        <div className="mx-auto grid w-full max-w-[360px] gap-2" style={{ gridTemplateColumns: `repeat(${mission.cols}, minmax(0, 1fr))` }}>
-          {Array.from({ length: mission.rows * mission.cols }, (_, index) => {
-            const row = Math.floor(index / mission.cols);
-            const col = index % mission.cols;
-            const key = `${row}-${col}`;
-            const fox = position[0] === row && position[1] === col;
-            const goal = mission.goal[0] === row && mission.goal[1] === col;
-            return (
-              <div key={key} className={`grid aspect-square place-items-center rounded-[14px] border text-2xl sm:text-3xl ${blocked.has(key) ? "border-ink/5 bg-ink/8" : goal ? "border-brand-yellow/30 bg-brand-yellow/14" : "border-white bg-white shadow-sm"}`}>
-                {fox ? "🦊" : blocked.has(key) ? "🌳" : goal ? mission.goalEmoji : ""}
-              </div>
-            );
-          })}
-        </div>
-        <div className="mx-auto grid grid-cols-3 gap-2">
-          <span />
-          <button type="button" onClick={() => move(-1, 0)} className="grid h-12 w-12 place-items-center rounded-[15px] bg-ink text-xl font-black text-white">↑</button>
-          <span />
-          <button type="button" onClick={() => move(0, -1)} className="grid h-12 w-12 place-items-center rounded-[15px] bg-ink text-xl font-black text-white">←</button>
-          <button type="button" onClick={restart} className="grid h-12 w-12 place-items-center rounded-[15px] border border-ink/10 bg-white text-base">↻</button>
-          <button type="button" onClick={() => move(0, 1)} className="grid h-12 w-12 place-items-center rounded-[15px] bg-ink text-xl font-black text-white">→</button>
-          <span />
-          <button type="button" onClick={() => move(1, 0)} className="grid h-12 w-12 place-items-center rounded-[15px] bg-ink text-xl font-black text-white">↓</button>
-          <span />
+      <div className="mt-5 rounded-[26px] border border-brand-purple/16 bg-brand-purple/[0.035] p-4 sm:p-6">
+        {checkpointKeys.length > 0 && (
+          <div className="mb-4 flex items-center justify-between gap-3 rounded-[18px] border border-brand-purple/12 bg-white px-4 py-3 text-sm font-extrabold text-ink/64">
+            <span>Сначала компас, затем ключ</span>
+            <span className={visited.length === checkpointKeys.length ? "text-brand-green" : "text-brand-purple"}>{visited.length} / {checkpointKeys.length} точка</span>
+          </div>
+        )}
+        <div className="grid gap-6 sm:grid-cols-[1fr_auto] sm:items-center">
+          <div className="mx-auto grid w-full max-w-[500px] gap-2.5" style={{ gridTemplateColumns: `repeat(${mission.cols}, minmax(0, 1fr))` }}>
+            {Array.from({ length: mission.rows * mission.cols }, (_, index) => {
+              const row = Math.floor(index / mission.cols);
+              const col = index % mission.cols;
+              const key = `${row}-${col}`;
+              const explorer = position[0] === row && position[1] === col;
+              const goal = mission.goal[0] === row && mission.goal[1] === col;
+              const checkpoint = checkpointKeys.includes(key);
+              const checkpointVisited = visited.includes(key);
+              return (
+                <div key={key} className={`grid aspect-square min-h-[58px] place-items-center rounded-[17px] border sm:min-h-[74px] ${blocked.has(key) ? "border-ink/5 bg-ink/8" : goal ? "border-brand-yellow/30 bg-brand-yellow/14" : checkpoint ? "border-brand-purple/22 bg-brand-purple/[0.08]" : "border-white bg-white shadow-sm"}`}>
+                  {explorer
+                    ? <SchoolPrepVisual name="explorer" label="Исследователь" compact />
+                    : blocked.has(key)
+                      ? <SchoolPrepVisual name="tree" label="Препятствие" compact />
+                      : goal
+                        ? <SchoolPrepVisual name={mission.goalVisual || "key"} label="Цель маршрута" compact />
+                        : checkpoint && !checkpointVisited
+                          ? <SchoolPrepVisual name="compass" label="Контрольная точка" compact />
+                          : checkpointVisited
+                            ? <span className="text-2xl font-black text-brand-green">✓</span>
+                            : ""}
+                </div>
+              );
+            })}
+          </div>
+          <div className="mx-auto grid grid-cols-3 gap-2.5">
+            <span />
+            <button type="button" aria-label="Вверх" onClick={() => move(-1, 0)} className="grid h-14 w-14 place-items-center rounded-[17px] bg-ink text-2xl font-black text-white">↑</button>
+            <span />
+            <button type="button" aria-label="Влево" onClick={() => move(0, -1)} className="grid h-14 w-14 place-items-center rounded-[17px] bg-ink text-2xl font-black text-white">←</button>
+            <button type="button" aria-label="Начать маршрут заново" onClick={restart} className="grid h-14 w-14 place-items-center rounded-[17px] border border-ink/10 bg-white text-xl">↻</button>
+            <button type="button" aria-label="Вправо" onClick={() => move(0, 1)} className="grid h-14 w-14 place-items-center rounded-[17px] bg-ink text-2xl font-black text-white">→</button>
+            <span />
+            <button type="button" aria-label="Вниз" onClick={() => move(1, 0)} className="grid h-14 w-14 place-items-center rounded-[17px] bg-ink text-2xl font-black text-white">↓</button>
+            <span />
+          </div>
         </div>
       </div>
       <ResultMessage state={result} success={mission.success} hint={mission.hint} />
     </>
   );
 }
-
 function ActionMission({ mission, done, onComplete, audioBase }) {
   const [step, setStep] = useState(done ? mission.actions.length : 0);
   const finished = step >= mission.actions.length;
@@ -496,7 +616,11 @@ function ActionMission({ mission, done, onComplete, audioBase }) {
         <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-brand-orange">Перерыв-игра · встаём со стула</p>
         {!finished ? (
           <>
-            <div className="mt-5 text-7xl" aria-hidden="true">{action.emoji}</div>
+            <div className="mt-5 flex justify-center">
+              {action.visual
+                ? <SchoolPrepVisual name={action.visual} label={action.title} />
+                : <span className="text-7xl" aria-hidden="true">{action.emoji}</span>}
+            </div>
             <h5 className="mt-4 font-display text-2xl font-extrabold text-ink">{action.title}</h5>
             <p className="mx-auto mt-2 max-w-lg text-sm font-semibold leading-6 text-ink/56">{action.text}</p>
             <SchoolPrepAudioButton src={`${audioBase}/action-${step + 1}.mp3`} label="Послушать команду" className="mt-4" />
@@ -540,10 +664,11 @@ function MissionCard({ mission, index, done, onComplete, dayId }) {
           {done ? "Звезда получена" : "1 звезда"}
         </span>
       </div>
-      <MissionPrompt prompt={mission.prompt} title={mission.title} />
+      <MissionPrompt mission={mission} />
       <SchoolPrepAudioButton src={`${audioBase}/instruction.mp3`} className="mt-4" />
 
       {mission.type === "choice" && <ChoiceMission mission={mission} done={done} onComplete={onComplete} />}
+      {mission.type === "recall" && <RecallMission mission={mission} done={done} onComplete={onComplete} />}
       {mission.type === "sequence" && <SequenceMission mission={mission} done={done} onComplete={onComplete} />}
       {mission.type === "memory" && <MemoryMission mission={mission} done={done} onComplete={onComplete} />}
       {mission.type === "quiz" && <QuizMission mission={mission} done={done} onComplete={onComplete} audioBase={audioBase} />}

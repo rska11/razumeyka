@@ -5,6 +5,7 @@ import { SubscribeButton } from "@/components/drawing/SubscribeButton.jsx";
 import { getAuthSession } from "@/lib/auth";
 import { reconcileUserPayments } from "@/lib/payments";
 import {
+import { canonical } from '@/lib/seo';
   DIRECTION_COMPARE_PRICE,
   directionPrice,
   getAccessMap,
@@ -15,7 +16,7 @@ export const metadata = {
   title: "Тарифы на детские онлайн-курсы",
   description:
     "Три открытых курса Знайтона: рисование, ментальная арифметика и подготовка к школе. Первые занятия бесплатно, полный доступ на 30 дней — 490 ₽.",
-  alternates: { canonical: "/tarify" },
+  alternates: canonical("/tarify"),
 };
 
 const courses = [

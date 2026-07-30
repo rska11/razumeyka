@@ -17,11 +17,12 @@ import { QuizAI } from '@/components/QuizAI.jsx';
 import { Results } from '@/components/Results.jsx';
 import { Scarcity } from '@/components/Scarcity.jsx';
 import { StickyMobileCTA } from '@/components/StickyMobileCTA.jsx';
+import { canonical } from '@/lib/seo';
 
 
 // canonical только здесь: в layout он наследовался бы всеми страницами без своего canonical
 export const metadata = {
-  alternates: { canonical: '/' },
+  alternates: canonical('/'),
 };
 
 export default function HomePage() {

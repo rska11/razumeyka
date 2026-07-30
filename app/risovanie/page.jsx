@@ -10,11 +10,12 @@ import { drawingIntro, whyBlocks, drawingSubscription } from '@/data/drawing-les
 import { getAuthSession } from '@/lib/auth';
 import { reconcileUserPayments } from '@/lib/payments';
 import { getAccessUntil, hasActiveAccess } from '@/lib/subscription';
+import { canonical } from '@/lib/seo';
 
 export const metadata = {
   title: 'Правополушарное рисование для детей — уроки-игры онлайн',
   description: 'Самостоятельные уроки рисования для детей 3–10 лет: понятный прогресс, авторские сюжеты и красивые работы по шагам.',
-  alternates: { canonical: '/risovanie' },
+  alternates: canonical('/risovanie'),
   openGraph: { type: 'website', locale: 'ru_RU', siteName: 'Знайтон', url: 'https://znayton.ru/risovanie', title: 'Правополушарное рисование для детей — Знайтон', description: 'Рисуем по шагам, развиваем руку и создаём настоящее портфолио.', images: [{ url: '/images/og.png', width: 1200, height: 630, alt: 'Рисование для детей — Знайтон' }] },
 };
 

@@ -12,6 +12,7 @@ import { schoolPrepProgram, schoolPrepWeekOne } from '@/data/school-prep-course.
 import { getAuthSession } from '@/lib/auth';
 import { reconcileUserPayments } from '@/lib/payments';
 import { directionPrice, getAccessUntil, hasActiveAccess } from '@/lib/subscription';
+import { canonical } from '@/lib/seo';
 
 const SCHOOL_PREP_DIRECTION = 'podgotovka-k-shkole';
 const SCHOOL_PREP_PRICE = directionPrice(SCHOOL_PREP_DIRECTION);
@@ -20,7 +21,7 @@ export const metadata = {
   title: 'Подготовка к школе 5–7 лет — курс-игра онлайн',
   description:
     'Умная подготовка к школе в формате приключения: речь, чтение, счёт, логика, внимание, графомоторика и уверенность. Первый полноценный игровой день доступен бесплатно.',
-  alternates: { canonical: '/podgotovka-k-shkole' },
+  alternates: canonical('/podgotovka-k-shkole'),
   openGraph: {
     type: 'website',
     locale: 'ru_RU',

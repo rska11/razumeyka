@@ -3,11 +3,12 @@ import { Footer } from '@/components/Footer.jsx';
 import { Header } from '@/components/Header.jsx';
 import { GameLauncher } from '@/components/games/GameShell.jsx';
 import { featuredGames, resolveGameId } from '@/data/games.js';
+import { canonical } from '@/lib/seo';
 
 export const metadata = {
   title: 'Развивающие игры для детей онлайн бесплатно',
   description: 'Игровой зал «Знайтона»: развивающие игры на счёт, внимание и подготовку к школе. Можно играть онлайн без регистрации.',
-  alternates: { canonical: '/igry' },
+  alternates: canonical('/igry'),
   openGraph: {
     type: 'website',
     locale: 'ru_RU',

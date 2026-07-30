@@ -2,12 +2,13 @@ import Link from 'next/link';
 import { Header } from '@/components/Header.jsx';
 import { Footer } from '@/components/Footer.jsx';
 import { blogPosts } from '@/data/blog.js';
+import { canonical } from '@/lib/seo';
 
 export const metadata = {
   title: 'Блог о развитии детей',
   description:
     'Статьи о развитии детей 4–12 лет: ментальная арифметика, чтение, подготовка к школе и советы родителям от онлайн-платформы «Знайтон».',
-  alternates: { canonical: '/blog' },
+  alternates: canonical('/blog'),
   openGraph: {
     type: 'website',
     locale: 'ru_RU',

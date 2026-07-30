@@ -2,11 +2,12 @@ import '../drawing.css';
 import { Header } from '@/components/Header.jsx';
 import { Footer } from '@/components/Footer.jsx';
 import { DrawingGallery } from '@/components/drawing/DrawingGallery.jsx';
+import { canonical } from '@/lib/seo';
 
 export const metadata = {
   title: 'Галерея работ учеников по рисованию — Знайтон',
   description: 'Одобренные рисунки учеников, недельные итоги, лайки посетителей и загрузка свободной работы на модерацию.',
-  alternates: { canonical: '/risovanie/galereya' },
+  alternates: canonical('/risovanie/galereya'),
 };
 
 export default function DrawingGalleryPage() {

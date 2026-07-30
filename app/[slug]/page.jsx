@@ -3,6 +3,7 @@ import { directionsData, getDirectionBySlug } from '@/data/directions.js';
 import { landingsData, getLandingBySlug } from '@/data/landings.js';
 import { LandingPage } from '@/components/LandingPage.jsx';
 import { isDirectionReady } from '@/data/launch.js';
+import { canonical } from '@/lib/seo';
 
 export function generateStaticParams() {
   return [
@@ -23,7 +24,7 @@ export async function generateMetadata({ params }) {
     return {
       title: metaTitle,
       description: metaDesc,
-      alternates: { canonical: `/${slug}` },
+      alternates: canonical(`/${slug}`),
       openGraph: {
         type: 'article',
         locale: 'ru_RU',
@@ -43,7 +44,7 @@ export async function generateMetadata({ params }) {
     return {
       title: landing.title,
       description: landing.description,
-      alternates: { canonical: `/${slug}` },
+      alternates: canonical(`/${slug}`),
       openGraph: {
         type: 'article',
         locale: 'ru_RU',

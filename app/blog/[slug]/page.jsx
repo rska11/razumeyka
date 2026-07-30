@@ -6,6 +6,7 @@ import { Icon } from '@/components/Icon.jsx';
 import { getDirectionBySlug } from '@/data/directions.js';
 import { getLandingBySlug } from '@/data/landings.js';
 import { blogPosts, getPostBySlug } from '@/data/blog.js';
+import { canonical } from '@/lib/seo';
 
 export function generateStaticParams() {
   return blogPosts.map((p) => ({ slug: p.slug }));
@@ -18,7 +19,7 @@ export async function generateMetadata({ params }) {
   return {
     title: post.title,
     description: post.description,
-    alternates: { canonical: `/blog/${slug}` },
+    alternates: canonical(`/blog/${slug}`),
     openGraph: {
       type: 'article',
       locale: 'ru_RU',

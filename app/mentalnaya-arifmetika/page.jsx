@@ -8,6 +8,7 @@ import { SorobanDemo } from '@/components/mental/SorobanDemo.jsx';
 import { SubscribeButton } from '@/components/drawing/SubscribeButton.jsx';
 import { CourseDiscovery } from '@/components/CourseDiscovery.jsx';
 import {
+import { canonical } from '@/lib/seo';
   mentalIntro,
   mentalSubscription,
   whyBlocks,
@@ -19,7 +20,7 @@ import { getAccessUntil, hasActiveAccess } from '@/lib/subscription';
 export const metadata = {
   title: 'Ментальная арифметика для детей — счёт в уме онлайн',
   description: 'Премиальный онлайн-курс ментальной арифметики для детей 4–10 лет: интерактивный абакус, флеш-карты, устный счёт, внимание и память.',
-  alternates: { canonical: '/mentalnaya-arifmetika' },
+  alternates: canonical('/mentalnaya-arifmetika'),
   openGraph: {
     type: 'website',
     locale: 'ru_RU',

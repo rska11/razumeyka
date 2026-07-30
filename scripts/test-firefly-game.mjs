@@ -61,7 +61,12 @@ for (let i = 0; i < LEVELS.length; i += 1) {
   );
   check('  точность 100% → три звезды', starsFor(accuracy(game)) === 3, { accuracy: accuracy(game) });
   check('  событие done ровно одно', events.filter((e) => e === 'done').length === 1);
-  check('  по пути были искры-чекпоинты', events.filter((e) => e === 'sparkle').length > 0);
+  const collected = events.filter((e) => e === 'collect').length;
+  check('  все потерявшиеся светлячки спасены', collected === game.lights.length && game.swarm === collected, {
+    собрано: collected,
+    всего: game.lights.length,
+    рой: game.swarm,
+  });
 }
 
 console.log('\n2. Срезать путь нельзя');

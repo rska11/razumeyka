@@ -228,7 +228,11 @@ export function FireflyGame({ hasAccess = false, onExit }) {
     const game = gameRef.current;
     if (!game) return;
     unlockAudio();
-    event.currentTarget.setPointerCapture?.(event.pointerId);
+    try {
+      event.currentTarget.setPointerCapture?.(event.pointerId);
+    } catch {
+      // захват необязателен — без него ведение тоже работает
+    }
     if (event.pointerType === 'mouse') setPointerType(game, 'mouse');
     const point = toWorld(event);
     setPointer(game, point.x, point.y, true);

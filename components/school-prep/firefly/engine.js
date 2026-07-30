@@ -1,39 +1,47 @@
 // Движок игры «Светлячок» — подготовка руки к письму (неделя 6 курса).
 //
-// Ребёнок ведёт светлячка по светящейся дорожке от старта к домику. Пока
-// светлячок на дорожке — он светит и продвигается; сошёл — свет гаснет и
-// путь не идёт. Никакой картинки не рисуется: это не рисование, а тренировка
-// плавного управляемого движения, из которого потом вырастает письмо.
-// Поэтому дорожки идут от простой линии к элементам букв и цифр.
+// История, понятная пятилетке: маленькие светлячки заблудились в ночном лесу.
+// Ты ведёшь старшего светлячка по светящейся тропинке, по дороге будишь
+// потерявшихся — они пристраиваются в хвост роем — и приводишь всех домой,
+// пока не погас фонарик.
 //
-// Как и в «Мосте», движок ничего не знает про DOM: он получает координаты
-// указателя в координатах мира и отдаёт состояние. Проверяется симуляцией.
+// Под историей — тренировка руки: вести плавную линию, не срываясь с тропинки.
+// Сошёл — фонарик гаснет и тратится быстрее, но прогресс не сбрасывается.
+// Никакого проигрыша: кончился фонарик — «светлячок устал», пробуем снова.
+//
+// Движок ничего не знает про DOM: получает координаты указателя в координатах
+// мира и отдаёт состояние. Проверяется симуляцией (scripts/test-firefly-game.mjs).
 
 export const WORLD_W = 960;
 export const WORLD_H = 540;
 export const STEP = 1 / 60;
 
-// Насколько далеко вперёд по дорожке можно «зацепиться» за точку. Ограничение
+// Насколько далеко вперёд по тропинке можно «зацепиться» за точку. Ограничение
 // не даёт срезать угол и перепрыгнуть сразу к домику.
 export const LOOKAHEAD = 12;
 export const SAMPLES = 190;
 
-// Мышью попадать в узкую дорожку заметно труднее, чем пальцем, — на компьютере
+// Мышью попадать в узкую тропинку заметно труднее, чем пальцем, — на компьютере
 // добавляем запас по ширине, иначе игра превращается в борьбу с мышью.
 export const MOUSE_BONUS = 9;
 
+// Через сколько точек тропинки сидит следующий потерявшийся светлячок.
+const LIGHT_EVERY = 24;
+// Длина хвоста позиций, по которому летит рой.
+const FOLLOW_LENGTH = 150;
+
 export const LEVELS = [
-  { id: 1, title: 'Прямая дорожка', note: 'Ровно и не спеша', shape: 'line', width: 38, seconds: 30 },
-  { id: 2, title: 'Волна', note: 'Плавные подъёмы и спуски', shape: 'wave', width: 36, seconds: 32 },
-  { id: 3, title: 'Горки', note: 'Острые повороты', shape: 'zigzag', width: 36, seconds: 34 },
-  { id: 4, title: 'Радуга', note: 'Большая дуга', shape: 'arc', width: 34, seconds: 32 },
-  { id: 5, title: 'Волна поменьше', note: 'Мельче волна — точнее рука', shape: 'wave2', width: 30, seconds: 34 },
-  { id: 6, title: 'Крючки', note: 'Элемент письменных букв', shape: 'hooks', width: 30, seconds: 36 },
-  { id: 7, title: 'Петельки', note: 'Из них состоят буквы', shape: 'loops', width: 28, seconds: 38 },
-  { id: 8, title: 'Улитка', note: 'Спираль — самое сложное', shape: 'spiral', width: 28, seconds: 40 },
+  { id: 1, title: 'Прямая тропинка', note: 'Ровно и не спеша', shape: 'line', width: 38, seconds: 30, clouds: 0 },
+  { id: 2, title: 'Волна', note: 'Плавные подъёмы и спуски', shape: 'wave', width: 36, seconds: 32, clouds: 0 },
+  { id: 3, title: 'Горки', note: 'Острые повороты', shape: 'zigzag', width: 36, seconds: 34, clouds: 0 },
+  { id: 4, title: 'Радуга', note: 'Большая дуга', shape: 'arc', width: 34, seconds: 32, clouds: 1 },
+  { id: 5, title: 'Мелкая волна', note: 'Мельче волна — точнее рука', shape: 'wave2', width: 30, seconds: 34, clouds: 1 },
+  { id: 6, title: 'Крючки', note: 'Элемент письменных букв', shape: 'hooks', width: 30, seconds: 36, clouds: 2 },
+  { id: 7, title: 'Петельки', note: 'Из них состоят буквы', shape: 'loops', width: 28, seconds: 38, clouds: 2 },
+  { id: 8, title: 'Улитка', note: 'Спираль — самое сложное', shape: 'spiral', width: 28, seconds: 40, clouds: 2 },
 ];
 
-// Дорожки заданы формулой и разворачиваются в набор точек: движку удобнее
+// Тропинки заданы формулой и разворачиваются в набор точек: движку удобнее
 // считать расстояние до точки, а художнику — рисовать по тем же точкам.
 function pathPoints(shape) {
   const points = [];
@@ -86,10 +94,53 @@ export function starsFor(accuracy) {
   return 1;
 }
 
+function makeLights(points) {
+  const lights = [];
+  for (let i = LIGHT_EVERY; i < points.length - 6; i += LIGHT_EVERY) {
+    lights.push({ index: i, x: points[i].x, y: points[i].y, taken: false, phase: i * 0.7 });
+  }
+  return lights;
+}
+
+function makeClouds(count, rng) {
+  const clouds = [];
+  for (let i = 0; i < count; i += 1) {
+    clouds.push({
+      x: 300 + rng() * 500,
+      y: 150 + rng() * 220,
+      r: 70 + rng() * 40,
+      vx: (rng() < 0.5 ? -1 : 1) * (16 + rng() * 16),
+      phase: rng() * 6.28,
+    });
+  }
+  return clouds;
+}
+
+function makeDecor(rng) {
+  // Грибы-фонарики вдоль поляны: загораются по мере продвижения — мир
+  // оживает от того, что делает ребёнок.
+  const mushrooms = [];
+  for (let i = 0; i < 9; i += 1) {
+    mushrooms.push({
+      x: 70 + i * 105 + rng() * 30,
+      y: WORLD_H - 34 - rng() * 16,
+      size: 9 + rng() * 7,
+      at: i / 9,
+    });
+  }
+  return mushrooms;
+}
+
 export function createGame(levelIndex, options) {
   const level = LEVELS[levelIndex] || LEVELS[0];
   const pointerType = (options && options.pointerType) || 'touch';
   const points = pathPoints(level.shape);
+  let seed = (level.id * 9301 + 49297) % 233280;
+  const rng = () => {
+    seed = (seed * 9301 + 49297) % 233280;
+    return seed / 233280;
+  };
+
   return {
     level,
     levelIndex,
@@ -102,10 +153,15 @@ export function createGame(levelIndex, options) {
     maxEnergy: level.seconds,
     lit: false,
     holding: false,
+    shadowed: false,
     inside: 0,
     outside: 0,
-    checkpoint: 0,
     time: 0,
+    swarm: 0,
+    lights: makeLights(points),
+    clouds: makeClouds(level.clouds || 0, rng),
+    mushrooms: makeDecor(rng),
+    follow: [],
     pointer: { x: points[0].x, y: points[0].y, active: false },
     firefly: { x: points[0].x, y: points[0].y },
     sparks: [],
@@ -134,9 +190,13 @@ export function accuracy(state) {
   return total === 0 ? 1 : state.inside / total;
 }
 
-function addSpark(state, x, y) {
-  if (state.sparks.length > 60) return;
-  state.sparks.push({ x, y, life: 0, max: 0.55 });
+export function totalLights(state) {
+  return state.lights.length;
+}
+
+function addSpark(state, x, y, kind) {
+  if (state.sparks.length > 90) return;
+  state.sparks.push({ x, y, life: 0, max: kind === 'big' ? 0.8 : 0.5, kind: kind || 'small' });
 }
 
 export function update(state, dt) {
@@ -148,12 +208,22 @@ export function update(state, dt) {
     if (spark.life >= spark.max) state.sparks.splice(i, 1);
   }
 
+  for (const cloud of state.clouds) {
+    cloud.x += cloud.vx * dt;
+    if (cloud.x < -140) cloud.x = WORLD_W + 140;
+    if (cloud.x > WORLD_W + 140) cloud.x = -140;
+  }
+
   if (state.status !== 'run') return;
 
   // Светлячок тянется к пальцу, а не прыгает за ним: так линия получается
-  // плавной, а не дёрганой, и ребёнку видно, что он ведёт живое существо.
+  // плавной, а не дёрганой, и видно, что ведёшь живое существо.
   state.firefly.x += (state.pointer.x - state.firefly.x) * Math.min(1, dt * 18);
   state.firefly.y += (state.pointer.y - state.firefly.y) * Math.min(1, dt * 18);
+
+  // Хвост позиций — по нему летит спасённый рой.
+  state.follow.unshift({ x: state.firefly.x, y: state.firefly.y });
+  if (state.follow.length > FOLLOW_LENGTH) state.follow.length = FOLLOW_LENGTH;
 
   if (!state.holding) {
     if (state.lit) state.events.push('lost');
@@ -179,6 +249,15 @@ export function update(state, dt) {
     }
   }
 
+  // Тучка над головой — фонарик мигает и тратится быстрее. Не наказание,
+  // а повод поторопиться: напряжение без проигрыша.
+  state.shadowed = false;
+  for (const cloud of state.clouds) {
+    const dx = cloud.x - state.firefly.x;
+    const dy = cloud.y - state.firefly.y;
+    if (Math.sqrt(dx * dx + dy * dy) < cloud.r) state.shadowed = true;
+  }
+
   const wasLit = state.lit;
   state.lit = bestDistance <= state.radius;
 
@@ -186,23 +265,30 @@ export function update(state, dt) {
     state.inside += 1;
     if (best > state.index) {
       state.index = best;
-      if (state.index - state.checkpoint >= 24) {
-        state.checkpoint = state.index;
-        addSpark(state, state.points[state.index].x, state.points[state.index].y);
-        state.events.push('sparkle');
+      for (const light of state.lights) {
+        if (!light.taken && state.index >= light.index) {
+          light.taken = true;
+          state.swarm += 1;
+          addSpark(state, light.x, light.y, 'big');
+          state.events.push('collect');
+        }
       }
     }
-    state.energy = Math.max(0, state.energy - dt);
+    state.energy = Math.max(0, state.energy - dt * (state.shadowed ? 1.6 : 1));
   } else {
     state.outside += 1;
     if (wasLit) state.events.push('lost');
-    // Сошёл с дорожки — фонарик тратится быстрее, но путь не сбрасывается:
+    // Сошёл с тропинки — фонарик тратится быстрее, но путь не сбрасывается:
     // вернулся на линию и продолжил с того же места.
-    state.energy = Math.max(0, state.energy - dt * 1.9);
+    state.energy = Math.max(0, state.energy - dt * (state.shadowed ? 2.4 : 1.9));
   }
 
   if (state.index >= state.points.length - 1) {
     state.status = 'done';
+    for (let i = 0; i < 26; i += 1) {
+      const end = state.points[state.points.length - 1];
+      addSpark(state, end.x + (Math.random() - 0.5) * 120, end.y - Math.random() * 90, 'big');
+    }
     state.events.push('done');
     return;
   }

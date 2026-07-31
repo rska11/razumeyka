@@ -105,6 +105,7 @@ export default async function BlogPost({ params }) {
   };
   const coverGrad = coverThemes[post.cover?.theme] ?? coverThemes.blue;
   const editorialMeta = {
+    'razvitie-melkoy-motoriki-ruki-rebenka': { category: 'Мелкая моторика', gradient: 'from-[#16A6A1] via-[#3B82F6] to-[#7257E8]' },
     'kak-podgotovit-rebenka-k-shkole-doma': { category: 'Подготовка к школе', gradient: 'from-[#246BFD] via-[#7257E8] to-[#F05A87]' },
     'razvitie-vnimaniya-u-detey': { category: 'Внимание', gradient: 'from-[#246BFD] via-[#7257E8] to-[#A855F7]' },
     'netraditsionnye-tehniki-risovaniya': { category: 'Творчество', gradient: 'from-[#7257E8] via-[#D946EF] to-[#F05A87]' },

@@ -15,7 +15,7 @@ const nav = [
   ['Блог', '/blog'],
 ];
 
-export function Header() {
+export function Header({ primaryHref = '/#programs', primaryLabel = 'Начать бесплатно' }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   function closeMenu() {
@@ -39,8 +39,8 @@ export function Header() {
 
         <div className="flex items-center gap-3">
           <AccountButton className="hidden lg:inline-flex" />
-          <a href="/#programs" className="primary-btn hidden min-h-[54px] px-7 py-3 text-base shadow-color hover:scale-105 md:inline-flex">
-            Начать бесплатно
+          <a href={primaryHref} className="primary-btn hidden min-h-[54px] px-7 py-3 text-base shadow-color hover:scale-105 md:inline-flex">
+            {primaryLabel}
             <Icon name="arrow" className="relative h-5 w-5" />
           </a>
           <button
@@ -77,11 +77,11 @@ export function Header() {
               </a>
             ))}
             <a
-              href="/#programs"
+              href={primaryHref}
               onClick={closeMenu}
               className="primary-btn mt-3 justify-center"
             >
-              Начать бесплатно
+              {primaryLabel}
               <Icon name="arrow" className="relative h-5 w-5" />
             </a>
             <AccountButton className="mt-2 justify-center" />

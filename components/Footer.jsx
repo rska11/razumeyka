@@ -15,6 +15,7 @@ const navLinks = [
 
 const directions = [
   ['Ментальная арифметика', '/mentalnaya-arifmetika'],
+  ['Тренажёр умножения', '/trenazher-umnozheniya'],
   ['Скорочтение', '/speed-reading'],
   ['Правополушарное рисование', '/risovanie'],
   ['Интуиция', '/intuition'],

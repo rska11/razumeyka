@@ -552,7 +552,9 @@ export default async function SchoolPrepPage() {
                     <p className="flex items-center justify-between gap-4"><span>Учебных дней</span><strong className="text-ink">20</strong></p>
                     <p className="flex items-center justify-between gap-4"><span>Шагов в маршруте</span><strong className="text-ink">до 500</strong></p>
                     <p className="flex items-center justify-between gap-4"><span>Первый день</span><strong className="text-brand-green">бесплатно</strong></p>
+                    <p className="flex items-center justify-between gap-4"><span>Тренажёр умножения 2–9</span><strong className="text-brand-purple">включён</strong></p>
                   </div>
+                  <TrackedLink goal="school_prep_multiplication_open" href="/trenazher-umnozheniya" className="mt-6 inline-flex min-h-[48px] w-full items-center justify-center rounded-full border border-brand-purple/16 bg-[#F5F0FF] px-5 py-3 text-sm font-extrabold text-brand-purple transition hover:-translate-y-0.5">Посмотреть тренажёр умножения →</TrackedLink>
                   <SubscribeButton
                     isLoggedIn={Boolean(session?.user?.id)}
                     hasAccess={hasAccess}

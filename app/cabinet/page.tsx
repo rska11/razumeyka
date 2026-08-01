@@ -17,13 +17,13 @@ const COURSE_VISUALS: Record<
   },
   "mentalnaya-arifmetika": {
     kicker: "Тренировка мышления",
-    description: "Игровые занятия для внимания, памяти и уверенного счёта в уме.",
+    description: "Абакус, уверенный счёт в уме и полноценный тренажёр таблицы умножения.",
     gradient: "from-[#079A78] via-[#16A6A1] to-[#3B82F6]",
     glow: "bg-brand-cyan/30",
   },
   "podgotovka-k-shkole": {
     kicker: "Экспедиция в Город знаний",
-    description: "Сюжетные миссии на речь, счёт, внимание, самостоятельность и спокойную готовность к школе.",
+    description: "Речь, счёт, внимание, письмо и полный тренажёр таблицы умножения 2–9.",
     gradient: "from-[#246BFD] via-[#7257E8] to-[#F05A87]",
     glow: "bg-brand-purple/30",
   },

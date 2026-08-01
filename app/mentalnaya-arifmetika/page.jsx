@@ -119,11 +119,16 @@ export default async function MentalArithmeticPage() {
                     <span className="grid h-8 w-8 place-items-center rounded-full bg-[#75E5C1] text-xs text-[#09152E] transition group-hover:scale-110">▶</span>
                     Играть: «Звёздный абакус»
                   </a>
+                  <a href="/trenazher-umnozheniya" className="group inline-flex min-h-[58px] items-center justify-center gap-3 rounded-full border border-[#FFD166]/35 bg-[#FFD166]/12 px-6 py-4 text-sm font-extrabold text-[#FFD166] shadow-[0_18px_46px_rgba(0,0,0,.16)] transition hover:-translate-y-1 hover:bg-[#FFD166]/20">
+                    <span className="grid h-8 w-8 place-items-center rounded-full bg-[#FFD166] text-xs text-[#09152E] transition group-hover:scale-110">×</span>
+                    Тренажёр умножения
+                  </a>
                 </div>
                 <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-xs font-bold text-white/46">
                   <span>✓ Без покупки счётов</span>
                   <span>✓ Без карты для старта</span>
                   <span>✓ 5–12 минут за урок</span>
+                  <span>✓ Умножение входит в доступ</span>
                 </div>
               </div>
 
@@ -165,6 +170,19 @@ export default async function MentalArithmeticPage() {
           </div>
         </section>
 
+        <section className="px-5 py-10 sm:px-8 lg:px-14 lg:py-14">
+          <div className="container-pad px-0">
+            <a href="/trenazher-umnozheniya" className="group relative grid overflow-hidden rounded-[34px] bg-gradient-to-br from-[#13264D] via-[#293A78] to-[#176C6C] p-6 text-white shadow-luxe transition hover:-translate-y-1 sm:p-9 lg:grid-cols-[1fr_auto] lg:items-center lg:gap-10 lg:p-12">
+              <div className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-[#FFD166]/20 blur-[90px]" />
+              <div className="relative max-w-4xl">
+                <div className="flex flex-wrap items-center gap-2"><span className="rounded-full bg-[#FFD166] px-3 py-1.5 text-[9px] font-extrabold uppercase tracking-[0.16em] text-[#17213A]">Новый модуль</span><span className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#9AECD3]">уже входит в курс</span></div>
+                <h2 className="mt-5 font-display text-3xl font-extrabold tracking-[-0.04em] sm:text-5xl">Таблица умножения — через смысл, стратегии и адаптивное повторение</h2>
+                <p className="mt-4 max-w-3xl text-sm font-semibold leading-6 text-white/62 sm:text-base">12 маршрутов: одинаковые группы, таблицы 2–9, деление и задачи. Тренажёр видит слабые примеры ребёнка и возвращает их чаще.</p>
+              </div>
+              <span className="relative mt-7 inline-flex min-h-[56px] items-center justify-center rounded-full bg-white px-7 py-4 text-sm font-extrabold text-[#13264D] transition group-hover:scale-[1.03] lg:mt-0">Попробовать бесплатно →</span>
+            </a>
+          </div>
+        </section>
         <section id="metod" className="px-5 py-24 sm:px-8 lg:px-14 lg:py-32">
           <div className="container-pad px-0">
             <div className="grid gap-12 lg:grid-cols-[.7fr_1.3fr] lg:items-end">

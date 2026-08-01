@@ -7,6 +7,7 @@ import { SchoolPrepBridgeGame } from '@/components/school-prep/SchoolPrepBridgeG
 import { SubscribeButton } from '@/components/drawing/SubscribeButton.jsx';
 import { CourseDiscovery } from '@/components/CourseDiscovery.jsx';
 import { GameLauncher } from '@/components/games/GameShell.jsx';
+import { TrackedLink } from '@/components/analytics/TrackedLink.jsx';
 import { gamesForWeek } from '@/data/games.js';
 import { schoolPrepProgram, schoolPrepWeekOne } from '@/data/school-prep-course.js';
 import { getAuthSession } from '@/lib/auth';
@@ -197,7 +198,7 @@ export default async function SchoolPrepPage() {
 
   return (
     <>
-      <Header />
+      <Header primaryHref="#quick-demo" primaryLabel="Попробовать бесплатно" primaryGoal="prep_header_click" />
       <main className="min-h-screen overflow-hidden bg-[#FBFAF7] text-ink">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
@@ -212,7 +213,7 @@ export default async function SchoolPrepPage() {
                   <span className="h-2 w-2 rounded-full bg-brand-green shadow-[0_0_0_4px_rgba(34,197,94,.12)]" />
                   Подготовка к школе · 5–7 лет
                 </div>
-                <h1 className="mt-7 max-w-[780px] font-display text-[44px] font-extrabold leading-[.98] tracking-[-0.055em] text-ink sm:text-6xl lg:text-[78px]">
+                <h1 className="mt-7 max-w-[780px] font-display text-[38px] font-extrabold leading-[1.02] tracking-[-0.055em] text-ink sm:text-6xl lg:text-[78px]">
                   Подготовка к школе <span className="bg-gradient-to-r from-brand-blue via-brand-purple to-brand-pink bg-clip-text text-transparent">без скучных тетрадей</span>
                 </h1>
                 <p className="mt-7 max-w-[680px] text-base font-semibold leading-7 text-ink/62 sm:text-lg sm:leading-8">
@@ -221,30 +222,34 @@ export default async function SchoolPrepPage() {
                 <p className="mt-3 max-w-[660px] text-sm font-semibold leading-6 text-ink/48 sm:text-base">
                   Ребёнка ведёт сюжет «Экспедиция в Город знаний», а родитель после каждого занятия видит конкретный результат.
                 </p>
-                <div className="mt-9 flex flex-wrap gap-3">
-                  <a href="#quick-demo" className="group inline-flex min-h-[58px] items-center justify-center gap-3 rounded-full bg-ink px-7 py-4 text-sm font-extrabold text-white shadow-button transition hover:-translate-y-1">
-                    Пройти первое занятие бесплатно <span className="transition group-hover:translate-x-1">→</span>
-                  </a>
-                  <SchoolPrepIntroAudio />
-                  <GameLauncher
-                    gameId="academy"
-                    hasAccess={hasAccess}
-                    className="group inline-flex min-h-[58px] items-center justify-center gap-3 rounded-full bg-gradient-to-r from-[#FFB02E] to-[#FF7A45] px-6 py-4 text-sm font-extrabold text-[#19213A] shadow-[0_18px_38px_rgba(255,150,52,.22)] transition hover:-translate-y-1"
+                <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                  <TrackedLink
+                    goal="prep_hero_start_click"
+                    params={{ destination: 'quick-demo' }}
+                    href="#quick-demo"
+                    className="group inline-flex min-h-[58px] items-center justify-center gap-3 rounded-full bg-ink px-7 py-4 text-sm font-extrabold text-white shadow-button transition hover:-translate-y-1"
                   >
-                    <span className="grid h-8 w-8 place-items-center rounded-full bg-white/75 text-xs transition group-hover:scale-110">▶</span>
-                    Играть: «Механическая академия»
-                  </GameLauncher>
+                    Попробовать 3 задания за 1 минуту <span className="transition group-hover:translate-x-1">→</span>
+                  </TrackedLink>
+                  <TrackedLink
+                    goal="prep_hero_offer_click"
+                    params={{ destination: 'podpiska' }}
+                    href="#podpiska"
+                    className="inline-flex min-h-[58px] items-center justify-center rounded-full border border-ink/10 bg-white/86 px-7 py-4 text-sm font-extrabold text-ink shadow-card transition hover:-translate-y-1 hover:bg-white"
+                  >
+                    Программа и стоимость
+                  </TrackedLink>
                 </div>
-                <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-[11px] font-extrabold text-ink/48 sm:text-xs">
+                <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-[11px] font-extrabold text-ink/48 sm:text-xs">
+                  <span>● Без регистрации</span>
                   <span>● Без карты</span>
-                  <span>● Голосовые подсказки</span>
-                  <span>● Результат для родителя</span>
+                  <span>● С голосовыми подсказками</span>
                 </div>
                 <div className="mt-8 grid grid-cols-3 gap-3">
                   {[
-                    ['12+1', 'недель', 'полная программа'],
+                    ['3', 'задания', 'сразу без регистрации'],
                     ['20–25', 'минут', 'одно занятие'],
-                    ['1', 'занятие', 'можно бесплатно'],
+                    [String(SCHOOL_PREP_PRICE) + ' ₽', '30 дней', 'без автосписаний'],
                   ].map(([value, unit, note]) => (
                     <div key={note} className="rounded-[20px] border border-ink/7 bg-white/82 p-4 shadow-card backdrop-blur-xl sm:p-5">
                       <div className="flex items-baseline gap-1.5">
@@ -255,42 +260,87 @@ export default async function SchoolPrepPage() {
                     </div>
                   ))}
                 </div>
-                <div className="hidden">
-                  <div className="mb-4 flex items-end justify-between gap-4">
-                    <div>
-                      <span className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-brand-purple">Масштаб курса</span>
-                      <p className="mt-1 font-display text-xl font-extrabold tracking-[-0.035em] text-ink sm:text-2xl">Не несколько пробных игр — большая программа</p>
-                    </div>
-                    <span className="hidden rounded-full bg-brand-green/10 px-3 py-2 text-[10px] font-extrabold text-brand-green sm:inline-flex">12 недель + бонус</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                  {[
-                    ['Один день', '25', 'шагов', '20–25 минут увлекательной практики', 'from-[#E5F8FF] to-[#DDEBFF]', 'text-[#1978D4]', 'bg-[#35BFD0]'],
-                    ['Одна неделя', '125', 'шагов', '5 полноценных учебных дней', 'from-[#FFF5D5] to-[#FFE8CB]', 'text-[#E57C14]', 'bg-[#F4B83F]'],
-                    ['Один месяц', '500', 'шагов', '20 занятий без однообразия', 'from-[#FFE5F0] to-[#EDE4FF]', 'text-[#D93F83]', 'bg-[#E4589A]'],
-                    ['Полный курс', '1 625', 'шагов', '12 недель и бонусный маршрут', 'from-[#DFF8EE] to-[#DDF7F8]', 'text-[#0B9B70]', 'bg-[#20B98B]'],
-                  ].map(([period, value, label, note, background, tone, accent]) => (
-                    <div key={period} className={`group relative min-h-[164px] overflow-hidden rounded-[26px] border border-white bg-gradient-to-br ${background} p-5 shadow-[0_18px_48px_rgba(20,35,70,.10)] transition duration-300 hover:-translate-y-1 hover:shadow-color sm:min-h-[184px] sm:p-6`}>
-                      <i className={`absolute -right-8 -top-10 h-28 w-28 rounded-full ${accent} opacity-15 blur-xl transition group-hover:scale-125`} />
-                      <div className={`absolute inset-y-5 left-0 w-1 rounded-r-full ${accent}`} />
-                      <span className="relative text-[10px] font-extrabold uppercase tracking-[0.17em] text-ink/48">{period}</span>
-                      <div className="relative mt-3 flex items-end gap-2">
-                        <strong className={`font-display text-[48px] font-extrabold leading-[.84] tracking-[-0.07em] sm:text-[62px] ${tone}`}>{value}</strong>
-                        <span className="pb-1 text-sm font-extrabold text-ink/66 sm:text-base">{label}</span>
-                      </div>
-                      <p className="relative mt-4 text-[11px] font-bold leading-5 text-ink/52 sm:text-xs">{note}</p>
-                    </div>
-                  ))}
-                  </div>
-                </div>
               </div>
               <CityMap />
             </div>
-            <HeroSkills />
           </div>
         </section>
 
         <SchoolPrepQuickDemo />
+
+        <section id="week-one" className="scroll-mt-24 px-5 pb-24 pt-6 sm:px-8 lg:px-14 lg:pb-32 lg:pt-10">
+          <span id="uroki" className="block scroll-mt-24" />
+          <div className="container-pad px-0">
+            <div className="mx-auto mb-12 max-w-3xl text-center">
+              <span className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-brand-blue">Полноценный пробный маршрут</span>
+              <h2 className="mt-5 font-display text-4xl font-extrabold tracking-[-0.045em] sm:text-6xl"><span className="text-brand-blue">25 шагов.</span><br />Один день, чтобы почувствовать весь подход</h2>
+              <p className="mt-5 text-base font-semibold leading-7 text-ink/58 sm:text-lg">25 последовательных шагов на 20–25 минут: разминка, игры на речь, счёт, внимание и самостоятельность, а в финале — понятный итог для родителя. День 1 бесплатный, продолжение входит в полный курс.</p>
+            </div>
+            <div className="mb-10 overflow-hidden rounded-[32px] border border-ink/7 bg-white/82 p-6 shadow-card backdrop-blur-xl sm:p-8">
+              <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+                <div className="max-w-3xl">
+                  <span className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-brand-pink">Не тест из одинаковых вопросов</span>
+                  <h3 className="mt-3 font-display text-3xl font-extrabold tracking-[-0.035em] text-ink sm:text-4xl">Ребёнок не только выбирает ответ — он играет и действует</h3>
+                  <p className="mt-3 text-sm font-semibold leading-6 text-ink/56 sm:text-base">Первые игровые механики уже есть в бесплатном дне. Дальше они возвращаются с новыми правилами, картами и сюжетами.</p>
+                </div>
+                <span className="shrink-0 rounded-full bg-brand-green/10 px-4 py-2 text-xs font-extrabold text-brand-green">Можно попробовать бесплатно ✓</span>
+              </div>
+              <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {[
+                  ['🧭', 'Мини-маршруты', 'Вести Искру стрелками, обходить препятствия и искать короткий путь.', 'Управление героем'],
+                  ['📦', 'Сортировочные станции', 'Распределять предметы по зонам и самому открывать правило.', 'Игра на логику'],
+                  ['🧠', 'Карточки памяти', 'Открывать пары, запоминать места и улучшать собственный результат.', 'Мемори'],
+                  ['🧩', 'Конструкторы историй', 'Собирать события, планы и предложения в осмысленном порядке.', 'Собери сам'],
+                  ['🏃', 'Живые задания', 'Встать, хлопнуть, повторить движение и вернуть внимание к экрану.', 'Экран + движение'],
+                  ['🏆', 'Квесты и награды', 'Открывать печати, проходить мини-финалы и собирать золотой ключ.', 'Сюжетный финал'],
+                ].map(([icon, title, text, label]) => (
+                  <article key={title} className="group rounded-[22px] border border-ink/7 bg-[#FBFAF7] p-5 transition duration-300 hover:-translate-y-1 hover:border-brand-blue/18 hover:shadow-card">
+                    <div className="flex items-start justify-between gap-3">
+                      <span className="grid h-12 w-12 place-items-center rounded-[16px] bg-white text-2xl shadow-sm">{icon}</span>
+                      <span className="rounded-full bg-ink/5 px-2.5 py-1 text-[8px] font-extrabold uppercase tracking-[0.1em] text-ink/42">{label}</span>
+                    </div>
+                    <h4 className="mt-4 font-display text-lg font-extrabold text-ink">{title}</h4>
+                    <p className="mt-2 text-xs font-semibold leading-5 text-ink/52">{text}</p>
+                  </article>
+                ))}
+              </div>
+            </div>
+            <SchoolPrepAdventure
+              week={schoolPrepWeekOne}
+              price={SCHOOL_PREP_PRICE}
+              hasFullAccess={hasAccess || process.env.NODE_ENV !== 'production'}
+            />
+          </div>
+        </section>
+
+        <section className="px-5 pb-20 sm:px-8 lg:px-14 lg:pb-24">
+          <div className="container-pad px-0">
+            <HeroSkills />
+          </div>
+        </section>
+
+        <section className="px-5 pb-10 sm:px-8 lg:px-14">
+          <div className="container-pad px-0">
+            <div className="flex flex-col gap-5 rounded-[30px] border border-ink/7 bg-white/84 p-6 shadow-card sm:flex-row sm:items-center sm:justify-between sm:p-8">
+              <div className="max-w-2xl">
+                <p className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-brand-purple">Дополнительные игровые тренажёры</p>
+                <h2 className="mt-2 font-display text-2xl font-extrabold tracking-[-0.035em] text-ink sm:text-3xl">Игры дополняют курс, но не заменяют последовательные занятия</h2>
+                <p className="mt-3 text-sm font-semibold leading-6 text-ink/54">Сначала попробуйте учебный день, а затем можно отдельно исследовать Механическую академию и другие тренажёры.</p>
+              </div>
+              <div className="flex shrink-0 flex-col gap-3 sm:items-stretch">
+                <SchoolPrepIntroAudio />
+                <GameLauncher
+                  gameId="academy"
+                  hasAccess={hasAccess}
+                  className="group inline-flex min-h-[54px] items-center justify-center gap-3 rounded-full bg-gradient-to-r from-[#FFB02E] to-[#FF7A45] px-6 py-3 text-sm font-extrabold text-[#19213A] shadow-[0_18px_38px_rgba(255,150,52,.22)] transition hover:-translate-y-1"
+                >
+                  <span className="grid h-8 w-8 place-items-center rounded-full bg-white/75 text-xs">▶</span>
+                  Играть в академию
+                </GameLauncher>
+              </div>
+            </div>
+          </div>
+        </section>
 
         <SchoolPrepBridgeGame hasAccess={hasAccess} />
 
@@ -376,50 +426,6 @@ export default async function SchoolPrepPage() {
                 ))}
               </div>
             </div>
-          </div>
-        </section>
-
-        <section id="week-one" className="scroll-mt-24 px-5 py-24 sm:px-8 lg:px-14 lg:py-32">
-          <span id="uroki" className="block scroll-mt-24" />
-          <div className="container-pad px-0">
-            <div className="mx-auto mb-12 max-w-3xl text-center">
-              <span className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-brand-blue">Полноценный пробный маршрут</span>
-              <h2 className="mt-5 font-display text-4xl font-extrabold tracking-[-0.045em] sm:text-6xl"><span className="text-brand-blue">25 шагов.</span><br />Один день, чтобы почувствовать весь подход</h2>
-              <p className="mt-5 text-base font-semibold leading-7 text-ink/58 sm:text-lg">25 последовательных шагов на 20–25 минут: разминка, игры на речь, счёт, внимание и самостоятельность, а в финале — понятный итог для родителя. День 1 бесплатный, продолжение входит в полный курс.</p>
-            </div>
-            <div className="mb-10 overflow-hidden rounded-[32px] border border-ink/7 bg-white/82 p-6 shadow-card backdrop-blur-xl sm:p-8">
-              <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-                <div className="max-w-3xl">
-                  <span className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-brand-pink">Не тест из одинаковых вопросов</span>
-                  <h3 className="mt-3 font-display text-3xl font-extrabold tracking-[-0.035em] text-ink sm:text-4xl">Ребёнок не только выбирает ответ — он играет и действует</h3>
-                  <p className="mt-3 text-sm font-semibold leading-6 text-ink/56 sm:text-base">Первые игровые механики уже есть в бесплатном дне. Дальше они возвращаются с новыми правилами, картами и сюжетами.</p>
-                </div>
-                <span className="shrink-0 rounded-full bg-brand-green/10 px-4 py-2 text-xs font-extrabold text-brand-green">Можно попробовать бесплатно ✓</span>
-              </div>
-              <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {[
-                  ['🧭', 'Мини-маршруты', 'Вести Искру стрелками, обходить препятствия и искать короткий путь.', 'Управление героем'],
-                  ['📦', 'Сортировочные станции', 'Распределять предметы по зонам и самому открывать правило.', 'Игра на логику'],
-                  ['🧠', 'Карточки памяти', 'Открывать пары, запоминать места и улучшать собственный результат.', 'Мемори'],
-                  ['🧩', 'Конструкторы историй', 'Собирать события, планы и предложения в осмысленном порядке.', 'Собери сам'],
-                  ['🏃', 'Живые задания', 'Встать, хлопнуть, повторить движение и вернуть внимание к экрану.', 'Экран + движение'],
-                  ['🏆', 'Квесты и награды', 'Открывать печати, проходить мини-финалы и собирать золотой ключ.', 'Сюжетный финал'],
-                ].map(([icon, title, text, label]) => (
-                  <article key={title} className="group rounded-[22px] border border-ink/7 bg-[#FBFAF7] p-5 transition duration-300 hover:-translate-y-1 hover:border-brand-blue/18 hover:shadow-card">
-                    <div className="flex items-start justify-between gap-3">
-                      <span className="grid h-12 w-12 place-items-center rounded-[16px] bg-white text-2xl shadow-sm">{icon}</span>
-                      <span className="rounded-full bg-ink/5 px-2.5 py-1 text-[8px] font-extrabold uppercase tracking-[0.1em] text-ink/42">{label}</span>
-                    </div>
-                    <h4 className="mt-4 font-display text-lg font-extrabold text-ink">{title}</h4>
-                    <p className="mt-2 text-xs font-semibold leading-5 text-ink/52">{text}</p>
-                  </article>
-                ))}
-              </div>
-            </div>
-            <SchoolPrepAdventure
-              week={schoolPrepWeekOne}
-              hasFullAccess={hasAccess || process.env.NODE_ENV !== 'production'}
-            />
           </div>
         </section>
 
@@ -552,9 +558,10 @@ export default async function SchoolPrepPage() {
                     hasAccess={hasAccess}
                     accessUntil={accessUntilLabel}
                     returnTo="/podgotovka-k-shkole"
+                    loginCallback="/podgotovka-k-shkole#podpiska"
                   />
                   <p className="mt-4 text-center text-[11px] font-semibold leading-5 text-ink/40">
-                    Доступ открывается сразу после оплаты на 30 дней. Автопродления нет.
+                    {SCHOOL_PREP_PRICE} ₽ открывают программу на 30 дней. Продление — только вручную, автосписаний нет.
                   </p>
                 </div>
               </div>

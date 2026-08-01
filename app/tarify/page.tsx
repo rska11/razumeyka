@@ -15,7 +15,7 @@ import {
 export const metadata = {
   title: "Тарифы на детские онлайн-курсы",
   description:
-    "Три открытых курса Знайтона: рисование, ментальная арифметика и подготовка к школе. Первые занятия бесплатно, полный доступ на 30 дней — 490 ₽.",
+    "Три открытых курса Знайтона: рисование, ментальная арифметика и подготовка к школе. Первые занятия бесплатно, полный доступ на 30 дней — от 390 ₽.",
   alternates: canonical("/tarify"),
 };
 
@@ -86,11 +86,11 @@ export default async function TariffsPage() {
                 Выберите курс сейчас — <span className="bg-gradient-to-r from-brand-blue via-brand-purple to-brand-pink bg-clip-text text-transparent">первые занятия бесплатно</span>
               </h1>
               <p className="mx-auto mt-6 max-w-2xl text-base font-semibold leading-8 text-ink/62 sm:text-lg">
-                Единая стартовая цена на каждое направление. Без пакетов, скрытых доплат и автоматического продления.
+                Выберите подходящее направление. Без пакетов, скрытых доплат и автоматического продления.
               </p>
               <div className="mx-auto mt-7 inline-flex flex-wrap items-center justify-center gap-3 rounded-[24px] border border-white/90 bg-white/82 px-5 py-4 shadow-card backdrop-blur-xl">
                 <del className="text-xl font-extrabold text-ink/30">1 490 ₽</del>
-                <strong className="font-display text-4xl font-black text-brand-blue">490 ₽</strong>
+                <strong className="font-display text-4xl font-black text-brand-blue">от 390 ₽</strong>
                 <span className="text-sm font-extrabold text-ink/48">за курс на 30 дней</span>
               </div>
             </div>

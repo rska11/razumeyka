@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { SchoolPrepAudioButton } from "./SchoolPrepAudioButton.jsx";
 import { SchoolPrepAutoNarration } from "./SchoolPrepAutoNarration.jsx";
 import { SchoolPrepScene, SchoolPrepShape, SchoolPrepVisual } from "./SchoolPrepVisual.jsx";
+import { reachGoal } from "@/lib/metrika";
 
 const STORAGE_KEY = "razumeyka_school_prep_week1";
 
@@ -679,7 +680,7 @@ function MissionCard({ mission, index, done, onComplete, dayId }) {
   );
 }
 
-export function SchoolPrepAdventure({ week, hasFullAccess = false }) {
+export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490 }) {
   const [selectedDay, setSelectedDay] = useState(0);
   const [missionIndex, setMissionIndex] = useState(0);
   const [completed, setCompleted] = useState([]);
@@ -724,7 +725,17 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false }) {
   const progress = Math.round((visibleCompleted / visibleProgressIds.length) * 100);
 
   function completeMission(id) {
-    setCompleted((current) => (current.includes(id) ? current : [...current, id]));
+    setCompleted((current) => {
+      if (current.includes(id)) return current;
+      const next = [...current, id];
+      if (selectedDay === 0 && current.filter((missionId) => currentDay.missions.some((mission) => mission.id === missionId)).length === 0) {
+        reachGoal("prep_day_start");
+      }
+      if (selectedDay === 0 && currentDay.missions.every((mission) => next.includes(mission.id))) {
+        reachGoal("prep_day_complete", { missions: currentDay.missions.length });
+      }
+      return next;
+    });
   }
 
   function selectDay(index) {
@@ -972,8 +983,12 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false }) {
                 </p>
               </div>
               {!hasFullAccess && selectedDay === 0 ? (
-                <a href="#program" className="primary-btn shrink-0">
-                  Посмотреть полный маршрут →
+                <a
+                  href="#podpiska"
+                  onClick={() => reachGoal("prep_offer_click", { source: "day_complete" })}
+                  className="primary-btn shrink-0"
+                >
+                  Открыть продолжение за {price} ₽ →
                 </a>
               ) : selectedDay < week.days.length - 1 && (
                 <button type="button" onClick={() => selectDay(selectedDay + 1)} className="primary-btn shrink-0">

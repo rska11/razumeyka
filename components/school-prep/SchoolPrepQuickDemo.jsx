@@ -1,7 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { reachGoal } from '@/lib/metrika';
 import { SchoolPrepAudioButton } from './SchoolPrepAudioButton.jsx';
+import { SchoolPrepShape, SchoolPrepVisual } from './SchoolPrepVisual.jsx';
 
 const tasks = [
   {
@@ -25,7 +27,11 @@ const tasks = [
     skill: 'Закономерности',
     title: 'Следующий кристалл',
     scene: 'Кристаллы на воротах лежат повторяющимся узором.',
-    visual: '🔵  🔵  🟡   ·   🔵  🔵  🟡   ·   ?',
+    pattern: [
+      { color: 'blue' }, { color: 'blue' }, { color: 'yellow' },
+      { color: 'blue' }, { color: 'blue' }, { color: 'yellow' },
+      { gap: true },
+    ],
     prompt: 'Какой цвет продолжит узор?',
     options: [
       { id: 'blue', label: 'Синий', tone: 'bg-brand-blue' },
@@ -41,8 +47,12 @@ const tasks = [
     skill: 'Пространственное мышление',
     title: 'Где стоит Искра?',
     scene: 'Посмотри, что находится слева и справа от лисёнка.',
-    visual: '🏠       🦊       🌳',
-    characterNote: '🦊 Это лисёнок Искра',
+    sceneItems: [
+      { name: 'house', caption: 'Дом' },
+      { name: 'fox', caption: 'Лисёнок Искра' },
+      { name: 'tree', caption: 'Дерево' },
+    ],
+    characterNote: 'Лисёнок на картинке — это Искра',
     prompt: 'Выбери самое точное описание.',
     options: [
       { id: 'between', label: 'Между домом и деревом', tone: 'bg-brand-green' },
@@ -59,16 +69,22 @@ export function SchoolPrepQuickDemo() {
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState('');
   const [result, setResult] = useState('');
+  const started = useRef(false);
   const task = tasks[index];
   const last = index === tasks.length - 1;
 
   function answer(id) {
+    if (!started.current) {
+      started.current = true;
+      reachGoal('prep_demo_start');
+    }
     setSelected(id);
     setResult(id === task.correct ? 'success' : 'hint');
   }
 
   function next() {
     if (last) {
+      reachGoal('prep_demo_complete');
       document.getElementById('week-one')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       return;
     }
@@ -132,9 +148,24 @@ export function SchoolPrepQuickDemo() {
                     </div>
                     <div className={'mx-auto mt-2 h-1.5 w-[92%] rounded-full bg-gradient-to-r from-brand-blue/25 via-brand-blue/40 to-brand-blue/25'} />
                   </div>
-                ) : (
-                  <div className={'font-display text-4xl font-extrabold tracking-[0.04em] text-ink sm:text-6xl'}>{task.visual}</div>
-                )}
+                ) : task.pattern ? (
+                  <div className={'flex flex-wrap items-center justify-center gap-1 sm:gap-2'}>
+                    {task.pattern.map((item, itemIndex) => item.gap ? (
+                      <span key={itemIndex} className={'grid h-12 w-12 place-items-center rounded-[16px] border-2 border-dashed border-brand-blue/35 bg-white text-2xl font-black text-brand-blue sm:h-16 sm:w-16'}>?</span>
+                    ) : (
+                      <SchoolPrepShape key={itemIndex} shape={'circle'} color={item.color} size={'medium'} />
+                    ))}
+                  </div>
+                ) : task.sceneItems ? (
+                  <div className={'flex items-start justify-center gap-3 sm:gap-6'}>
+                    {task.sceneItems.map((item) => (
+                      <div key={item.name} className={'grid justify-items-center gap-2'}>
+                        <SchoolPrepVisual name={item.name} label={item.caption} />
+                        <span className={'max-w-24 text-xs font-extrabold leading-4 text-ink/60'}>{item.caption}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
                 <p className={'mt-4 text-sm font-extrabold text-ink/64 sm:text-base'}>{task.prompt}</p>
                 <SchoolPrepAudioButton src={'/audio/school-prep/day-1/' + task.id + '/instruction.mp3'} label={'Послушать задание'} className={'mt-4'} />
               </div>

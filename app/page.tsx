@@ -9,7 +9,6 @@ import { FinalCTA } from '@/components/FinalCTA.jsx';
 import { Footer } from '@/components/Footer.jsx';
 import { Header } from '@/components/Header.jsx';
 import { Hero } from '@/components/Hero.jsx';
-import { PrepCampaignHero } from '@/components/PrepCampaignHero.jsx';
 import { PainPoints } from '@/components/PainPoints.jsx';
 import { PresentationMap } from '@/components/PresentationMap.jsx';
 import { Process } from '@/components/Process.jsx';
@@ -26,24 +25,7 @@ export const metadata = {
   alternates: canonical('/'),
 };
 
-function firstSearchParam(value: string | string[] | undefined) {
-  return Array.isArray(value) ? value[0] ?? '' : value ?? '';
-}
-
-function isPrepCampaign(params: Record<string, string | string[] | undefined>) {
-  const campaign = firstSearchParam(params.utm_campaign);
-  const preview = firstSearchParam(params.view);
-  return preview === 'prep' || /(^|[-_])(prep|school|podgotovka)([-_]|$)/i.test(campaign);
-}
-
-export default async function HomePage({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
-  const params = await searchParams;
-  const prepCampaign = isPrepCampaign(params);
-
+export default function HomePage() {
   return (
     <>
       <script
@@ -78,13 +60,9 @@ export default async function HomePage({
           }),
         }}
       />
-      <Header
-        primaryHref={prepCampaign ? '/podgotovka-k-shkole#quick-demo' : '/#programs'}
-        primaryLabel={prepCampaign ? 'Попробовать бесплатно' : 'Начать бесплатно'}
-      />
+      <Header />
       <main>
-        {prepCampaign ? <PrepCampaignHero /> : <Hero />}
-        {!prepCampaign && (
+        <Hero />
         <section id="games" aria-labelledby="home-games-title" className="relative overflow-hidden bg-[#F6F8FC] px-5 py-14 sm:px-8 lg:px-14 lg:py-20">
           <div className="pointer-events-none absolute -left-24 top-0 h-72 w-72 rounded-full bg-brand-blue/12 blur-3xl" />
           <div className="pointer-events-none absolute -right-24 bottom-0 h-72 w-72 rounded-full bg-brand-pink/12 blur-3xl" />
@@ -141,7 +119,6 @@ export default async function HomePage({
             </div>
           </div>
         </section>
-        )}
         <PainPoints />
         <Directions />
         <AgePrograms />
@@ -158,10 +135,7 @@ export default async function HomePage({
         <FinalCTA />
       </main>
       <Footer />
-      <StickyMobileCTA
-        href={prepCampaign ? '/podgotovka-k-shkole#quick-demo' : '/#programs'}
-        label={prepCampaign ? 'Попробовать бесплатно' : 'Открыть уроки'}
-      />
+      <StickyMobileCTA />
     </>
   );
 }

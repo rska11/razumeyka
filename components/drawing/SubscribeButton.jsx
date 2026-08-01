@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { reachGoal } from '@/lib/metrika';
 
 // Кнопка оформления доступа к направлению self-study (раздельно по направлениям).
 // Не залогинен → на вход; залогинен → принимает оферту, создаём платёж и уходим на ЮKassa.
@@ -20,6 +21,7 @@ export function SubscribeButton({ isLoggedIn, hasAccess, accessUntil = '', retur
 
   async function go() {
     if (!isLoggedIn) {
+      reachGoal('subscription_login_start', { return_to: returnTo });
       window.location.href = `/login?callbackUrl=${encodeURIComponent(loginCallback)}`;
       return;
     }
@@ -28,6 +30,7 @@ export function SubscribeButton({ isLoggedIn, hasAccess, accessUntil = '', retur
       return;
     }
     setError('');
+    reachGoal('checkout_start', { return_to: returnTo });
     setLoading(true);
     try {
       const res = await fetch('/api/subscription/create', {

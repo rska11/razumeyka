@@ -14,7 +14,7 @@ const visualPalette = {
   notebook: "blue", pencil: "yellow", book: "purple", ruler: "cyan", folder: "blue",
   folderBlue: "blue", folderGreen: "green", toyCar: "orange", candy: "pink", eraser: "pink",
   sun: "yellow", wash: "cyan", breakfast: "orange", backpack: "purple", shoes: "blue",
-  cat: "orange", tree: "green", cloud: "cyan", chair: "purple", butterfly: "pink", stone: "blue",
+  cat: "orange", house: "blue", tree: "green", cloud: "cyan", chair: "purple", butterfly: "pink", stone: "blue",
   ball: "blue", honey: "yellow", bowl: "cyan", poppy: "pink", bridge: "orange", mouse: "purple",
   juice: "orange", fox: "orange", nose: "pink", sparkle: "yellow", search: "blue",
   walk: "green", handshake: "purple", key: "yellow", map: "green", bell: "orange",
@@ -64,6 +64,8 @@ function Icon({ name }) {
       return <><path {...common} d="M4 15c3 .5 5-1 6-4 1 3 3 4 6 5l4 1v3H4zM5 9l4 2M15 7l-2 5" /></>;
     case "cat":
       return <><path {...common} d="m7 8 1-4 4 3 4-3 1 4a8 8 0 1 1-10 0Z" /><path {...common} d="M9 12h.1M15 12h.1M10 16c1.3 1 2.7 1 4 0M5 14H2M19 14h3" /></>;
+    case "house":
+      return <><path {...common} d="m3 11 9-8 9 8" /><path {...common} d="M5 10v10h14V10M9 20v-6h6v6M8 10h2M14 10h2" /></>;
     case "tree":
       return <><path {...common} d="M12 21v-6M9 21h6" /><path {...common} d="M12 3a5 5 0 0 0-4.8 3.5A4.5 4.5 0 0 0 8 15h8a4.5 4.5 0 0 0 .8-8.5A5 5 0 0 0 12 3Z" /></>;
     case "cloud":

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Icon } from './Icon.jsx';
 
-export function StickyMobileCTA({ href = '/#programs', label = 'Открыть уроки' }) {
+export function StickyMobileCTA() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -21,8 +21,8 @@ export function StickyMobileCTA({ href = '/#programs', label = 'Открыть �
         isVisible ? 'translate-y-0' : 'translate-y-full'
       }`}
     >
-      <a href={href} className="primary-btn w-full justify-center py-4 text-base">
-        <span className="relative">{label}</span>
+      <a href="/#programs" className="primary-btn w-full justify-center py-4 text-base">
+        <span className="relative">Открыть уроки</span>
         <Icon name="arrow" className="relative h-5 w-5" />
       </a>
     </div>

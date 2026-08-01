@@ -21,7 +21,7 @@ export const DIRECTION_COMPARE_PRICE = 1490;
 export const DIRECTION_PRICE: Record<DirectionSlug, number> = {
   risovanie: SUBSCRIPTION_PRICE,
   "mentalnaya-arifmetika": SUBSCRIPTION_PRICE,
-  "podgotovka-k-shkole": SUBSCRIPTION_PRICE,
+  "podgotovka-k-shkole": 390,
 };
 
 /** Цена доступа к направлению в рублях. */

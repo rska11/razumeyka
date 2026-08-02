@@ -20,6 +20,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Soroban, columnsFor } from './Soroban.jsx';
+import { reachGoal } from '@/lib/metrika';
 
 function chainSum(chain) {
   return chain.reduce((a, b) => a + b, 0);
@@ -300,7 +301,7 @@ function SolveStep({ step, columns, onSolved }) {
 }
 
 // ——— Плеер ———
-export function MentalLessonPlayer({ lesson, nextLesson, onComplete, onNext, onClose, paceFactor = 1 }) {
+export function MentalLessonPlayer({ lesson, nextLesson, onComplete, onNext, onClose, paceFactor = 1, showUpgrade = false }) {
   const steps = lesson.steps ?? [];
   const total = steps.length;
   const columns = useMemo(() => lessonColumns(lesson), [lesson]);
@@ -511,6 +512,21 @@ export function MentalLessonPlayer({ lesson, nextLesson, onComplete, onNext, onC
                 <button onClick={onNext} className="primary-btn mt-5 w-full">
                   Следующий урок: {nextLesson.title} →
                 </button>
+              ) : showUpgrade ? (
+                <div className="mt-5 rounded-2xl border border-brand-blue/18 bg-gradient-to-r from-brand-blue/8 to-brand-green/8 p-4 text-left">
+                  <p className="font-display text-lg font-extrabold text-ink">Вы дошли до полного курса!</p>
+                  <p className="mt-1 text-xs font-semibold leading-5 text-ink/58">Дальше ребёнка ждут новые числа, цепочки, флеш-карты и игровые миссии. Доступ на 30 дней стоит 490 ₽, без автосписания.</p>
+                  <a
+                    href="#podpiska"
+                    onClick={() => {
+                      reachGoal('mental_free_route_upgrade_click', { lesson: lesson.slug });
+                      onClose?.();
+                    }}
+                    className="primary-btn mt-3 w-full"
+                  >
+                    Открыть полный курс за 490 ₽ →
+                  </a>
+                </div>
               ) : (
                 <p className="mt-5 text-sm font-semibold text-ink/54">Это последний открытый урок на сегодня.</p>
               )}

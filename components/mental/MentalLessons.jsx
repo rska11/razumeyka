@@ -16,6 +16,7 @@ import {
 } from '@/data/mental-lessons.js';
 import { MentalLessonPlayer } from './MentalLessonPlayer.jsx';
 import { Soroban } from './Soroban.jsx';
+import { reachGoal } from '@/lib/metrika';
 
 const STORAGE_DONE = 'razumeyka_mental_done';
 const STORAGE_BAND = 'razumeyka_mental_band';
@@ -196,6 +197,7 @@ export function MentalLessons({ hasSubscription = false }) {
   }, []);
 
   function selectBand(key) {
+    reachGoal('mental_age_select', { age_band: key });
     setBand(key);
     try {
       localStorage.setItem(STORAGE_BAND, key);
@@ -203,6 +205,7 @@ export function MentalLessons({ hasSubscription = false }) {
   }
 
   function markDone(slug) {
+    reachGoal('mental_lesson_complete', { lesson: slug, age_band: band });
     setDoneSet((prev) => {
       const next = new Set(prev);
       next.add(slug);
@@ -239,7 +242,13 @@ export function MentalLessons({ hasSubscription = false }) {
   }
 
   function goSubscribe() {
+    reachGoal('mental_paywall_click', { source: 'lesson_map', age_band: band });
     document.getElementById('podpiska')?.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function openLesson(lesson) {
+    reachGoal('mental_lesson_start', { lesson: lesson.slug, age_band: band, free: freeSlugs.has(lesson.slug) });
+    setActive(lesson);
   }
 
   return (
@@ -307,7 +316,7 @@ export function MentalLessons({ hasSubscription = false }) {
             doneSet={doneSet}
             unlocked={unlocked}
             freeSlugs={freeSlugs}
-            onOpen={setActive}
+            onOpen={openLesson}
             onLocked={goSubscribe}
           />
         )}
@@ -322,7 +331,7 @@ export function MentalLessons({ hasSubscription = false }) {
                   doneSet={doneSet}
                   unlocked={unlocked}
                   freeSlugs={freeSlugs}
-                  onOpen={setActive}
+                  onOpen={openLesson}
                   onLocked={goSubscribe}
                 />
               ) : null}
@@ -342,6 +351,7 @@ export function MentalLessons({ hasSubscription = false }) {
           onComplete={markDone}
           onNext={() => setActive(nextAfter(active) ?? null)}
           onClose={() => setActive(null)}
+          showUpgrade={!hasSubscription && !nextAfter(active)}
         />
       )}
     </div>

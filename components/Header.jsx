@@ -16,7 +16,7 @@ const nav = [
   ['Блог', '/blog'],
 ];
 
-export function Header({ primaryHref = '/#programs', primaryLabel = 'Начать бесплатно', primaryGoal = '' }) {
+export function Header({ primaryHref = '/#programs', primaryLabel = 'Начать бесплатно', primaryGoal = '', focused = false }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   function closeMenu() {
@@ -30,7 +30,7 @@ export function Header({ primaryHref = '/#programs', primaryLabel = 'Начат�
           <Logo />
         </a>
 
-        <nav className="hidden items-center gap-2 rounded-full border border-ink/8 bg-white/58 p-1.5 text-base font-extrabold text-ink/62 shadow-sm lg:flex xl:gap-3">
+        <nav className={`${focused ? 'hidden' : 'hidden lg:flex'} items-center gap-2 rounded-full border border-ink/8 bg-white/58 p-1.5 text-base font-extrabold text-ink/62 shadow-sm xl:gap-3`}>
           {nav.map(([item, href]) => (
             <a key={item} href={href} className="rounded-full px-5 py-3 transition hover:scale-[1.03] hover:bg-forest-900 hover:text-porcelain">
               {item}
@@ -67,7 +67,7 @@ export function Header({ primaryHref = '/#programs', primaryLabel = 'Начат�
       {isMenuOpen && (
         <div className="mx-auto mt-2 max-w-[1380px] overflow-hidden rounded-[8px] border border-white/70 bg-porcelain/96 shadow-color backdrop-blur-2xl lg:hidden">
           <nav className="flex flex-col gap-1 p-4">
-            {nav.map(([item, href]) => (
+            {!focused && nav.map(([item, href]) => (
               <a
                 key={item}
                 href={href}

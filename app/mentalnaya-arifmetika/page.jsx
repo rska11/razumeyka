@@ -8,6 +8,7 @@ import { MentalNumberGame } from '@/components/mental/MentalNumberGame.jsx';
 import { SorobanDemo } from '@/components/mental/SorobanDemo.jsx';
 import { SubscribeButton } from '@/components/drawing/SubscribeButton.jsx';
 import { CourseDiscovery } from '@/components/CourseDiscovery.jsx';
+import { TrackedLink } from '@/components/analytics/TrackedLink.jsx';
 import {
   mentalIntro,
   mentalSubscription,
@@ -88,7 +89,7 @@ export default async function MentalArithmeticPage() {
 
   return (
     <>
-      <Header />
+      <Header focused primaryHref="#uroki" primaryLabel="8 уроков бесплатно" primaryGoal="mental_header_free_click" />
       <main className="mental-page mental-v3 min-h-screen overflow-hidden bg-[#F7F9FC] text-ink">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
@@ -105,30 +106,28 @@ export default async function MentalArithmeticPage() {
                   Лаборатория чисел · 4–10 лет
                 </span>
                 <h1 className="mt-7 max-w-[780px] font-display text-[46px] font-extrabold leading-[.98] tracking-[-0.06em] text-white sm:text-6xl lg:text-[76px]">
-                  Сначала двигаем бусины.<br /><span className="bg-gradient-to-r from-[#56C7FF] via-[#75E5C1] to-[#FFD166] bg-clip-text text-transparent">Потом — числа в уме.</span>
+                  Учимся считать в уме.<br /><span className="bg-gradient-to-r from-[#56C7FF] via-[#75E5C1] to-[#FFD166] bg-clip-text text-transparent">Понятно, а не наизусть.</span>
                 </h1>
                 <p className="mt-7 max-w-[700px] text-base font-semibold leading-7 text-white/64 sm:text-lg sm:leading-8">
                   {mentalIntro.lead[0]} Интерактивный абакус превращает абстрактные цифры в понятные движения, а короткие игры постепенно ведут к настоящему устному счёту.
                 </p>
                 <div className="mt-9 flex flex-wrap gap-3">
-                  <a href="#uroki" className="inline-flex min-h-[58px] items-center justify-center gap-3 rounded-full bg-white px-7 py-4 text-sm font-extrabold text-[#09152E] shadow-[0_18px_46px_rgba(0,0,0,.24)] transition hover:-translate-y-1">
-                    Открыть бесплатные уроки <span className="text-lg">→</span>
-                  </a>
+                  <TrackedLink goal="mental_hero_free_click" params={{ source: 'hero' }} href="#uroki" className="inline-flex min-h-[58px] items-center justify-center gap-3 rounded-full bg-white px-7 py-4 text-sm font-extrabold text-[#09152E] shadow-[0_18px_46px_rgba(0,0,0,.24)] transition hover:-translate-y-1">
+                    Пройти 8 уроков бесплатно <span className="text-lg">→</span>
+                  </TrackedLink>
                   <MentalIntroAudio className="mental-audio-dark" src="/audio/mental/method/intro-hero-v1.mp3" />
-                  <a href="#igra" className="group inline-flex min-h-[58px] items-center justify-center gap-3 rounded-full border border-[#75E5C1]/35 bg-[#75E5C1]/12 px-6 py-4 text-sm font-extrabold text-[#9AF3D6] shadow-[0_18px_46px_rgba(0,0,0,.16)] backdrop-blur-xl transition hover:-translate-y-1 hover:bg-[#75E5C1]/20">
+                  <TrackedLink goal="mental_hero_game_click" params={{ source: 'hero' }} href="#igra" className="group inline-flex min-h-[58px] items-center justify-center gap-3 rounded-full border border-[#75E5C1]/35 bg-[#75E5C1]/12 px-6 py-4 text-sm font-extrabold text-[#9AF3D6] shadow-[0_18px_46px_rgba(0,0,0,.16)] backdrop-blur-xl transition hover:-translate-y-1 hover:bg-[#75E5C1]/20">
                     <span className="grid h-8 w-8 place-items-center rounded-full bg-[#75E5C1] text-xs text-[#09152E] transition group-hover:scale-110">▶</span>
-                    Играть: «Звёздный абакус»
-                  </a>
-                  <a href="/trenazher-umnozheniya" className="group inline-flex min-h-[58px] items-center justify-center gap-3 rounded-full border border-[#FFD166]/35 bg-[#FFD166]/12 px-6 py-4 text-sm font-extrabold text-[#FFD166] shadow-[0_18px_46px_rgba(0,0,0,.16)] transition hover:-translate-y-1 hover:bg-[#FFD166]/20">
-                    <span className="grid h-8 w-8 place-items-center rounded-full bg-[#FFD166] text-xs text-[#09152E] transition group-hover:scale-110">×</span>
-                    Тренажёр умножения
-                  </a>
+                    Попробовать игру
+                  </TrackedLink>
                 </div>
-                <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-xs font-bold text-white/46">
+                <div className="mt-6 flex max-w-[700px] flex-wrap gap-x-6 gap-y-2 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3 text-xs font-bold text-white/62 backdrop-blur-xl">
+                  <span className="text-white">Полный месяц — {mentalSubscription.price} ₽</span>
+                  <span>✓ 8 уроков + 3 миссии бесплатно</span>
                   <span>✓ Без покупки счётов</span>
                   <span>✓ Без карты для старта</span>
                   <span>✓ 5–12 минут за урок</span>
-                  <span>✓ Умножение входит в доступ</span>
+                  <span>✓ Без автосписания</span>
                 </div>
               </div>
 
@@ -157,7 +156,7 @@ export default async function MentalArithmeticPage() {
                 ['200', 'игровых миссий', 'маршрут первого месяца', 'from-[#236BFF] to-[#45A9F4]'],
                 ['1 000+', 'интерактивных заданий', 'двигать, считать, запоминать', 'from-[#7B59E8] to-[#B366E7]'],
                 ['20', 'учебных дней', '4 недели без перегруза', 'from-[#E6942A] to-[#F4BE4B]'],
-                ['3', 'урока бесплатно', 'без банковской карты', 'from-[#11A77B] to-[#42C9A3]'],
+                ['8', 'уроков бесплатно', 'и 3 миссии без карты', 'from-[#11A77B] to-[#42C9A3]'],
               ].map(([value, label, note, tone]) => (
                 <article key={label} className={`relative overflow-hidden rounded-[24px] bg-gradient-to-br ${tone} p-5 shadow-[0_22px_55px_rgba(0,0,0,.18)] sm:p-6`}>
                   <div className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full bg-white/18 blur-xl" />
@@ -170,17 +169,28 @@ export default async function MentalArithmeticPage() {
           </div>
         </section>
 
-        <section className="px-5 py-10 sm:px-8 lg:px-14 lg:py-14">
+        <section className="px-5 py-20 sm:px-8 lg:px-14 lg:py-24">
           <div className="container-pad px-0">
-            <a href="/trenazher-umnozheniya" className="group relative grid overflow-hidden rounded-[34px] bg-gradient-to-br from-[#13264D] via-[#293A78] to-[#176C6C] p-6 text-white shadow-luxe transition hover:-translate-y-1 sm:p-9 lg:grid-cols-[1fr_auto] lg:items-center lg:gap-10 lg:p-12">
-              <div className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-[#FFD166]/20 blur-[90px]" />
-              <div className="relative max-w-4xl">
-                <div className="flex flex-wrap items-center gap-2"><span className="rounded-full bg-[#FFD166] px-3 py-1.5 text-[9px] font-extrabold uppercase tracking-[0.16em] text-[#17213A]">Новый модуль</span><span className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#9AECD3]">уже входит в курс</span></div>
-                <h2 className="mt-5 font-display text-3xl font-extrabold tracking-[-0.04em] sm:text-5xl">Таблица умножения — через смысл, стратегии и адаптивное повторение</h2>
-                <p className="mt-4 max-w-3xl text-sm font-semibold leading-6 text-white/62 sm:text-base">12 маршрутов: одинаковые группы, таблицы 2–9, деление и задачи. Тренажёр видит слабые примеры ребёнка и возвращает их чаще.</p>
+            <div className="grid gap-10 lg:grid-cols-[.8fr_1.2fr] lg:items-start">
+              <div className="max-w-xl">
+                <span className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-brand-blue">Когда цифры пока не складываются</span>
+                <h2 className="mt-5 font-display text-4xl font-extrabold leading-[1.03] tracking-[-0.05em] sm:text-5xl">Знакомо вашему ребёнку?</h2>
+                <p className="mt-5 text-base font-semibold leading-7 text-ink/58">Абакус делает число видимым: ребёнок сначала собирает ответ движением, затем удерживает знакомый образ и постепенно считает без опоры.</p>
               </div>
-              <span className="relative mt-7 inline-flex min-h-[56px] items-center justify-center rounded-full bg-white px-7 py-4 text-sm font-extrabold text-[#13264D] transition group-hover:scale-[1.03] lg:mt-0">Попробовать бесплатно →</span>
-            </a>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {[
+                  ['Считает на пальцах', 'Идёт по одному и начинает сначала, если сбился.'],
+                  ['Теряет шаги', 'Забывает промежуточный результат в цепочке действий.'],
+                  ['Боится ошибиться', 'Замолкает или отказывается отвечать без подсказки взрослого.'],
+                  ['Быстро устаёт', 'Однотипные примеры не удерживают внимание и превращаются в зубрёжку.'],
+                ].map(([title, text]) => (
+                  <article key={title} className="rounded-[22px] border border-ink/8 bg-white p-5 shadow-card">
+                    <h3 className="font-display text-lg font-extrabold text-ink">{title}</h3>
+                    <p className="mt-2 text-sm font-semibold leading-6 text-ink/54">{text}</p>
+                  </article>
+                ))}
+              </div>
+            </div>
           </div>
         </section>
         <section id="metod" className="px-5 py-24 sm:px-8 lg:px-14 lg:py-32">
@@ -324,6 +334,33 @@ export default async function MentalArithmeticPage() {
           </div>
         </section>
 
+        <section className="px-5 pb-20 pt-4 sm:px-8 lg:px-14 lg:pb-24">
+          <div className="container-pad px-0">
+            <div className="grid gap-10 rounded-[36px] border border-ink/8 bg-white p-6 shadow-card sm:p-9 lg:grid-cols-[.75fr_1.25fr] lg:p-12">
+              <div>
+                <span className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-brand-blue">Перед стартом</span>
+                <h2 className="mt-5 font-display text-3xl font-extrabold leading-tight tracking-[-0.04em] sm:text-5xl">Всё, что важно родителю</h2>
+                <p className="mt-5 text-sm font-semibold leading-7 text-ink/56">Начните без оплаты: выберите возрастной темп, пройдите открытые уроки и посмотрите, насколько ребёнку подходит формат.</p>
+              </div>
+              <div className="grid gap-3">
+                {[
+                  ['Нужно ли покупать абакус?', 'Нет. Интерактивные счёты уже встроены в уроки и работают прямо на экране.'],
+                  ['Что именно доступно бесплатно?', 'Пять подготовительных уроков, три урока с абакусом и три миссии игры «Звёздный абакус». Банковская карта не нужна.'],
+                  ['Сколько длится занятие?', 'Обычно 5–12 минут. Лучше заниматься понемногу и регулярно, чем проходить много уроков подряд.'],
+                  ['Подойдёт ли ребёнку, который плохо знает цифры?', 'Да. Для старта есть «Ступень 0»: узнаём цифры и спокойно считаем предметы до десяти.'],
+                  ['Нужно ли постоянно сидеть рядом?', 'Курс объясняет действие и разбирает ошибки на экране. Малышам может понадобиться помощь взрослого на первых занятиях.'],
+                  ['Будут ли повторные списания?', 'Нет. Это разовая оплата за 30 дней доступа без автоматического продления.'],
+                ].map(([question, answer]) => (
+                  <details key={question} className="group rounded-[18px] border border-ink/8 bg-[#F7F9FC] px-5 py-4">
+                    <summary className="cursor-pointer list-none pr-6 font-display text-base font-extrabold text-ink marker:hidden">{question}<span className="float-right text-brand-blue transition group-open:rotate-45">＋</span></summary>
+                    <p className="mt-3 pr-6 text-sm font-semibold leading-6 text-ink/58">{answer}</p>
+                  </details>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section id="podpiska" className="scroll-mt-24 px-5 pb-24 sm:px-8 lg:px-14 lg:pb-32">
           <div className="container-pad px-0">
             <div className="relative overflow-hidden rounded-[40px] bg-gradient-to-br from-[#09152E] via-[#142B52] to-[#174C51] p-6 text-white shadow-luxe sm:p-10 lg:p-14">
@@ -342,11 +379,11 @@ export default async function MentalArithmeticPage() {
                   </ul>
                 </div>
                 <div className="rounded-[30px] bg-white p-6 text-ink shadow-[0_30px_80px_rgba(0,0,0,.3)] sm:p-8">
-                  <p className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-brand-blue">Стоимость доступа</p>
+                  <p className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-brand-blue">Стоимость доступа на 30 дней</p>
                   <del className="mt-4 block text-lg font-extrabold text-ink/35">{mentalSubscription.oldPrice} ₽</del>
                   <div className="mt-4 flex items-end gap-2">
                     <strong className="font-display text-6xl font-extrabold tracking-[-0.06em]">{mentalSubscription.price}</strong>
-                    <span className="pb-2 text-lg font-extrabold text-ink/44">₽</span>
+                    <span className="pb-2 text-lg font-extrabold text-ink/44">₽ · один платёж</span>
                   </div>
                   <p className="mt-2 text-sm font-bold text-ink/46">на 30 дней · без автосписания</p>
                   <div className="my-6 h-px bg-ink/8" />
@@ -355,7 +392,7 @@ export default async function MentalArithmeticPage() {
                     <p className="flex justify-between gap-4"><span>Игровая практика</span><strong className="text-ink">1 000+ заданий</strong></p>
                     <p className="flex justify-between gap-4"><span>Бесплатный старт</span><strong className="text-brand-green">8 уроков</strong></p>
                   </div>
-                  <SubscribeButton isLoggedIn={Boolean(session?.user?.id)} hasAccess={hasSub} accessUntil={accessUntilLabel} returnTo="/mentalnaya-arifmetika" />
+                  <SubscribeButton isLoggedIn={Boolean(session?.user?.id)} hasAccess={hasSub} accessUntil={accessUntilLabel} returnTo="/mentalnaya-arifmetika" loginCallback="/mentalnaya-arifmetika#podpiska" buttonLabel={`Открыть курс за ${mentalSubscription.price} ₽`} />
                   <p className="mt-4 text-center text-[11px] font-semibold leading-5 text-ink/38">Доступ открывается сразу после оплаты. Автоматического продления нет.</p>
                 </div>
               </div>
@@ -363,6 +400,12 @@ export default async function MentalArithmeticPage() {
             <CourseDiscovery current="mentalnaya-arifmetika" />
           </div>
         </section>
+        {!hasSub && (
+          <TrackedLink goal="mental_mobile_sticky_click" params={{ source: 'mobile_sticky' }} href="#uroki" className="fixed inset-x-3 bottom-3 z-40 flex min-h-[58px] items-center justify-between rounded-full bg-[#09152E] px-5 text-sm font-extrabold text-white shadow-[0_20px_50px_rgba(9,21,46,.36)] md:hidden">
+            <span>8 уроков бесплатно</span>
+            <span className="rounded-full bg-white/10 px-3 py-1.5 text-xs text-[#75E5C1]">затем {mentalSubscription.price} ₽ →</span>
+          </TrackedLink>
+        )}
       </main>
       <Footer />
     </>

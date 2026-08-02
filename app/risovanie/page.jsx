@@ -6,6 +6,7 @@ import { DrawingIntroAudio } from '@/components/drawing/DrawingIntroAudio.jsx';
 import { DrawingLessons } from '@/components/drawing/DrawingLessons.jsx';
 import { SubscribeButton } from '@/components/drawing/SubscribeButton.jsx';
 import { CourseDiscovery } from '@/components/CourseDiscovery.jsx';
+import { TrackedLink } from '@/components/analytics/TrackedLink.jsx';
 import { drawingIntro, whyBlocks, drawingSubscription } from '@/data/drawing-lessons.js';
 import { getAuthSession } from '@/lib/auth';
 import { reconcileUserPayments } from '@/lib/payments';
@@ -27,16 +28,16 @@ const HOW_STEPS = [
 ];
 const METHOD_POINTS = [
   {
-    title: 'Открываем вторую руку',
-    text: 'В большинстве случаев это левая рука. Через маленькие безопасные детали ребёнок получает новый маршрут движения и внимания.',
+    title: 'Снимаем страх ошибки',
+    text: 'На экране виден только один посильный шаг. Ребёнку не нужно сразу повторять сложную готовую картинку целиком.',
   },
   {
-    title: 'Соединяем логику и образ',
-    text: 'Левое полушарие помогает держать порядок и шаги, правое — видеть цвет, форму, интуицию и настроение рисунка целиком.',
+    title: 'Учимся видеть форму',
+    text: 'Ребёнок замечает направление линии, размер и расположение деталей, а затем выбирает цвет и добавляет собственные элементы.',
   },
   {
-    title: 'Выводим в уверенность',
-    text: 'Когда ребёнок видит «я могу», он смелее проявляет инициативу, предлагает идеи и становится заметнее среди сверстников.',
+    title: 'Завершаем свою работу',
+    text: 'Каждый маршрут приводит к картинке, которую можно показать близким, сохранить в портфолио и дополнить собственной историей.',
   },
 ];
 const HERO_ARTWORKS = [
@@ -81,7 +82,7 @@ export default async function DrawingPage() {
 
   return (
     <>
-      <Header />
+      <Header focused primaryHref="#uroki" primaryLabel="3 урока бесплатно" primaryGoal="drawing_header_free_click" />
       <main className="drawing-page min-h-screen">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
@@ -91,14 +92,20 @@ export default async function DrawingPage() {
             <div className="grid items-center gap-12 lg:grid-cols-[1.03fr_.97fr] lg:gap-16">
               <div className="relative z-10">
                 <span className="drawing-eyebrow"><span className="drawing-eyebrow-dot" /> Рисование · правополушарный подход · 3–10 лет</span>
-                <h1 className="drawing-hero-title mt-7">Рисование, которое развивает <em>смелость</em> и вкус</h1>
+                <h1 className="drawing-hero-title mt-7">Ребёнок создаст свою картину — даже если говорит <em>«я не умею»</em></h1>
                 <div className="mt-7 max-w-[680px] space-y-3">
                   {drawingIntro.lead.slice(0, 2).map((paragraph, index) => <p key={index} className="drawing-hero-lead">{paragraph}</p>)}
                 </div>
                 <div className="mt-9 flex flex-wrap gap-3">
-                  <a href="#uroki" className="drawing-primary-btn">Попробовать первый урок <span>↗</span></a>
+                  <TrackedLink goal="drawing_hero_free_click" params={{ source: 'hero' }} href="#uroki" className="drawing-primary-btn">Пройти 3 урока бесплатно <span>↗</span></TrackedLink>
                   <DrawingIntroAudio />
-                  <a href="#programma" className="drawing-ghost-btn">Посмотреть программу</a>
+                  <TrackedLink goal="drawing_hero_gallery_click" params={{ source: 'hero' }} href="#raboty-nedeli" className="drawing-ghost-btn">Посмотреть работы</TrackedLink>
+                </div>
+                <div className="mt-5 flex max-w-[650px] flex-wrap gap-x-5 gap-y-2 rounded-2xl border border-ink/8 bg-white/65 px-4 py-3 text-xs font-extrabold text-ink/58 shadow-sm backdrop-blur">
+                  <span>✓ 3 урока без карты</span>
+                  <span>✓ Бумага и карандаши</span>
+                  <span className="text-ink">Полный месяц — {drawingSubscription.price} ₽</span>
+                  <span>✓ Без автосписания</span>
                 </div>
                 <div className="mt-10 grid max-w-[650px] grid-cols-3 gap-3">
                   {[['20', 'учебных дней'], ['3', 'возрастные программы'], ['5–7', 'понятных шагов']].map(([value, label]) => (
@@ -131,12 +138,37 @@ export default async function DrawingPage() {
           </div>
         </section>
 
+        <section className="px-5 py-20 sm:px-8 lg:px-14 lg:py-24">
+          <div className="container-pad px-0">
+            <div className="grid gap-10 lg:grid-cols-[.8fr_1.2fr] lg:items-start">
+              <div className="max-w-xl">
+                <span className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-brand-pink">Когда хочется рисовать, но страшно начать</span>
+                <h2 className="mt-5 font-display text-4xl font-extrabold leading-[1.03] tracking-[-0.05em] sm:text-5xl">Знакомо вашему ребёнку?</h2>
+                <p className="mt-5 text-base font-semibold leading-7 text-ink/58">Мы превратили большой рисунок в короткую последовательность понятных действий, чтобы ребёнок чаще говорил «я сам», а не «нарисуй за меня».</p>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {[
+                  ['«Я не умею»', 'Отказывается начинать, увидев сложную готовую картинку.'],
+                  ['Бросает на середине', 'Расстраивается из-за одной неровной линии и теряет интерес.'],
+                  ['Просит дорисовать', 'Ждёт постоянной помощи взрослого вместо самостоятельного шага.'],
+                  ['Не знает, что придумать', 'Копирует образец, но боится добавить цвет, фон или свою деталь.'],
+                ].map(([title, text]) => (
+                  <article key={title} className="rounded-[22px] border border-ink/8 bg-white/80 p-5 shadow-card">
+                    <h3 className="font-display text-lg font-extrabold text-ink">{title}</h3>
+                    <p className="mt-2 text-sm font-semibold leading-6 text-ink/54">{text}</p>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section className="drawing-method-section px-5 py-14 sm:px-8 sm:py-16 lg:px-14">
           <div className="container-pad px-0">
             <div className="drawing-section-head drawing-method-head">
               <span>Метод курса</span>
-              <h2>Что значит<br /><em>правополушарное</em> рисование?</h2>
-              <p>Это не набор раскрасок. Мы через рисование включаем вторую руку, чаще левую, и соединяем два режима мышления: логичный пошаговый порядок и правополушарный образ, цвет, интуицию, чувство целого. Ребёнок не просто повторяет — он раскрывает смелость, фантазию и уверенность.</p>
+              <h2>Метод, который помогает<br /><em>не бояться</em> чистого листа</h2>
+              <p>«Правополушарное рисование» — распространённое название творческого подхода. В нашем курсе ребёнок учится видеть форму целиком, двигаться по понятным шагам и свободнее выбирать цвет и детали. Это творческая практика, а не медицинская тренировка отдельных полушарий.</p>
             </div>
             <div className="mt-10 grid gap-4 lg:grid-cols-3">
               {METHOD_POINTS.map((point, index) => (
@@ -150,7 +182,7 @@ export default async function DrawingPage() {
             <div className="mt-5 rounded-[26px] border border-brand-purple/15 bg-brand-purple/8 px-6 py-5">
               <p className="text-sm font-semibold leading-7 text-ink/70">
                 <span className="font-extrabold text-brand-purple">Важно:</span>{' '}
-                мы не требуем идеальной левой руки и не сравниваем детей. Главный рисунок ребёнок делает удобной рукой, а непишущей пробует маленькие элементы там, где не страшно ошибиться.
+                мы не сравниваем детей и не требуем идеальных линий. Главный рисунок ребёнок делает удобной рукой, а вторую подключает только в небольших игровых упражнениях.
               </p>
             </div>
           </div>
@@ -190,8 +222,35 @@ export default async function DrawingPage() {
 
         <section id="uroki" className="drawing-section px-5 sm:px-8 lg:px-14">
           <div className="container-pad px-0">
-            <div className="drawing-section-head"><span>Программа курса</span><h2>Выберите возраст.<br />Откройте мастерскую.</h2><p>В каждой программе — последовательные учебные дни, понятный прогресс и бесплатные стартовые уроки.</p></div>
+            <div className="drawing-section-head"><span>Программа курса</span><h2>Выберите возраст.<br />Откройте мастерскую.</h2><p>В каждой программе — последовательные учебные дни, понятный прогресс и три бесплатных стартовых урока.</p></div>
             <div className="mt-10"><DrawingLessons hasSubscription={hasSub} /></div>
+          </div>
+        </section>
+
+        <section className="px-5 pb-20 pt-8 sm:px-8 lg:px-14 lg:pb-24">
+          <div className="container-pad px-0">
+            <div className="grid gap-10 rounded-[34px] border border-ink/8 bg-white/80 p-6 shadow-card sm:p-9 lg:grid-cols-[.75fr_1.25fr] lg:p-12">
+              <div>
+                <span className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-brand-pink">Перед стартом</span>
+                <h2 className="mt-5 font-display text-3xl font-extrabold leading-tight tracking-[-0.04em] sm:text-5xl">Всё, что важно родителю</h2>
+                <p className="mt-5 text-sm font-semibold leading-7 text-ink/56">Начать можно без подготовки: выберите возраст, откройте любой из трёх бесплатных уроков и рисуйте в удобном темпе.</p>
+              </div>
+              <div className="grid gap-3">
+                {[
+                  ['Что понадобится?', 'Обычная бумага, простой карандаш, ластик и цветные карандаши или фломастеры. Покупать специальные наборы не нужно.'],
+                  ['Сколько длится занятие?', 'Урок разбит на короткие шаги. Можно остановиться, повторить показ и закончить рисунок в своём темпе.'],
+                  ['Нужно ли уже уметь рисовать?', 'Нет. Возрастные программы начинаются с простых форм и постепенно ведут к деталям, героям и сюжетам.'],
+                  ['Нужно ли постоянно сидеть рядом?', 'Ребёнок видит текущий шаг и может повторить его самостоятельно. Малышам 3–4 лет помощь взрослого может понадобиться на старте.'],
+                  ['Что откроется после оплаты?', 'Полный маршрут выбранного месяца, все возрастные программы, пошаговый плеер и творческие задания.'],
+                  ['Будут ли повторные списания?', 'Нет. Это разовая оплата за 30 дней доступа без автоматического продления.'],
+                ].map(([question, answer]) => (
+                  <details key={question} className="group rounded-[18px] border border-ink/8 bg-[#FBF8F1] px-5 py-4">
+                    <summary className="cursor-pointer list-none pr-6 font-display text-base font-extrabold text-ink marker:hidden">{question}<span className="float-right text-brand-pink transition group-open:rotate-45">＋</span></summary>
+                    <p className="mt-3 pr-6 text-sm font-semibold leading-6 text-ink/58">{answer}</p>
+                  </details>
+                ))}
+              </div>
+            </div>
           </div>
         </section>
 
@@ -199,11 +258,17 @@ export default async function DrawingPage() {
           <div className="container-pad px-0">
             <div className="drawing-price-card">
               <div className="drawing-price-copy"><span>Полный доступ к мастерской</span><h2>Месяц, который останется<br />в детском портфолио</h2><p>Все уроки, пошаговый плеер, творческие задания и новые работы без ограничений.</p><ul>{drawingSubscription.perks.map((perk) => <li key={perk}><i>✓</i>{perk}</li>)}</ul></div>
-              <div className="drawing-price-box"><p>Стоимость доступа</p><del className="mt-3 block text-lg font-extrabold text-ink/35">{drawingSubscription.oldPrice} ₽</del><strong>{drawingSubscription.price}<small> ₽ / {drawingSubscription.period}</small></strong><span>Первые уроки бесплатно · без карты</span><SubscribeButton isLoggedIn={Boolean(session?.user?.id)} hasAccess={hasSub} accessUntil={accessUntilLabel} /><small>После оплаты доступ открывается сразу на 30 дней</small></div>
+              <div className="drawing-price-box"><p>Стоимость доступа на 30 дней</p><del className="mt-3 block text-lg font-extrabold text-white/35">{drawingSubscription.oldPrice} ₽</del><strong>{drawingSubscription.price}<small> ₽ · один платёж</small></strong><span>Сначала пройдите 3 урока бесплатно · без карты</span><SubscribeButton isLoggedIn={Boolean(session?.user?.id)} hasAccess={hasSub} accessUntil={accessUntilLabel} returnTo="/risovanie" loginCallback="/risovanie#podpiska" buttonLabel={`Открыть мастерскую за ${drawingSubscription.price} ₽`} /><small>Доступ открывается сразу · автоматического продления нет</small></div>
             </div>
             <CourseDiscovery current="risovanie" />
           </div>
         </section>
+        {!hasSub && (
+          <TrackedLink goal="drawing_mobile_sticky_click" params={{ source: 'mobile_sticky' }} href="#uroki" className="fixed inset-x-3 bottom-3 z-40 flex min-h-[58px] items-center justify-between rounded-full bg-[#15233D] px-5 text-sm font-extrabold text-white shadow-[0_20px_50px_rgba(21,35,61,.32)] md:hidden">
+            <span>3 урока бесплатно</span>
+            <span className="rounded-full bg-white/12 px-3 py-1.5 text-xs text-[#F3C65C]">затем {drawingSubscription.price} ₽ →</span>
+          </TrackedLink>
+        )}
       </main>
       <Footer />
     </>

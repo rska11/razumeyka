@@ -9,19 +9,6 @@ const FACTORS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const REVIEW_INTERVALS = [0, 10 * 60 * 1000, 24 * 60 * 60 * 1000, 3 * 24 * 60 * 60 * 1000, 7 * 24 * 60 * 60 * 1000, 14 * 24 * 60 * 60 * 1000];
 const INPUT_MODES = new Set(['direct', 'missing', 'division', 'family']);
 
-const MODE_LABELS = {
-  groups: ['Собираем группы', 'понимаем смысл'],
-  array: ['Видим ряды', 'считаем быстрее'],
-  repeated: ['Связываем со сложением', 'строим правило'],
-  sequence: ['Продолжаем ряд', 'замечаем шаг'],
-  direct: ['Вспоминаем сами', 'без подсказок'],
-  missing: ['Ищем множитель', 'обратное мышление'],
-  division: ['Делим поровну', 'обратное действие'],
-  family: ['Семейство примеров', 'связи действий'],
-  strategy: ['Удобная стратегия', 'не зубрим'],
-  story: ['Решаем задачу', 'применяем в жизни'],
-};
-
 const defaultProgress = { facts: {}, stages: {}, sessions: 0 };
 
 function factKey(a, b) {
@@ -275,6 +262,93 @@ function ConceptVisual({ challenge }) {
   return null;
 }
 
+function getTaskView(challenge) {
+  if (challenge.mode === 'array') {
+    return {
+      question: 'Сколько точек всего?',
+      condition: `${challenge.a} ряда, в каждом по ${challenge.b} точек`,
+      expression: `${challenge.a} × ${challenge.b} = ?`,
+      tip: 'Умножь количество рядов на количество точек в одном ряду.',
+      steps: [`Найди ${challenge.a} ряда`, `В каждом ряду по ${challenge.b} точек`, `Посчитай всё: ${challenge.a} × ${challenge.b}`],
+    };
+  }
+
+  if (challenge.mode === 'groups') {
+    return {
+      question: 'Сколько предметов всего?',
+      condition: `${challenge.a} одинаковые группы, в каждой по ${challenge.b}`,
+      expression: `${challenge.a} × ${challenge.b} = ?`,
+      tip: 'Умножь количество групп на количество предметов в одной группе.',
+      steps: [`Найди ${challenge.a} группы`, `В каждой группе по ${challenge.b}`, `Посчитай всё: ${challenge.a} × ${challenge.b}`],
+    };
+  }
+
+  if (challenge.mode === 'repeated') {
+    return {
+      question: 'Чему равна сумма?',
+      condition: `Число ${challenge.b} повторяется ${challenge.a} раза`,
+      expression: `${challenge.prompt} = ?`,
+      tip: 'Одинаковые слагаемые можно посчитать умножением.',
+      steps: [`Число ${challenge.b} взяли ${challenge.a} раза`, 'Сложи одинаковые части', `Это то же самое, что ${challenge.a} × ${challenge.b}`],
+    };
+  }
+
+  if (challenge.mode === 'story') {
+    return {
+      question: challenge.prompt,
+      condition: `${challenge.a} одинаковых групп, в каждой по ${challenge.b}`,
+      expression: `${challenge.a} × ${challenge.b} = ?`,
+      tip: 'Найди в условии количество одинаковых групп и сколько предметов в каждой.',
+      steps: ['Прочитай условие', `Найди ${challenge.a} группы по ${challenge.b}`, 'Умножь и выбери ответ'],
+    };
+  }
+
+  if (challenge.mode === 'direct') {
+    return {
+      question: 'Чему равно произведение?',
+      condition: 'Реши пример на умножение',
+      expression: `${challenge.prompt} = ?`,
+      tip: 'Вспомни таблицу умножения и введи ответ.',
+      steps: ['Посмотри на множители', 'Вспомни нужный пример', 'Введи результат'],
+    };
+  }
+
+  if (challenge.mode === 'missing') {
+    return {
+      question: 'Какое число пропущено?',
+      condition: challenge.instruction,
+      expression: challenge.prompt,
+      tip: 'Подбери число, при умножении на которое получится ответ справа.',
+      steps: ['Посмотри на результат', 'Найди неизвестный множитель', 'Введи пропущенное число'],
+    };
+  }
+
+  if (challenge.mode === 'division' || challenge.mode === 'family') {
+    return {
+      question: 'Сколько получится?',
+      condition: challenge.instruction,
+      expression: challenge.mode === 'family' ? `${challenge.a * challenge.b} ÷ ${challenge.b} = ?` : `${challenge.prompt} = ?`,
+      tip: 'Вспомни обратный пример на умножение.',
+      steps: ['Прочитай пример', 'Вспомни связанное умножение', 'Введи частное'],
+    };
+  }
+
+  return {
+    question: challenge.instruction,
+    condition: challenge.title,
+    expression: challenge.prompt,
+    tip: INPUT_MODES.has(challenge.mode) ? 'Введи ответ с помощью кнопок ниже.' : 'Выбери один правильный ответ.',
+    steps: ['Прочитай вопрос', 'Реши пример', 'Выбери или введи ответ'],
+  };
+}
+
+function solutionEquation(challenge) {
+  const product = challenge.a * challenge.b;
+  if (challenge.mode === 'division') return `${product} ÷ ${challenge.a} = ${challenge.b}`;
+  if (challenge.mode === 'family') return `${product} ÷ ${challenge.b} = ${challenge.a}`;
+  return `${challenge.a} × ${challenge.b} = ${product}`;
+}
+
 function NumberPad({ value, onDigit, onDelete, onSubmit, disabled, invalid }) {
   return (
     <div className="mx-auto mt-5 max-w-md rounded-[26px] border border-ink/7 bg-white p-4 shadow-card sm:p-5">
@@ -455,6 +529,7 @@ export function MultiplicationTrainer({ hasAccess = false }) {
   }
 
   if (activeStage) {
+    const taskView = challenge ? getTaskView(challenge) : null;
     return (
       <div className="overflow-hidden rounded-[34px] border border-white/80 bg-[#0B1734] text-white shadow-[0_32px_90px_rgba(14,32,72,.24)]">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/9 px-5 py-5 sm:px-8">
@@ -483,52 +558,66 @@ export function MultiplicationTrainer({ hasAccess = false }) {
             </div>
           </div>
         ) : challenge ? (
-          <div className="grid min-h-[620px] lg:grid-cols-[.72fr_1.28fr]">
+          <div className="grid min-h-[620px] lg:grid-cols-[.5fr_1.5fr]">
             <aside className="border-b border-white/9 bg-white/[0.035] p-5 lg:border-b-0 lg:border-r lg:p-8">
-              <div className="flex items-center justify-between text-xs font-extrabold text-white/44"><span>Задание {round + 1} из {activeStage.rounds}</span><span>{correct} верно</span></div>
+              <div className="flex items-center justify-between text-xs font-extrabold text-white/58"><span>Задание {round + 1} из {activeStage.rounds}</span><span>{correct} верно</span></div>
               <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/9"><i className="block h-full rounded-full bg-gradient-to-r from-[#3978F6] to-[#75E5C1] transition-all" style={{ width: `${((round + 1) / activeStage.rounds) * 100}%` }} /></div>
-              <div className="mt-8 rounded-[24px] border border-white/9 bg-white/[0.055] p-5">
-                <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#75E5C1]">Почему это полезно</p>
-                <p className="mt-3 text-sm font-semibold leading-6 text-white/58">{activeStage.description}</p>
+              <div className="mt-8 rounded-[24px] border border-[#75E5C1]/20 bg-[#75E5C1]/8 p-5">
+                <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#75E5C1]">Что делаем сейчас</p>
+                <p className="mt-3 font-display text-xl font-extrabold leading-tight text-white">{taskView.question}</p>
               </div>
-              <div className="mt-4 grid grid-cols-2 gap-3">
-                <div className="rounded-[20px] bg-white/[0.055] p-4"><strong className="font-display text-2xl">{trained}</strong><span className="mt-1 block text-[10px] font-bold text-white/38">сочетаний встречалось</span></div>
-                <div className="rounded-[20px] bg-white/[0.055] p-4"><strong className="font-display text-2xl">{mastered}</strong><span className="mt-1 block text-[10px] font-bold text-white/38">закреплено</span></div>
+              <div className="mt-4 rounded-[24px] border border-white/9 bg-white/[0.055] p-5">
+                <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-white/42">Как решить</p>
+                <ol className="mt-4 space-y-4">
+                  {taskView.steps.map((step, index) => (
+                    <li key={step} className="flex gap-3 text-xs font-semibold leading-5 text-white/70">
+                      <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-white/10 text-[10px] font-extrabold text-[#75E5C1]">{index + 1}</span>
+                      <span>{step}</span>
+                    </li>
+                  ))}
+                </ol>
               </div>
-              <div className={`mt-4 rounded-[20px] border p-4 transition ${streak >= 3 ? 'border-[#FFD166]/35 bg-[#FFD166]/12' : 'border-white/8 bg-white/[0.04]'}`}>
-                <span className="text-[9px] font-extrabold uppercase tracking-[0.16em] text-white/38">Серия без ошибок</span>
-                <div className="mt-2 flex items-end justify-between gap-3"><strong className={`font-display text-3xl ${streak >= 3 ? 'text-[#FFD166]' : 'text-white'}`}>×{streak}</strong><span className="text-[10px] font-bold text-white/42">3+ — уверенный навык</span></div>
-              </div>
+              {streak >= 2 && <p className="mt-5 text-center text-xs font-extrabold text-[#FFD166]">Верных подряд: {streak}</p>}
             </aside>
 
             <div className="bg-[#F8FAFF] p-5 text-ink sm:p-8 lg:p-10">
-              <p className="text-[10px] font-extrabold uppercase tracking-[0.17em] text-brand-blue">{challenge.title}</p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {(MODE_LABELS[challenge.mode] || []).map((label, index) => <span key={label} className={`rounded-full px-3 py-1.5 text-[9px] font-extrabold ${index === 0 ? 'bg-[#EDF5FF] text-brand-blue' : 'bg-[#E9FAF4] text-[#087B5A]'}`}>{label}</span>)}
-                {INPUT_MODES.has(challenge.mode) && <span className="rounded-full bg-[#FFF5D8] px-3 py-1.5 text-[9px] font-extrabold text-[#9A6810]">ответ без вариантов</span>}
-              </div>
+              <p className="text-[10px] font-extrabold uppercase tracking-[0.17em] text-brand-blue">Задание · {challenge.title}</p>
               <div className="mt-4 rounded-[28px] border border-ink/7 bg-white p-5 text-center shadow-card sm:p-8">
-                <ConceptVisual challenge={challenge} />
-                <div className={`${challenge.visual || ['repeated', 'sequence', 'strategy', 'story', 'division', 'family'].includes(challenge.mode) ? 'mt-6' : ''} font-display text-[34px] font-extrabold leading-[1.08] tracking-[-0.04em] text-ink sm:text-5xl`}>{challenge.prompt}</div>
-                <p className="mx-auto mt-4 max-w-xl text-sm font-semibold leading-6 text-ink/52 sm:text-base">{challenge.instruction}</p>
+                <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-brand-blue">Вопрос</p>
+                <h4 className="mx-auto mt-2 max-w-2xl font-display text-2xl font-extrabold leading-tight text-ink sm:text-4xl">{taskView.question}</h4>
+                <div className="mt-6"><ConceptVisual challenge={challenge} /></div>
+                <p className={`${challenge.visual || ['repeated', 'sequence', 'strategy', 'story', 'division', 'family'].includes(challenge.mode) ? 'mt-6' : 'mt-5'} text-sm font-bold text-ink/58 sm:text-base`}>{taskView.condition}</p>
+                <div className="mt-2 font-display text-[34px] font-extrabold leading-[1.08] tracking-[-0.04em] text-ink sm:text-5xl">{taskView.expression}</div>
+                <p className="mx-auto mt-4 max-w-xl rounded-2xl bg-[#EDF5FF] px-4 py-3 text-sm font-semibold leading-6 text-brand-blue sm:text-base">Подсказка: {taskView.tip}</p>
               </div>
 
-              {INPUT_MODES.has(challenge.mode) ? (
+              {feedback?.correct ? (
+                <div className="mt-5 rounded-[24px] border-2 border-[#10A77A]/24 bg-[#E9FAF4] px-5 py-5 text-[#087B5A] sm:px-7 sm:py-6">
+                  <div className="flex items-start gap-4">
+                    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#10A77A] text-xl font-black text-white">✓</span>
+                    <div>
+                      <p className="text-sm font-extrabold uppercase tracking-[0.12em]">Верно! Вот решение</p>
+                      <p className="mt-2 font-display text-3xl font-extrabold text-ink sm:text-4xl">{solutionEquation(challenge)}</p>
+                      <p className="mt-3 text-base font-bold leading-7">{feedback.text}</p>
+                    </div>
+                  </div>
+                </div>
+              ) : INPUT_MODES.has(challenge.mode) ? (
                 <NumberPad value={typedAnswer} onDigit={addDigit} onDelete={deleteDigit} onSubmit={submitTypedAnswer} disabled={Boolean(feedback?.correct)} invalid={Boolean(feedback && !feedback.correct)} />
               ) : (
                 <div className="mt-5 grid grid-cols-2 gap-3">
                   {challenge.options.map((option) => {
                     const pickedWrong = lastChoice === option && feedback && !feedback.correct;
                     return (
-                      <button key={option} type="button" onClick={() => answer(option)} className={`min-h-[68px] rounded-[20px] border px-4 py-3 font-display text-2xl font-extrabold transition ${pickedWrong ? 'border-[#F06E3D] bg-[#FFF0E9] text-[#D85426]' : 'border-ink/8 bg-white text-ink shadow-sm hover:-translate-y-0.5 hover:border-brand-blue/30 hover:shadow-card'}`}>{option}</button>
+                      <button key={option} type="button" disabled={Boolean(feedback?.correct)} onClick={() => answer(option)} className={`min-h-[68px] rounded-[20px] border px-4 py-3 font-display text-2xl font-extrabold transition disabled:cursor-default ${pickedWrong ? 'border-[#F06E3D] bg-[#FFF0E9] text-[#D85426]' : lastChoice === option && feedback?.correct ? 'border-[#10A77A] bg-[#E9FAF4] text-[#087B5A] shadow-sm' : 'border-ink/8 bg-white text-ink shadow-sm hover:-translate-y-0.5 hover:border-brand-blue/30 hover:shadow-card'}`}>{option}</button>
                     );
                   })}
                 </div>
               )}
 
-              {feedback && (
-                <div className={`mt-5 rounded-[20px] border px-5 py-4 text-sm font-bold leading-6 ${feedback.correct ? 'border-[#10A77A]/18 bg-[#E9FAF4] text-[#087B5A]' : 'border-[#F06E3D]/18 bg-[#FFF2EC] text-[#B94D27]'}`}>
-                  <strong>{feedback.correct ? 'Верно! ' : 'Попробуй ещё раз. '}</strong>{feedback.text}
+              {feedback && !feedback.correct && (
+                <div className="mt-5 rounded-[20px] border border-[#F06E3D]/22 bg-[#FFF2EC] px-5 py-4 text-sm font-bold leading-6 text-[#B94D27]">
+                  <strong>Почти! Посмотри ещё раз. </strong>{challenge.instruction}
                 </div>
               )}
               {feedback?.correct && <button type="button" onClick={nextQuestion} className="mt-5 min-h-[54px] w-full rounded-full bg-ink px-6 py-3 text-sm font-extrabold text-white transition hover:-translate-y-0.5">{round + 1 >= activeStage.rounds ? 'Посмотреть результат' : 'Следующее задание →'}</button>}

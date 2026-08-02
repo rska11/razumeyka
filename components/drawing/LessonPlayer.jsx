@@ -9,6 +9,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { SymmetryDraw } from '@/components/games/SymmetryDraw.jsx';
+import { reachGoal } from '@/lib/metrika';
 
 const HAND_LABEL = {
   left: 'Непишущей рукой',
@@ -102,7 +103,7 @@ function methodTipFor(lesson) {
   };
 }
 
-export function LessonPlayer({ lesson, nextLesson, onComplete, onNext, onClose }) {
+export function LessonPlayer({ lesson, nextLesson, onComplete, onNext, onClose, showUpgrade = false }) {
   const isGame = lesson.game === 'symmetry';
   const steps = lesson.steps ?? [];
   const total = steps.length;
@@ -508,6 +509,21 @@ export function LessonPlayer({ lesson, nextLesson, onComplete, onNext, onClose }
                   <button onClick={onNext} className="primary-btn w-full">
                     Следующая картинка: {nextLesson.title} →
                   </button>
+                ) : showUpgrade ? (
+                  <div className="rounded-2xl border border-brand-pink/18 bg-gradient-to-r from-brand-pink/8 to-brand-orange/8 p-4 text-left">
+                    <p className="font-display text-lg font-extrabold text-ink">Бесплатная ступень завершена!</p>
+                    <p className="mt-1 text-xs font-semibold leading-5 text-ink/58">Дальше — новые формы, детали и сюжеты полного маршрута. Доступ на 30 дней стоит 490 ₽, без автосписания.</p>
+                    <a
+                      href="#podpiska"
+                      onClick={() => {
+                        reachGoal('drawing_free_route_upgrade_click', { lesson: lesson.slug });
+                        onClose?.();
+                      }}
+                      className="primary-btn mt-3 w-full"
+                    >
+                      Открыть мастерскую за 490 ₽ →
+                    </a>
+                  </div>
                 ) : (
                   <p className="text-center text-sm font-semibold text-ink/54">Это последняя открытая картинка в этой ступени.</p>
                 )}

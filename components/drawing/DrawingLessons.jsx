@@ -5,6 +5,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { ageBands, drawingChapterGuides, lessonsByBand } from '@/data/drawing-lessons.js';
+import { reachGoal } from '@/lib/metrika';
 import { LessonPlayer } from './LessonPlayer.jsx';
 
 const STORAGE_DONE = 'razumeyka_drawing_done';
@@ -331,6 +332,7 @@ export function DrawingLessons({ hasSubscription = false }) {
   }, []);
 
   function selectBand(key) {
+    reachGoal('drawing_age_select', { age_band: key });
     setBand(key);
     try {
       localStorage.setItem(STORAGE_BAND, key);
@@ -338,6 +340,7 @@ export function DrawingLessons({ hasSubscription = false }) {
   }
 
   function markDone(slug) {
+    reachGoal('drawing_lesson_complete', { lesson: slug, age_band: band });
     setDoneSet((prev) => {
       const next = new Set(prev);
       next.add(slug);
@@ -373,7 +376,13 @@ export function DrawingLessons({ hasSubscription = false }) {
   }
 
   function goSubscribe() {
+    reachGoal('drawing_paywall_click', { source: 'lesson_map', age_band: band });
     document.getElementById('podpiska')?.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function openLesson(lesson) {
+    reachGoal('drawing_lesson_start', { lesson: lesson.slug, age_band: band, free: freeSlugs.has(lesson.slug) });
+    setActive(lesson);
   }
 
   return (
@@ -443,7 +452,7 @@ export function DrawingLessons({ hasSubscription = false }) {
                   dayNumber={dayNumber}
                   doneSet={doneSet}
                   unlocked={unlocked}
-                  onOpen={setActive}
+                  onOpen={openLesson}
                   onLocked={goSubscribe}
                 />
               ) : (
@@ -467,9 +476,9 @@ export function DrawingLessons({ hasSubscription = false }) {
           onComplete={markDone}
           onNext={() => setActive(nextAfter(active) ?? null)}
           onClose={() => setActive(null)}
+          showUpgrade={!hasSubscription && !nextAfter(active)}
         />
       )}
     </div>
   );
 }
-

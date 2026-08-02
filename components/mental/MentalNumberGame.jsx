@@ -5,6 +5,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FREE_MISSIONS, MISSIONS, makeChallenge, starsFor } from './number-game-engine';
+import { reachGoal } from '@/lib/metrika';
 
 const STORAGE_KEY = 'znayton_mental_sky_v1';
 const START_LANE = 1;
@@ -162,6 +163,7 @@ export function MentalNumberGame({ hasSubscription = false, onComplete, classNam
 
   const finishMission = useCallback((targetMission) => {
     const earned = starsFor(mistakesRef.current);
+    reachGoal('mental_game_mission_complete', { mission: targetMission.id, stars: earned, mistakes: mistakesRef.current });
     setProgress((current) => {
       const next = { ...current, [targetMission.id]: Math.max(Number(current[targetMission.id] || 0), earned) };
       persist(next);
@@ -284,6 +286,7 @@ export function MentalNumberGame({ hasSubscription = false, onComplete, classNam
 
   function startMission(id) {
     if (!isMissionOpen(id)) return;
+    reachGoal('mental_game_mission_start', { mission: id, free: id <= FREE_MISSIONS });
     clearTimers();
     const targetMission = MISSIONS.find((item) => item.id === id) ?? MISSIONS[0];
     setMissionId(id);
@@ -344,7 +347,7 @@ export function MentalNumberGame({ hasSubscription = false, onComplete, classNam
           <div className="mental-sky-intro-facts">
             <span>↕ Тап, свайп или клавиши 1–3</span><span>◇ Ошибка не прерывает полёт</span><span>⚡ Ответ сразу объясняется</span>
           </div>
-          <button type="button" className="mental-sky-start" onClick={() => setView('missions')}><b>▶</b> Посмотреть 8 миссий</button>
+          <button type="button" className="mental-sky-start" onClick={() => { reachGoal('mental_game_open'); setView('missions'); }}><b>▶</b> Посмотреть 8 миссий</button>
         </div>
         <div className="mental-sky-preview" aria-hidden="true">
           <div className="mental-sky-preview-stars">✦　·　✧　　·　✦</div>
@@ -409,7 +412,7 @@ export function MentalNumberGame({ hasSubscription = false, onComplete, classNam
         {!hasSubscription ? (
           <div className="mental-sky-map-access">
             <span>Первые три миссии можно пройти прямо сейчас.</span>
-            <a href="#podpiska">Открыть весь маршрут →</a>
+            <a href="#podpiska" onClick={() => reachGoal('mental_game_upgrade_click', { source: 'mission_map' })}>Открыть весь маршрут →</a>
           </div>
         ) : null}
       </div>
@@ -427,7 +430,7 @@ export function MentalNumberGame({ hasSubscription = false, onComplete, classNam
         <p>Счёт: {score}. Ошибок: {mistakes}. Каждая ошибка разобрана по пути — теперь числовой маршрут знаком лучше.</p>
         <div className="mental-sky-result-actions">
           {nextMission && isMissionOpen(nextMission.id) ? <button type="button" onClick={() => startMission(nextMission.id)}>Следующая миссия →</button> : null}
-          {nextMission && !isMissionOpen(nextMission.id) && nextMission.id > FREE_MISSIONS ? <a href="#podpiska">Открыть весь маршрут →</a> : null}
+          {nextMission && !isMissionOpen(nextMission.id) && nextMission.id > FREE_MISSIONS ? <a href="#podpiska" onClick={() => reachGoal('mental_game_upgrade_click', { mission: mission.id })}>Открыть весь маршрут →</a> : null}
           <button type="button" onClick={() => startMission(missionId)}>Пройти ещё раз</button>
           <button type="button" onClick={() => setView('missions')}>К карте</button>
         </div>

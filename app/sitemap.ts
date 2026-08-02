@@ -46,6 +46,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/risovanie`, lastModified: CONTENT_UPDATED, changeFrequency: "monthly", priority: 0.8 },
     { url: `${BASE}/risovanie/galereya`, lastModified: CONTENT_UPDATED, changeFrequency: "weekly", priority: 0.6 },
     { url: `${BASE}/mentalnaya-arifmetika`, lastModified: CONTENT_UPDATED, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${BASE}/trenazher-umnozheniya`, lastModified: new Date("2026-08-02"), changeFrequency: "monthly", priority: 0.8 },
     { url: `${BASE}/trenazher-umnozheniya`, lastModified: new Date("2026-08-01"), changeFrequency: "weekly", priority: 0.9 },
     { url: `${BASE}/blog`, lastModified: latestPost, changeFrequency: "weekly", priority: 0.7 },
     ...directions,

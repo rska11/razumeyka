@@ -14,21 +14,29 @@ const INCLUDED_DIRECTIONS = ['mentalnaya-arifmetika', 'podgotovka-k-shkole'];
 const PRICE = directionPrice(PRIMARY_DIRECTION);
 
 export const metadata = {
-  title: 'Тренажёр таблицы умножения для детей онлайн',
-  description: 'Интерактивный тренажёр умножения для детей 6–10 лет: понимание смысла, таблицы 2–9, деление, задачи и адаптивное повторение сложных примеров.',
-  keywords: ['тренажёр умножения', 'таблица умножения тренажёр', 'выучить таблицу умножения', 'умножение для детей онлайн'],
+  title: 'Приложение «Таблица умножения» — онлайн-тренажёр для детей',
+  description: 'Приложение для изучения таблицы умножения, которое работает прямо в браузере — без скачивания и установки. Тренажёр умножения для детей 6–10 лет: смысл действия, таблицы 2–9, деление, задачи и повторение сложных примеров.',
+  keywords: [
+    'приложение таблица умножения',
+    'таблица умножения онлайн',
+    'тренажёр умножения',
+    'таблица умножения тренажёр',
+    'выучить таблицу умножения',
+    'умножение для детей онлайн',
+  ],
   alternates: canonical('/trenazher-umnozheniya'),
   openGraph: {
     type: 'website',
     locale: 'ru_RU',
     siteName: 'Знайтон',
     url: 'https://znayton.ru/trenazher-umnozheniya',
-    title: 'Таблица умножения без зубрёжки — тренажёр Знайтон',
-    description: 'Ребёнок понимает умножение, тренирует слабые примеры и видит свой прогресс.',
+    title: 'Таблица умножения без зубрёжки — приложение-тренажёр Знайтон',
+    description: 'Работает в браузере без скачивания: ребёнок понимает умножение, тренирует слабые примеры и видит свой прогресс.',
   },
 };
 
 const FAQ = [
+  ['Это приложение? Нужно ли что-то скачивать?', 'Скачивать и устанавливать ничего не нужно: приложение для изучения таблицы умножения работает прямо в браузере — на компьютере, планшете и телефоне. Страницу можно добавить на главный экран, и тренажёр будет открываться как обычное приложение.'],
   ['С какого возраста подходит тренажёр?', 'Оптимально с 6–7 лет, когда ребёнок уверенно считает и понимает сложение. Начальные маршруты объясняют смысл умножения через предметы и одинаковые группы.'],
   ['Нужно ли сначала выучить таблицу?', 'Нет. Тренажёр сначала помогает понять действие, затем показывает удобные стратегии и только после этого переводит примеры в быстрое узнавание.'],
   ['Что доступно бесплатно?', 'Без регистрации открыты два маршрута: смысл умножения и таблица на 2. Они позволяют проверить формат до оплаты.'],
@@ -134,13 +142,13 @@ export default async function MultiplicationTrainerPage() {
                 <h1 className="mt-7 max-w-[760px] font-display text-[40px] font-extrabold leading-[1] tracking-[-0.055em] sm:text-6xl lg:text-[72px]">
                   Таблица умножения <span className="bg-gradient-to-r from-[#66B6FF] via-[#75E5C1] to-[#FFD166] bg-clip-text text-transparent">без скучной зубрёжки</span>
                 </h1>
-                <p className="mt-7 max-w-[690px] text-base font-semibold leading-7 text-white/66 sm:text-lg sm:leading-8">Ребёнок сначала понимает одинаковые группы и удобные стратегии, затем тренирует таблицы 2–9, деление и задачи. Слабые примеры возвращаются чаще — освоенные не мешают двигаться дальше.</p>
+                <p className="mt-7 max-w-[690px] text-base font-semibold leading-7 text-white/66 sm:text-lg sm:leading-8">Приложение для изучения таблицы умножения, которое открывается прямо в браузере — скачивать и устанавливать ничего не нужно. Ребёнок сначала понимает одинаковые группы и удобные стратегии, затем тренирует таблицы 2–9, деление и задачи. Слабые примеры возвращаются чаще — освоенные не мешают двигаться дальше.</p>
                 <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                   <TrackedLink goal="multiplication_hero_start" href="#trenazher" className="inline-flex min-h-[58px] items-center justify-center rounded-full bg-[#75E5C1] px-7 py-4 text-sm font-extrabold text-[#09152E] shadow-[0_18px_46px_rgba(65,220,175,.22)] transition hover:-translate-y-1">Попробовать 2 маршрута бесплатно →</TrackedLink>
                   <TrackedLink goal="multiplication_hero_program" href="#programma" className="inline-flex min-h-[58px] items-center justify-center rounded-full border border-white/15 bg-white/8 px-7 py-4 text-sm font-extrabold text-white transition hover:-translate-y-1 hover:bg-white/12">Посмотреть программу</TrackedLink>
                 </div>
                 <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-xs font-bold text-white/46">
-                  <span>✓ Без регистрации для старта</span><span>✓ Прогресс каждого примера</span><span>✓ Без автосписания</span>
+                  <span>✓ Работает в браузере, без скачивания</span><span>✓ Без регистрации для старта</span><span>✓ Прогресс каждого примера</span><span>✓ Без автосписания</span>
                 </div>
               </div>
               <MultiplicationBoard />

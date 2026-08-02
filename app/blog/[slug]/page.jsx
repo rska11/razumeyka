@@ -29,9 +29,18 @@ export async function generateMetadata({ params }) {
       description: post.description,
       images: [
         post.cover?.image
-          ? { url: post.cover.image, alt: post.title }
+          ? {
+              url: post.cover.image,
+              alt: post.cover.alt ?? post.title,
+              ...(post.cover.width && post.cover.height ? { width: post.cover.width, height: post.cover.height } : {}),
+            }
           : { url: '/images/og.png', width: 1200, height: 630, alt: post.title },
       ],
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 },
     },
   };
 }
@@ -135,7 +144,8 @@ export default async function BlogPost({ params }) {
     headline: post.title,
     description: post.description,
     datePublished: post.date,
-    dateModified: post.date,
+    dateModified: post.updatedAt ?? post.date,
+    image: post.cover?.image ? `https://znayton.ru${post.cover.image}` : 'https://znayton.ru/images/og.png',
     author: { '@type': 'Organization', name: 'Знайтон' },
     publisher: { '@type': 'Organization', name: 'Знайтон' },
     mainEntityOfPage: `https://znayton.ru/blog/${slug}`,
@@ -197,7 +207,14 @@ export default async function BlogPost({ params }) {
 
                 <div className={'group relative min-h-[300px] overflow-hidden bg-gradient-to-br ' + editorialMeta.gradient + ' sm:min-h-[390px] lg:min-h-full'}>
                   {post.cover?.image ? (
-                    <img src={post.cover.image} alt={post.title} className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]" />
+                    <img
+                      src={post.cover.image}
+                      alt={post.cover.alt ?? post.title}
+                      width={post.cover.width ?? 1600}
+                      height={post.cover.height ?? 900}
+                      fetchPriority="high"
+                      className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]"
+                    />
                   ) : (
                     <span className="absolute inset-0 grid place-items-center text-8xl">{post.cover?.emoji ?? '📚'}</span>
                   )}
@@ -243,6 +260,32 @@ export default async function BlogPost({ params }) {
                       <span className="mr-3 inline-block h-6 w-1.5 translate-y-0.5 rounded-full bg-gradient-to-b from-brand-blue to-brand-purple align-middle" />
                       {b.text}
                     </h2>
+                  );
+                }
+
+                if (b.type === 'image') {
+                  return (
+                    <figure key={i} className="group overflow-hidden rounded-[26px] border border-white/90 bg-white/90 p-2.5 shadow-card backdrop-blur-xl sm:p-3">
+                      <div className="relative aspect-video overflow-hidden rounded-[19px] bg-ink/5">
+                        <img
+                          src={b.src}
+                          alt={b.alt}
+                          width={b.width ?? 1440}
+                          height={b.height ?? 810}
+                          loading="lazy"
+                          className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.025]"
+                        />
+                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#07152f]/20 via-transparent to-white/5" />
+                      </div>
+                      {b.caption && (
+                        <figcaption className="flex items-start gap-3 px-2.5 pb-2 pt-4 text-sm font-semibold leading-6 text-ink/62 sm:px-3">
+                          <span className="mt-0.5 shrink-0 rounded-full bg-brand-blue/10 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.12em] text-brand-blue">
+                            {b.label ?? 'На практике'}
+                          </span>
+                          <span>{b.caption}</span>
+                        </figcaption>
+                      )}
+                    </figure>
                   );
                 }
 
@@ -349,6 +392,24 @@ export default async function BlogPost({ params }) {
                         </li>
                       ))}
                     </ul>
+                  );
+                }
+
+                if (b.type === 'sources') {
+                  return (
+                    <aside key={i} className="rounded-[22px] border border-ink/8 bg-white/70 p-5 shadow-[0_12px_36px_rgba(16,42,86,0.05)] sm:p-6">
+                      <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-ink/44">{b.title ?? 'Источники'}</p>
+                      <ul className="mt-3 grid gap-2">
+                        {b.items.map((source, j) => (
+                          <li key={j} className="flex items-start gap-2 text-sm font-semibold leading-6 text-ink/62">
+                            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-green" />
+                            <a href={source.href} target="_blank" rel="noreferrer" className="underline decoration-ink/16 underline-offset-4 transition hover:text-brand-blue">
+                              {source.label}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </aside>
                   );
                 }
 

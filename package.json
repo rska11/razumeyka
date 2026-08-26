@@ -12,6 +12,7 @@
     "test:firefly": "node scripts/test-firefly-game.mjs",
     "audio:drawing": "node scripts/generate-drawing-audio.mjs",
     "audio:school-prep": "node scripts/generate-school-prep-audio.mjs",
+    "audio:multiplication": "node scripts/generate-multiplication-audio.mjs",
     "test:house": "node scripts/test-house-game.mjs",
     "test:academy": "node scripts/test-academy-game.mjs",
     "test:mental-game": "node scripts/test-mental-number-game.mjs",

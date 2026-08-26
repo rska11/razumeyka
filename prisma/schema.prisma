@@ -69,8 +69,22 @@ model Child {
   parent       User          @relation(fields: [parentId], references: [id], onDelete: Cascade)
   enrollments  Enrollment[]
   achievements Achievement[]
+  multiplicationProgress MultiplicationProgress?
 
   @@index([parentId])
+}
+
+/// Персональная карта таблицы умножения. Один профиль ребёнка — одна карта.
+/// payload хранит факты, интервалы повторения и результаты маршрутов в JSON-строке.
+model MultiplicationProgress {
+  id        String   @id @default(cuid())
+  childId   String   @unique
+  payload   String   @default("{}")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  child     Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
+
+  @@index([childId])
 }
 
 /// Запись ребёнка на направление (направление + формат + тариф/срок)

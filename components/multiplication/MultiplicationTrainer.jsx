@@ -8,17 +8,50 @@ const TABLES = [2, 3, 4, 5, 6, 7, 8, 9];
 const FACTORS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const REVIEW_INTERVALS = [0, 10 * 60 * 1000, 24 * 60 * 60 * 1000, 3 * 24 * 60 * 60 * 1000, 7 * 24 * 60 * 60 * 1000, 14 * 24 * 60 * 60 * 1000];
 const INPUT_MODES = new Set(['direct', 'missing', 'division', 'family']);
+const VOICE_STORAGE_KEY = 'znayton-multiplication-voice-v1';
+const VOICE_ROOT = '/audio/multiplication';
+const DIAGNOSTIC_FACTS = [
+  { a: 2, b: 6 }, { a: 5, b: 7 }, { a: 10, b: 8 }, { a: 3, b: 4 },
+  { a: 4, b: 6 }, { a: 9, b: 3 }, { a: 6, b: 7 }, { a: 7, b: 8 },
+  { a: 8, b: 6 }, { a: 3, b: 8 }, { a: 9, b: 7 }, { a: 4, b: 9 },
+];
+const DIAGNOSTIC_STAGE = {
+  id: 'diagnostic',
+  number: 'СТАРТ',
+  title: 'Короткая диагностика',
+  shortTitle: 'Проверка без оценок',
+  description: '12 примеров помогают понять, какие таблицы уже знакомы и с чего лучше начать.',
+  tables: TABLES,
+  modes: ['direct'],
+  rounds: DIAGNOSTIC_FACTS.length,
+  free: true,
+};
+const DAILY_STAGE = {
+  id: 'daily',
+  number: 'СЕГОДНЯ',
+  title: 'Тренировка на сегодня',
+  shortTitle: 'Только нужные примеры',
+  description: 'Короткая адаптивная сессия из слабых и подошедших к повторению примеров.',
+  tables: TABLES,
+  modes: ['direct', 'missing', 'strategy', 'division'],
+  rounds: 12,
+  free: true,
+};
 
-const defaultProgress = { facts: {}, stages: {}, sessions: 0 };
+const defaultProgress = { facts: {}, stages: {}, sessions: 0, diagnosticCompletedAt: 0 };
 
 function factKey(a, b) {
   return `${a}x${b}`;
 }
 
-function readProgress() {
+function progressStorageKey(childId = '') {
+  return childId ? `${MULTIPLICATION_STORAGE_KEY}:${childId}` : MULTIPLICATION_STORAGE_KEY;
+}
+
+function readProgress(childId = '') {
   if (typeof window === 'undefined') return defaultProgress;
   try {
-    const saved = JSON.parse(window.localStorage.getItem(MULTIPLICATION_STORAGE_KEY) || 'null');
+    const saved = JSON.parse(window.localStorage.getItem(progressStorageKey(childId)) || 'null');
     return saved && typeof saved === 'object'
       ? { ...defaultProgress, ...saved, facts: saved.facts || {}, stages: saved.stages || {} }
       : defaultProgress;
@@ -27,9 +60,9 @@ function readProgress() {
   }
 }
 
-function saveProgress(progress) {
+function saveProgress(progress, childId = '') {
   try {
-    window.localStorage.setItem(MULTIPLICATION_STORAGE_KEY, JSON.stringify(progress));
+    window.localStorage.setItem(progressStorageKey(childId), JSON.stringify(progress));
   } catch {}
 }
 
@@ -57,10 +90,11 @@ function choicesFor(answer, a, b) {
   return shuffle(unique);
 }
 
-function pickFact(stage, progress) {
+function pickFact(stage, progress, roundIndex = 0) {
+  if (stage.id === 'diagnostic') return DIAGNOSTIC_FACTS[roundIndex % DIAGNOSTIC_FACTS.length];
   let tables = stage.tables;
   if (stage.id === 'meaning') tables = [2, 3, 4];
-  const pool = tables.flatMap((a) => FACTORS.map((b) => ({ a, b })));
+  const pool = shuffle(tables.flatMap((a) => FACTORS.map((b) => ({ a, b }))));
   const now = Date.now();
   pool.sort((left, right) => {
     const leftFact = progress.facts[factKey(left.a, left.b)] || {};
@@ -74,7 +108,7 @@ function pickFact(stage, progress) {
 }
 
 function makeChallenge(stage, progress, roundIndex) {
-  let { a, b } = pickFact(stage, progress);
+  let { a, b } = pickFact(stage, progress, roundIndex);
   const mode = stage.modes[roundIndex % stage.modes.length];
   if ((mode === 'groups' || mode === 'array') && a > 5) [a, b] = [Math.min(b, 5), a];
   if (mode === 'sequence' && b < 4) b += 4;
@@ -170,6 +204,26 @@ function makeChallenge(stage, progress, roundIndex) {
     visual,
     options: choicesFor(answer, a, b),
   };
+}
+
+function weakestFacts(progress, limit = 4) {
+  return Object.entries(progress.facts || {})
+    .filter(([, fact]) => (fact.attempts || 0) > 0)
+    .sort(([, left], [, right]) => {
+      if ((left.strength || 0) !== (right.strength || 0)) return (left.strength || 0) - (right.strength || 0);
+      return (right.attempts || 0) - (left.attempts || 0);
+    })
+    .slice(0, limit)
+    .map(([key]) => key.replace('x', ' × '));
+}
+
+function dueFactsCount(progress) {
+  const now = Date.now();
+  return Object.values(progress.facts || {}).filter((fact) => (fact.attempts || 0) > 0 && (!fact.due || fact.due <= now)).length;
+}
+
+function hasMeaningfulProgress(progress) {
+  return Boolean((progress.sessions || 0) > 0 || Object.keys(progress.facts || {}).length > 0);
 }
 
 function GroupsVisual({ groups, amount }) {
@@ -387,7 +441,7 @@ function MasteryMap({ progress }) {
   );
 }
 
-export function MultiplicationTrainer({ hasAccess = false }) {
+export function MultiplicationTrainer({ hasAccess = false, children = [], isLoggedIn = false }) {
   const [progress, setProgress] = useState(defaultProgress);
   const [activeStage, setActiveStage] = useState(null);
   const [challenge, setChallenge] = useState(null);
@@ -400,12 +454,129 @@ export function MultiplicationTrainer({ hasAccess = false }) {
   const [firstTry, setFirstTry] = useState(true);
   const [typedAnswer, setTypedAnswer] = useState('');
   const [streak, setStreak] = useState(0);
+  const [attempt, setAttempt] = useState(0);
+  const [voiceOn, setVoiceOn] = useState(true);
+  const [selectedChildId, setSelectedChildId] = useState('');
+  const [progressReady, setProgressReady] = useState(false);
+  const [syncState, setSyncState] = useState('local');
   const startedAt = useRef(0);
+  const audioRef = useRef(null);
+  const voiceOnRef = useRef(true);
+  const syncTimerRef = useRef(null);
 
-  useEffect(() => setProgress(readProgress()), []);
+  useEffect(() => {
+    const enabled = window.localStorage.getItem(VOICE_STORAGE_KEY) !== 'off';
+    setVoiceOn(enabled);
+    voiceOnRef.current = enabled;
+    if (children.length) {
+      const savedChildId = window.localStorage.getItem('znayton-multiplication-child-v1');
+      const initialChild = children.some((child) => child.id === savedChildId) ? savedChildId : children[0].id;
+      setSelectedChildId(initialChild);
+    } else {
+      setProgress(readProgress());
+      setProgressReady(true);
+    }
+    return () => {
+      audioRef.current?.pause();
+      audioRef.current = null;
+      if (syncTimerRef.current) clearTimeout(syncTimerRef.current);
+    };
+  }, [children]);
+
+  useEffect(() => {
+    if (!selectedChildId) return;
+    let cancelled = false;
+    setProgressReady(false);
+    setSyncState('loading');
+    window.localStorage.setItem('znayton-multiplication-child-v1', selectedChildId);
+
+    async function loadProgress() {
+      const childLocal = readProgress(selectedChildId);
+      const guestLocal = readProgress();
+      const migrationKey = 'znayton-multiplication-guest-migrated-v1';
+      const canMigrateGuest = !window.localStorage.getItem(migrationKey) && hasMeaningfulProgress(guestLocal);
+      const local = hasMeaningfulProgress(childLocal) ? childLocal : canMigrateGuest ? guestLocal : defaultProgress;
+      if (canMigrateGuest && !hasMeaningfulProgress(childLocal)) window.localStorage.setItem(migrationKey, selectedChildId);
+      try {
+        const response = await fetch(`/api/multiplication/progress?childId=${encodeURIComponent(selectedChildId)}`);
+        const data = await response.json().catch(() => ({}));
+        const cloud = response.ok && data.progress && typeof data.progress === 'object'
+          ? { ...defaultProgress, ...data.progress, facts: data.progress.facts || {}, stages: data.progress.stages || {} }
+          : null;
+        const chosen = cloud && (Number(data.updatedAt) || 0) >= (Number(local.updatedAt) || 0) ? cloud : local;
+        if (!cancelled) {
+          setProgress(chosen);
+          saveProgress(chosen, selectedChildId);
+          setProgressReady(true);
+          setSyncState('synced');
+        }
+      } catch {
+        if (!cancelled) {
+          setProgress(local);
+          setProgressReady(true);
+          setSyncState('offline');
+        }
+      }
+    }
+
+    loadProgress();
+    return () => { cancelled = true; };
+  }, [selectedChildId]);
+
+  useEffect(() => {
+    if (!progressReady) return;
+    saveProgress(progress, selectedChildId);
+    if (!selectedChildId) return;
+    if (syncTimerRef.current) clearTimeout(syncTimerRef.current);
+    setSyncState('saving');
+    syncTimerRef.current = setTimeout(async () => {
+      try {
+        const response = await fetch('/api/multiplication/progress', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ childId: selectedChildId, progress }),
+        });
+        setSyncState(response.ok ? 'synced' : 'offline');
+      } catch {
+        setSyncState('offline');
+      }
+    }, 700);
+    return () => {
+      if (syncTimerRef.current) clearTimeout(syncTimerRef.current);
+    };
+  }, [progress, progressReady, selectedChildId]);
 
   const mastered = useMemo(() => TABLES.flatMap((a) => FACTORS.map((b) => factKey(a, b))).filter((key) => (progress.facts[key]?.strength || 0) >= 4).length, [progress]);
   const trained = useMemo(() => Object.values(progress.facts).filter((fact) => (fact.attempts || 0) > 0).length, [progress]);
+  const weakNow = useMemo(() => weakestFacts(progress), [progress]);
+  const dueNow = useMemo(() => dueFactsCount(progress), [progress]);
+
+  function stopVoice() {
+    audioRef.current?.pause();
+    audioRef.current = null;
+  }
+
+  function playVoice(name, onEnd) {
+    if (!voiceOnRef.current || !name) return;
+    stopVoice();
+    const audio = new Audio(`${VOICE_ROOT}/${name}.mp3?v=1`);
+    audioRef.current = audio;
+    if (onEnd) audio.onended = onEnd;
+    audio.play().catch(() => {});
+  }
+
+  function playChallengeVoice(nextChallenge) {
+    if (nextChallenge?.mode) playVoice(nextChallenge.mode);
+  }
+
+  function toggleVoice() {
+    const next = !voiceOnRef.current;
+    voiceOnRef.current = next;
+    setVoiceOn(next);
+    window.localStorage.setItem(VOICE_STORAGE_KEY, next ? 'on' : 'off');
+    if (!next) stopVoice();
+    else if (challenge) playChallengeVoice(challenge);
+  }
 
   function persistFact(a, b, wasCorrect, responseMs) {
     setProgress((current) => {
@@ -422,8 +593,8 @@ export function MultiplicationTrainer({ hasAccess = false }) {
         bestMs: wasCorrect ? Math.min(previous.bestMs || Infinity, responseMs) : previous.bestMs,
         due: Date.now() + REVIEW_INTERVALS[Math.min(5, Math.floor(strength))],
       };
-      const next = { ...current, facts: { ...current.facts, [key]: fact } };
-      saveProgress(next);
+      const next = { ...current, updatedAt: Date.now(), facts: { ...current.facts, [key]: fact } };
+      saveProgress(next, selectedChildId);
       return next;
     });
   }
@@ -445,9 +616,12 @@ export function MultiplicationTrainer({ hasAccess = false }) {
     setFirstTry(true);
     setTypedAnswer('');
     setStreak(0);
+    setAttempt(0);
     const next = makeChallenge(stage, progress, 0);
     setChallenge(next);
     startedAt.current = Date.now();
+    const intro = stage.id === 'diagnostic' ? 'diagnostic-intro' : stage.id === 'daily' ? 'daily-intro' : 'stage-intro';
+    playVoice(intro, () => playChallengeVoice(next));
   }
 
   function answer(value) {
@@ -460,11 +634,16 @@ export function MultiplicationTrainer({ hasAccess = false }) {
       setCorrect((count) => count + 1);
       setStreak((count) => count + 1);
       setFeedback({ correct: true, text: challenge.explanation });
+      playVoice('correct');
     } else {
+      const nextAttempt = attempt + 1;
       setMistakes((count) => count + 1);
       setStreak(0);
       setFirstTry(false);
-      setFeedback({ correct: false, text: `Пока не получилось. ${challenge.instruction}` });
+      setAttempt(nextAttempt);
+      const guided = nextAttempt >= 2;
+      setFeedback({ correct: false, level: guided ? 'guided' : 'retry', text: guided ? challenge.explanation : challenge.instruction });
+      playVoice(guided ? 'guided' : 'retry');
     }
   }
 
@@ -502,13 +681,16 @@ export function MultiplicationTrainer({ hasAccess = false }) {
         const previousBest = current.stages[activeStage.id]?.stars || 0;
         const next = {
           ...current,
+          updatedAt: Date.now(),
           sessions: (current.sessions || 0) + 1,
+          diagnosticCompletedAt: activeStage.id === 'diagnostic' ? Date.now() : current.diagnosticCompletedAt,
           stages: { ...current.stages, [activeStage.id]: { stars: Math.max(stars, previousBest), accuracy, completedAt: Date.now() } },
         };
-        saveProgress(next);
+        saveProgress(next, selectedChildId);
         return next;
       });
       reachGoal('multiplication_stage_complete', { stage: activeStage.id, accuracy, stars });
+      playVoice(activeStage.id === 'diagnostic' ? 'diagnostic-finish' : activeStage.id === 'daily' ? 'daily-finish' : 'stage-finish');
       return;
     }
     setRound(nextRound);
@@ -516,9 +698,11 @@ export function MultiplicationTrainer({ hasAccess = false }) {
     setLastChoice(null);
     setFirstTry(true);
     setTypedAnswer('');
+    setAttempt(0);
     const next = makeChallenge(activeStage, progress, nextRound);
     setChallenge(next);
     startedAt.current = Date.now();
+    playChallengeVoice(next);
   }
 
   function closeSession() {
@@ -526,6 +710,7 @@ export function MultiplicationTrainer({ hasAccess = false }) {
     setChallenge(null);
     setSummary(null);
     setFeedback(null);
+    stopVoice();
   }
 
   if (activeStage) {
@@ -537,16 +722,24 @@ export function MultiplicationTrainer({ hasAccess = false }) {
             <p className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-[#75E5C1]">Маршрут {activeStage.number}</p>
             <h3 className="mt-1 font-display text-xl font-extrabold sm:text-2xl">{activeStage.title}</h3>
           </div>
-          <button type="button" onClick={closeSession} className="rounded-full border border-white/14 bg-white/7 px-4 py-2 text-xs font-extrabold text-white/72 transition hover:bg-white/12">К карте маршрутов</button>
+          <div className="flex flex-wrap gap-2">
+            <button type="button" onClick={toggleVoice} aria-pressed={voiceOn} className={`rounded-full border px-4 py-2 text-xs font-extrabold transition ${voiceOn ? 'border-[#75E5C1]/30 bg-[#75E5C1]/12 text-[#9AECD3]' : 'border-white/14 bg-white/7 text-white/62 hover:bg-white/12'}`}>{voiceOn ? '🔊 Марина' : '🔇 Включить голос'}</button>
+            <button type="button" onClick={closeSession} className="rounded-full border border-white/14 bg-white/7 px-4 py-2 text-xs font-extrabold text-white/72 transition hover:bg-white/12">К карте маршрутов</button>
+          </div>
         </div>
 
         {summary ? (
           <div className="grid min-h-[560px] place-items-center px-5 py-12 text-center sm:px-8">
             <div className="max-w-xl">
               <div className="text-5xl">{summary.stars === 3 ? '🏆' : summary.stars === 2 ? '⭐' : '🌱'}</div>
-              <p className="mt-5 text-xs font-extrabold uppercase tracking-[0.18em] text-[#75E5C1]">Тренировка завершена</p>
-              <h3 className="mt-4 font-display text-4xl font-extrabold sm:text-5xl">Навык стал крепче</h3>
+              <p className="mt-5 text-xs font-extrabold uppercase tracking-[0.18em] text-[#75E5C1]">{summary.stage.id === 'diagnostic' ? 'Диагностика завершена' : summary.stage.id === 'daily' ? 'План на сегодня выполнен' : 'Тренировка завершена'}</p>
+              <h3 className="mt-4 font-display text-4xl font-extrabold sm:text-5xl">{summary.stage.id === 'diagnostic' ? 'Теперь знаем, с чего начать' : 'Навык стал крепче'}</h3>
               <p className="mt-4 text-base font-semibold leading-7 text-white/60">Верных ответов: {summary.correct} из {summary.stage.rounds}. Тренажёр запомнил сложные примеры и вернёт их в следующих занятиях.</p>
+              <div className="mt-6 grid gap-2 text-left sm:grid-cols-3">
+                <div className="rounded-[18px] bg-white/8 p-4"><strong className="font-display text-2xl text-[#75E5C1]">{summary.accuracy}%</strong><span className="mt-1 block text-[10px] font-bold text-white/48">точность</span></div>
+                <div className="rounded-[18px] bg-white/8 p-4"><strong className="font-display text-2xl text-[#FFD166]">{summary.mistakes}</strong><span className="mt-1 block text-[10px] font-bold text-white/48">ошибок разобрано</span></div>
+                <div className="rounded-[18px] bg-white/8 p-4"><strong className="font-display text-lg text-white">{weakNow.length ? weakNow.slice(0, 2).join(', ') : 'новый старт'}</strong><span className="mt-1 block text-[10px] font-bold text-white/48">повторим дальше</span></div>
+              </div>
               <div className="mt-7 flex justify-center gap-2 text-3xl">{[1, 2, 3].map((star) => <span key={star} className={star <= summary.stars ? 'opacity-100' : 'grayscale opacity-20'}>★</span>)}</div>
               <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
                 <button type="button" onClick={() => startStage(activeStage)} className="rounded-full bg-[#75E5C1] px-6 py-3.5 text-sm font-extrabold text-[#09152E]">Повторить маршрут</button>
@@ -582,6 +775,7 @@ export function MultiplicationTrainer({ hasAccess = false }) {
 
             <div className="bg-[#F8FAFF] p-5 text-ink sm:p-8 lg:p-10">
               <p className="text-[10px] font-extrabold uppercase tracking-[0.17em] text-brand-blue">Задание · {challenge.title}</p>
+              <button type="button" onClick={() => playChallengeVoice(challenge)} className="mt-3 inline-flex min-h-[38px] items-center gap-2 rounded-full border border-brand-purple/16 bg-brand-purple/[0.07] px-4 py-2 text-xs font-extrabold text-brand-purple">▶ Послушать задание</button>
               <div className="mt-4 rounded-[28px] border border-ink/7 bg-white p-5 text-center shadow-card sm:p-8">
                 <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-brand-blue">Вопрос</p>
                 <h4 className="mx-auto mt-2 max-w-2xl font-display text-2xl font-extrabold leading-tight text-ink sm:text-4xl">{taskView.question}</h4>
@@ -616,9 +810,18 @@ export function MultiplicationTrainer({ hasAccess = false }) {
               )}
 
               {feedback && !feedback.correct && (
-                <div className="mt-5 rounded-[20px] border border-[#F06E3D]/22 bg-[#FFF2EC] px-5 py-4 text-sm font-bold leading-6 text-[#B94D27]">
-                  <strong>Почти! Посмотри ещё раз. </strong>{challenge.instruction}
-                </div>
+                feedback.level === 'guided' ? (
+                  <div className="mt-5 rounded-[22px] border-2 border-brand-blue/18 bg-[#EDF5FF] px-5 py-5 text-brand-blue sm:px-7">
+                    <p className="text-xs font-extrabold uppercase tracking-[0.12em]">Разберём вместе</p>
+                    <p className="mt-2 font-display text-3xl font-extrabold text-ink">{solutionEquation(challenge)}</p>
+                    <p className="mt-3 text-sm font-bold leading-6">{feedback.text}</p>
+                    <p className="mt-2 text-xs font-semibold text-ink/48">Теперь введи или выбери этот ответ самостоятельно.</p>
+                  </div>
+                ) : (
+                  <div className="mt-5 rounded-[20px] border border-[#F06E3D]/22 bg-[#FFF2EC] px-5 py-4 text-sm font-bold leading-6 text-[#B94D27]">
+                    <strong>Почти! Попробуй другим способом. </strong>{feedback.text}
+                  </div>
+                )
               )}
               {feedback?.correct && <button type="button" onClick={nextQuestion} className="mt-5 min-h-[54px] w-full rounded-full bg-ink px-6 py-3 text-sm font-extrabold text-white transition hover:-translate-y-0.5">{round + 1 >= activeStage.rounds ? 'Посмотреть результат' : 'Следующее задание →'}</button>}
               <span className="sr-only">{firstTry ? 'Первая попытка' : 'Повторная попытка'}</span>
@@ -629,8 +832,69 @@ export function MultiplicationTrainer({ hasAccess = false }) {
     );
   }
 
+  if (!progressReady) {
+    return (
+      <div className="grid min-h-[360px] place-items-center rounded-[34px] border border-ink/7 bg-white p-8 text-center shadow-luxe">
+        <div>
+          <span className="mx-auto block h-11 w-11 animate-spin rounded-full border-4 border-brand-blue/15 border-t-brand-blue" />
+          <p className="mt-5 font-display text-xl font-extrabold text-ink">Загружаем личную карту примеров…</p>
+        </div>
+      </div>
+    );
+  }
+
+  const diagnosticDone = Boolean(progress.diagnosticCompletedAt);
+  const dailyStage = {
+    ...DAILY_STAGE,
+    tables: hasAccess ? TABLES : [2],
+    rounds: hasAccess ? DAILY_STAGE.rounds : 8,
+  };
+  const focusText = weakNow.length ? weakNow.join(', ') : 'начнём с базовых примеров и найдём сильные стороны';
+
   return (
     <div className="rounded-[34px] border border-ink/7 bg-white p-5 shadow-luxe sm:p-8 lg:p-10">
+      {children.length > 0 && (
+        <div className="mb-5 flex flex-col gap-3 rounded-[20px] border border-brand-blue/10 bg-[#F5F8FF] p-4 sm:flex-row sm:items-center sm:justify-between">
+          <label className="flex items-center gap-3 text-sm font-extrabold text-ink">
+            Прогресс ребёнка
+            <select
+              value={selectedChildId}
+              onChange={(event) => setSelectedChildId(event.target.value)}
+              className="min-h-[42px] rounded-full border border-brand-blue/16 bg-white px-4 text-sm font-extrabold text-brand-blue outline-none"
+            >
+              {children.map((child) => <option key={child.id} value={child.id}>{child.name}</option>)}
+            </select>
+          </label>
+          <span className={`text-xs font-extrabold ${syncState === 'synced' ? 'text-brand-green' : syncState === 'offline' ? 'text-brand-orange' : 'text-ink/40'}`}>
+            {syncState === 'synced' ? '☁ Прогресс сохранён' : syncState === 'offline' ? 'Локально · синхронизируем позже' : syncState === 'saving' ? 'Сохраняем…' : 'Загружаем…'}
+          </span>
+        </div>
+      )}
+      {isLoggedIn && children.length === 0 && (
+        <div className="mb-5 flex flex-col gap-3 rounded-[20px] border border-dashed border-brand-purple/22 bg-brand-purple/[0.045] p-5 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm font-semibold leading-6 text-ink/58"><strong className="text-ink">Хотите сохранять прогресс по ребёнку?</strong><br />Добавьте профиль — карта не потеряется при смене устройства.</p>
+          <a href="/cabinet/children" className="inline-flex min-h-[44px] shrink-0 items-center justify-center rounded-full bg-brand-purple px-5 py-3 text-sm font-extrabold text-white">Добавить ребёнка</a>
+        </div>
+      )}
+      <section className="relative mb-9 overflow-hidden rounded-[28px] bg-gradient-to-br from-[#0B1734] via-[#203A72] to-[#0C7A68] p-6 text-white shadow-color sm:p-8">
+        <div className="pointer-events-none absolute -right-12 -top-20 h-56 w-56 rounded-full bg-[#75E5C1]/22 blur-[70px]" />
+        <div className="relative grid gap-7 lg:grid-cols-[1fr_auto] lg:items-center">
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-full bg-[#75E5C1] px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#09283A]">{diagnosticDone ? 'План на сегодня' : 'Первый шаг'}</span>
+              <span className="text-xs font-bold text-white/52">{diagnosticDone ? `${dailyStage.rounds} заданий · около 5 минут` : '12 заданий · без оценок и секундомера'}</span>
+            </div>
+            <h3 className="mt-5 font-display text-3xl font-extrabold leading-tight sm:text-4xl">{diagnosticDone ? 'Тренажёр уже собрал нужное занятие' : 'Узнаем, что ребёнок уже умеет'}</h3>
+            <p className="mt-3 max-w-2xl text-sm font-semibold leading-6 text-white/64">{diagnosticDone ? `В фокусе: ${focusText}. Освоенные примеры не будут отнимать время.` : 'Короткая диагностика найдёт знакомые таблицы и слабые примеры, чтобы не заставлять ребёнка проходить всё с нуля.'}</p>
+            {diagnosticDone && <p className="mt-3 text-xs font-extrabold text-[#FFE19A]">{dueNow ? `К повторению подошло: ${dueNow}` : 'Просроченных повторений нет — укрепим самые слабые сочетания.'}</p>}
+          </div>
+          <div className="min-w-[230px]">
+            <button type="button" onClick={() => startStage(diagnosticDone ? dailyStage : DIAGNOSTIC_STAGE)} className="min-h-[56px] w-full rounded-full bg-[#75E5C1] px-6 py-4 text-sm font-extrabold text-[#09283A] shadow-[0_18px_40px_rgba(65,220,175,.2)] transition hover:-translate-y-1">{diagnosticDone ? 'Начать занятие →' : 'Пройти диагностику →'}</button>
+            <button type="button" onClick={toggleVoice} aria-pressed={voiceOn} className="mt-3 w-full text-center text-xs font-extrabold text-white/62 transition hover:text-white">{voiceOn ? '🔊 Голос Марины включён' : '🔇 Включить голос Марины'}</button>
+          </div>
+        </div>
+      </section>
+
       <div className="grid gap-7 lg:grid-cols-[.78fr_1.22fr] lg:items-end">
         <div>
           <p className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-brand-blue">Персональная карта навыка</p>
@@ -644,6 +908,19 @@ export function MultiplicationTrainer({ hasAccess = false }) {
         </div>
         <MasteryMap progress={progress} />
       </div>
+
+      <section className="mt-7 grid gap-3 sm:grid-cols-2">
+        <div className="rounded-[22px] border border-brand-blue/10 bg-[#F4F8FF] p-5">
+          <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-brand-blue">Родителю после занятия</p>
+          <h4 className="mt-3 font-display text-xl font-extrabold text-ink">{weakNow.length ? 'Что повторим дальше' : 'Сначала соберём личную статистику'}</h4>
+          <p className="mt-2 text-sm font-semibold leading-6 text-ink/54">{weakNow.length ? `Сейчас больше внимания требуют: ${weakNow.join(', ')}. Тренажёр вернёт их через подходящий интервал.` : 'После диагностики здесь появятся конкретные примеры, а не общая оценка «знает или не знает таблицу».'}</p>
+        </div>
+        <div className="rounded-[22px] border border-brand-green/12 bg-[#EFFBF7] p-5">
+          <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-brand-green">Ритм без перегруза</p>
+          <h4 className="mt-3 font-display text-xl font-extrabold text-ink">Одно короткое занятие в день</h4>
+          <p className="mt-2 text-sm font-semibold leading-6 text-ink/54">Не нужно выбирать таблицу вручную. Кнопка «Начать занятие» сама соединяет новые, слабые и подошедшие к повторению примеры.</p>
+        </div>
+      </section>
 
       <div className="mt-10 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {multiplicationStages.map((stage) => {

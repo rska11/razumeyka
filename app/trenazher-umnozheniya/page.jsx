@@ -7,11 +7,13 @@ import { SubscribeButton } from '@/components/drawing/SubscribeButton.jsx';
 import { multiplicationBenefits, multiplicationStages } from '@/data/multiplication-course.js';
 import { getAuthSession } from '@/lib/auth';
 import { reconcileUserPayments } from '@/lib/payments';
+import { prisma } from '@/lib/prisma';
 import { directionPrice, getAccessUntil, hasActiveAccess } from '@/lib/subscription';
 
 const PRIMARY_DIRECTION = 'mentalnaya-arifmetika';
 const INCLUDED_DIRECTIONS = ['mentalnaya-arifmetika', 'podgotovka-k-shkole'];
-const PRICE = directionPrice(PRIMARY_DIRECTION);
+const MENTAL_PRICE = directionPrice(PRIMARY_DIRECTION);
+const SCHOOL_PRICE = directionPrice('podgotovka-k-shkole');
 
 export const metadata = {
   title: 'Приложение «Таблица умножения» — онлайн-тренажёр для детей',
@@ -40,7 +42,7 @@ const FAQ = [
   ['С какого возраста подходит тренажёр?', 'Оптимально с 6–7 лет, когда ребёнок уверенно считает и понимает сложение. Начальные маршруты объясняют смысл умножения через предметы и одинаковые группы.'],
   ['Нужно ли сначала выучить таблицу?', 'Нет. Тренажёр сначала помогает понять действие, затем показывает удобные стратегии и только после этого переводит примеры в быстрое узнавание.'],
   ['Что доступно бесплатно?', 'Без регистрации открыты два маршрута: смысл умножения и таблица на 2. Они позволяют проверить формат до оплаты.'],
-  ['Какая покупка открывает тренажёр?', 'Полный тренажёр открывается с любым из двух направлений: ментальной арифметикой или подготовкой к школе. Если одно из них уже оплачено, второй раз платить не нужно.'],
+  ['Какая покупка открывает тренажёр?', 'Полный тренажёр открывается при покупке любого одного курса: ментальной арифметики или подготовки к школе. Покупка ментальной арифметики даёт доступ к менталке и тренажёру; покупка подготовки к школе — к подготовке и тренажёру. Сами курсы продаются отдельно: один курс не открывает другой.'],
   ['Есть ли автоматическое списание?', 'Нет. Доступ оформляется на 30 дней и продлевается только вручную.'],
 ];
 
@@ -60,7 +62,10 @@ const courseSchema = {
   name: 'Таблица умножения без зубрёжки',
   description: 'Интерактивная программа освоения таблицы умножения для детей 6–10 лет: смысл действия, стратегии, деление, задачи и адаптивное повторение.',
   provider: { '@type': 'Organization', name: 'Знайтон', url: 'https://znayton.ru' },
-  offers: { '@type': 'Offer', price: PRICE, priceCurrency: 'RUB', availability: 'https://schema.org/InStock' },
+  offers: [
+    { '@type': 'Offer', name: 'Ментальная арифметика + тренажёр умножения', price: MENTAL_PRICE, priceCurrency: 'RUB', availability: 'https://schema.org/InStock' },
+    { '@type': 'Offer', name: 'Подготовка к школе + тренажёр умножения', price: SCHOOL_PRICE, priceCurrency: 'RUB', availability: 'https://schema.org/InStock' },
+  ],
 };
 
 const faqSchema = {
@@ -111,14 +116,24 @@ function MultiplicationBoard() {
 export default async function MultiplicationTrainerPage() {
   const session = await getAuthSession();
   let hasAccess = false;
-  let accessUntilLabel = '';
+  let mentalHasAccess = false;
+  let schoolHasAccess = false;
+  let mentalAccessUntilLabel = '';
+  let schoolAccessUntilLabel = '';
+  let children = [];
   if (session?.user?.id) {
     await reconcileUserPayments(session.user.id);
-    const accessStates = await Promise.all(INCLUDED_DIRECTIONS.map((direction) => hasActiveAccess(session.user.id, direction)));
+    const [accessStates, childRows] = await Promise.all([
+      Promise.all(INCLUDED_DIRECTIONS.map((direction) => hasActiveAccess(session.user.id, direction))),
+      prisma.child.findMany({ where: { parentId: session.user.id }, orderBy: { createdAt: 'asc' }, select: { id: true, name: true } }),
+    ]);
+    children = childRows;
     hasAccess = accessStates.some(Boolean);
+    [mentalHasAccess, schoolHasAccess] = accessStates;
     const accessDates = await Promise.all(INCLUDED_DIRECTIONS.map((direction) => getAccessUntil(session.user.id, direction)));
-    const latestUntil = accessDates.filter(Boolean).sort((left, right) => right.getTime() - left.getTime())[0];
-    if (latestUntil) accessUntilLabel = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }).format(latestUntil);
+    const formatAccess = (date) => date ? new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }).format(date) : '';
+    mentalAccessUntilLabel = formatAccess(accessDates[0]);
+    schoolAccessUntilLabel = formatAccess(accessDates[1]);
   }
 
   return (
@@ -137,7 +152,7 @@ export default async function MultiplicationTrainerPage() {
               <div>
                 <div className="flex flex-wrap gap-2">
                   <span className="inline-flex rounded-full border border-white/12 bg-white/[0.07] px-4 py-2 text-[10px] font-extrabold uppercase tracking-[0.17em] text-[#9AECD3]">Тренажёр умножения · 6–10 лет</span>
-                  <span className="inline-flex rounded-full border border-[#FFD166]/24 bg-[#FFD166]/10 px-4 py-2 text-[10px] font-extrabold text-[#FFD166]">Входит в менталку и подготовку к школе</span>
+                  <span className="inline-flex rounded-full border border-[#FFD166]/24 bg-[#FFD166]/10 px-4 py-2 text-[10px] font-extrabold text-[#FFD166]">Включён в любой один выбранный курс</span>
                 </div>
                 <h1 className="mt-7 max-w-[760px] font-display text-[40px] font-extrabold leading-[1] tracking-[-0.055em] sm:text-6xl lg:text-[72px]">
                   Таблица умножения <span className="bg-gradient-to-r from-[#66B6FF] via-[#75E5C1] to-[#FFD166] bg-clip-text text-transparent">без скучной зубрёжки</span>
@@ -171,7 +186,7 @@ export default async function MultiplicationTrainerPage() {
               <h2 className="mt-5 font-display text-4xl font-extrabold tracking-[-0.045em] sm:text-6xl">Тренажёр запоминает, что ребёнок уже умеет</h2>
               <p className="mt-5 text-base font-semibold leading-7 text-ink/56 sm:text-lg">Выберите первый маршрут. После каждого ответа карта навыка обновляется, а слабые примеры получают дополнительное повторение.</p>
             </div>
-            <MultiplicationTrainer hasAccess={hasAccess} />
+            <MultiplicationTrainer hasAccess={hasAccess} children={children} isLoggedIn={Boolean(session?.user?.id)} />
           </div>
         </section>
 
@@ -210,23 +225,34 @@ export default async function MultiplicationTrainerPage() {
           <div className="container-pad px-0">
             <div className="relative overflow-hidden rounded-[38px] bg-gradient-to-br from-[#13264D] via-[#293A78] to-[#176C6C] p-6 text-white shadow-luxe sm:p-10 lg:p-14">
               <div className="pointer-events-none absolute -left-24 top-0 h-80 w-80 rounded-full bg-[#3978F6]/24 blur-[100px]" />
-              <div className="relative grid gap-10 lg:grid-cols-[1.08fr_.72fr] lg:items-center">
+              <div className="relative grid gap-10 lg:grid-cols-[.82fr_1.18fr] lg:items-center">
                 <div>
                   <span className="inline-flex rounded-full border border-[#75E5C1]/20 bg-[#75E5C1]/10 px-4 py-2 text-[10px] font-extrabold uppercase tracking-[0.17em] text-[#9AECD3]">Открывается с любым из двух курсов</span>
-                  <h2 className="mt-6 max-w-3xl font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.05em] sm:text-6xl">Тренажёр входит и в менталку, и в подготовку к школе</h2>
-                  <p className="mt-5 max-w-2xl text-base font-semibold leading-7 text-white/64 sm:text-lg">Покупка любого из двух курсов открывает все маршруты умножения. На этой странице можно оформить ментальную арифметику; если подготовка к школе уже куплена, тренажёр откроется автоматически.</p>
+                  <h2 className="mt-6 max-w-3xl font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.05em] sm:text-6xl">Выберите один курс — тренажёр будет включён</h2>
+                  <p className="mt-5 max-w-2xl text-base font-semibold leading-7 text-white/64 sm:text-lg">Ментальная арифметика и подготовка к школе — два самостоятельных курса. Покупка менталки открывает менталку + тренажёр умножения. Покупка подготовки открывает подготовку + тот же тренажёр. Второй курс не открывается и приобретается отдельно.</p>
+                  <div className="mt-5 max-w-2xl rounded-[18px] border border-[#FFD166]/22 bg-[#FFD166]/10 px-5 py-4 text-sm font-extrabold leading-6 text-[#FFE19A]">Важно: это не объединённый пакет из двух курсов. Общим для них является только тренажёр умножения.</div>
                   <div className="mt-8 grid gap-3 sm:grid-cols-2">
-                    {['Все таблицы от 2 до 9', 'Умножение, деление и задачи', 'Адаптивное повторение слабых примеров', 'Курс ментальной арифметики с абакусом'].map((perk) => <div key={perk} className="flex items-start gap-3 rounded-[18px] border border-white/10 bg-white/[0.07] px-4 py-3.5 text-sm font-bold text-white/76"><span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-[#75E5C1] text-[10px] text-[#09283A]">✓</span>{perk}</div>)}
+                    {['Все таблицы от 2 до 9', 'Умножение, деление и задачи', 'Адаптивное повторение ошибок', 'Прогресс каждого примера'].map((perk) => <div key={perk} className="flex items-start gap-3 rounded-[18px] border border-white/10 bg-white/[0.07] px-4 py-3.5 text-sm font-bold text-white/76"><span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-[#75E5C1] text-[10px] text-[#09283A]">✓</span>{perk}</div>)}
                   </div>
                 </div>
-                <div className="rounded-[30px] bg-white p-6 text-ink shadow-[0_30px_80px_rgba(0,0,0,.3)] sm:p-8">
-                  <p className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-brand-blue">Полный доступ на 30 дней</p>
-                  <del className="mt-4 block text-lg font-extrabold text-ink/32">1 490 ₽</del>
-                  <div className="mt-1 flex items-end gap-2"><strong className="font-display text-6xl font-extrabold tracking-[-0.06em]">{PRICE}</strong><span className="pb-2 text-lg font-extrabold text-ink/44">₽</span></div>
-                  <p className="mt-2 text-sm font-bold text-ink/46">менталка + полный тренажёр</p>
-                  <div className="my-6 h-px bg-ink/8" />
-                  <SubscribeButton isLoggedIn={Boolean(session?.user?.id)} hasAccess={hasAccess} accessUntil={accessUntilLabel} returnTo="/mentalnaya-arifmetika" loginCallback="/trenazher-umnozheniya#dostup" buttonLabel={`Открыть всё за ${PRICE} ₽`} />
-                  <p className="mt-4 text-center text-[11px] font-semibold leading-5 text-ink/40">Продление только вручную. Автоматического списания нет.</p>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <article className="rounded-[28px] bg-white p-6 text-ink shadow-[0_30px_80px_rgba(0,0,0,.25)]">
+                    <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-brand-green">Отдельный курс №1</p>
+                    <h3 className="mt-3 font-display text-2xl font-extrabold">Ментальная арифметика</h3>
+                    <p className="mt-2 min-h-[48px] text-xs font-semibold leading-5 text-ink/48">Абакус, устный счёт и полный тренажёр умножения.</p>
+                    <del className="mt-5 block text-sm font-extrabold text-ink/28">1 490 ₽</del>
+                    <div className="mt-1 flex items-end gap-2"><strong className="font-display text-5xl font-extrabold tracking-[-0.06em]">{MENTAL_PRICE}</strong><span className="pb-1.5 text-base font-extrabold text-ink/44">₽</span></div>
+                    <SubscribeButton isLoggedIn={Boolean(session?.user?.id)} hasAccess={mentalHasAccess} accessUntil={mentalAccessUntilLabel} returnTo="/mentalnaya-arifmetika" loginCallback="/trenazher-umnozheniya#dostup" buttonLabel={`Выбрать менталку · ${MENTAL_PRICE} ₽`} />
+                  </article>
+                  <article className="rounded-[28px] bg-white p-6 text-ink shadow-[0_30px_80px_rgba(0,0,0,.25)]">
+                    <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-brand-purple">Отдельный курс №2</p>
+                    <h3 className="mt-3 font-display text-2xl font-extrabold">Подготовка к школе</h3>
+                    <p className="mt-2 min-h-[48px] text-xs font-semibold leading-5 text-ink/48">Чтение, речь, логика, письмо и полный тренажёр умножения.</p>
+                    <del className="mt-5 block text-sm font-extrabold text-ink/28">1 490 ₽</del>
+                    <div className="mt-1 flex items-end gap-2"><strong className="font-display text-5xl font-extrabold tracking-[-0.06em]">{SCHOOL_PRICE}</strong><span className="pb-1.5 text-base font-extrabold text-ink/44">₽</span></div>
+                    <SubscribeButton isLoggedIn={Boolean(session?.user?.id)} hasAccess={schoolHasAccess} accessUntil={schoolAccessUntilLabel} returnTo="/podgotovka-k-shkole" loginCallback="/trenazher-umnozheniya#dostup" buttonLabel={`Выбрать подготовку · ${SCHOOL_PRICE} ₽`} />
+                  </article>
+                  <p className="text-center text-[11px] font-semibold leading-5 text-white/48 md:col-span-2">Вы покупаете только выбранный курс. Второй курс не откроется. Продление — вручную, без автосписания.</p>
                 </div>
               </div>
             </div>

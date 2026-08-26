@@ -2,8 +2,9 @@
 
 import Script from 'next/script';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { Suspense, useEffect, useRef } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { METRIKA_ID as COUNTER_ID } from '@/lib/metrika';
+import { CONSENT_EVENT, hasAnalyticsConsent } from '@/lib/consent';
 
 // Отслеживание переходов внутри SPA (клиентская навигация Next.js).
 function MetrikaHits() {
@@ -22,7 +23,26 @@ function MetrikaHits() {
   return null;
 }
 
+/**
+ * Счётчик подключается ТОЛЬКО после явного согласия (см. lib/consent.ts).
+ * До согласия в DOM нет ни тега Метрики, ни запроса к mc.yandex.ru —
+ * именно это проверяют при контроле соблюдения 152-ФЗ.
+ *
+ * noscript-пикселя здесь сознательно нет: без JS согласие получить нечем,
+ * а пиксель отправил бы визит в обход решения пользователя.
+ */
 export function YandexMetrika() {
+  const [allowed, setAllowed] = useState(false);
+
+  useEffect(() => {
+    const sync = () => setAllowed(hasAnalyticsConsent());
+    sync(); // решение могло быть принято в прошлый визит
+    window.addEventListener(CONSENT_EVENT, sync);
+    return () => window.removeEventListener(CONSENT_EVENT, sync);
+  }, []);
+
+  if (!allowed) return null;
+
   return (
     <>
       <Script id="yandex-metrika" strategy="afterInteractive">
@@ -31,11 +51,6 @@ export function YandexMetrika() {
       <Suspense fallback={null}>
         <MetrikaHits />
       </Suspense>
-      <noscript>
-        <div>
-          <img src={`https://mc.yandex.ru/watch/${COUNTER_ID}`} style={{ position: 'absolute', left: '-9999px' }} alt="" />
-        </div>
-      </noscript>
     </>
   );
 }

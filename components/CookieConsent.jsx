@@ -1,64 +1,100 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
+import { CONSENT_OPEN_EVENT, readConsent, saveConsent } from '@/lib/consent';
 
-// Версия ключа: подъём сбрасывает «видел» у всех, чтобы обновлённое
-// уведомление показалось заново (после переработки плашки).
-const ACK_KEY = 'razumeyka_cookie_ack_v2';
-
+/**
+ * Плашка cookie-согласия (opt-in).
+ *
+ * Пока решения нет — аналитика не подключена (см. components/analytics/YandexMetrika.jsx),
+ * плашка висит внизу и не перекрывает контент. Отказ сделан такой же простой,
+ * как согласие (одинаковые по заметности кнопки, никаких «крестик = согласен»).
+ * Решение можно поменять в любой момент — «Настройки cookie» в подвале.
+ */
 export function CookieConsent() {
   const [visible, setVisible] = useState(false);
+  const [current, setCurrent] = useState(null);
 
   useEffect(() => {
-    try {
-      if (localStorage.getItem(ACK_KEY) !== '1') setVisible(true);
-    } catch {
+    const saved = readConsent();
+    setCurrent(saved);
+    if (!saved) setVisible(true); // решения ещё нет — спрашиваем
+
+    const open = () => {
+      setCurrent(readConsent());
       setVisible(true);
-    }
+    };
+    window.addEventListener(CONSENT_OPEN_EVENT, open);
+    return () => window.removeEventListener(CONSENT_OPEN_EVENT, open);
   }, []);
 
-  function acknowledge() {
-    try {
-      localStorage.setItem(ACK_KEY, '1');
-    } catch {
-      /* ignore */
-    }
-    setVisible(false);
-  }
+  const decide = useCallback(
+    (analytics) => {
+      const wasAllowed = readConsent()?.analytics === true;
+      saveConsent(analytics);
+      setVisible(false);
+      // Отзыв согласия: уже загруженный счётчик выгрузить нельзя —
+      // cookie удалены в saveConsent, страницу перезагружаем без Метрики.
+      if (wasAllowed && !analytics) window.location.reload();
+    },
+    [],
+  );
 
   if (!visible) return null;
 
   return (
     <div
       className="pointer-events-none fixed inset-x-0 bottom-0 z-[120] px-2 pb-[max(.5rem,env(safe-area-inset-bottom))] sm:px-4 sm:pb-4"
-      role="region"
-      aria-label="Уведомление об использовании cookie"
+      role="dialog"
+      aria-live="polite"
+      aria-label="Использование cookie"
     >
-      {/* Светлая, компактная плашка «в характере» бренда: польза впереди,
-          подразумеваемое согласие зашито во фразу (юр-покрытие), детали про
-          аналитику — в политике. Тёмный вариант отпугивал (звучал как слежка). */}
-      <div className="pointer-events-auto mx-auto flex max-w-xl items-center gap-2.5 rounded-[14px] border border-ink/8 bg-white/95 p-2 text-ink shadow-luxe backdrop-blur-xl sm:max-w-3xl sm:gap-3.5 sm:rounded-[18px] sm:p-3 lg:max-w-4xl">
-        <span aria-hidden className="hidden h-9 w-9 shrink-0 place-items-center rounded-[12px] bg-brand-blue/10 text-lg sm:grid">
-          🍪
-        </span>
-        <p className="min-w-0 flex-1 text-[11px] font-semibold leading-[1.35] text-ink/64 sm:text-[13px] sm:leading-5 lg:whitespace-nowrap">
-          Используем cookie, чтобы сайт был удобнее. Продолжая, вы принимаете{' '}
-          <Link href="/privacy" className="font-extrabold text-brand-blue underline decoration-brand-blue/30 underline-offset-2">
-            политику конфиденциальности
-          </Link>
-          .
-        </p>
-        {/* Тихий крестик вместо яркой кнопки: согласие зашито во фразу
-            «Продолжая…», а закрытие не читается как «на что-то подписываюсь». */}
-        <button
-          type="button"
-          onClick={acknowledge}
-          aria-label="Закрыть уведомление"
-          className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-lg leading-none text-ink/40 transition hover:bg-ink/5 hover:text-ink/70"
-        >
-          <span aria-hidden>✕</span>
-        </button>
+      <div className="pointer-events-auto mx-auto max-w-xl rounded-[16px] border border-ink/8 bg-white/96 p-3 text-ink shadow-luxe backdrop-blur-xl sm:max-w-3xl sm:rounded-[20px] sm:p-4 lg:max-w-4xl">
+        <div className="flex items-start gap-3">
+          <span aria-hidden className="hidden h-9 w-9 shrink-0 place-items-center rounded-[12px] bg-brand-blue/10 text-lg sm:grid">
+            🍪
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-[12px] font-semibold leading-[1.45] text-ink/70 sm:text-[13px] sm:leading-5">
+              <span className="font-extrabold text-ink">Обязательные cookie</span> нужны, чтобы работал вход в кабинет
+              и сохранялся прогресс уроков. <span className="font-extrabold text-ink">Аналитические</span> —
+              Яндекс.Метрика, включая Вебвизор, — подключаются только с вашего согласия и помогают нам понять,
+              какие уроки детям заходят. Отказ ничего не ломает.
+            </p>
+            <p className="mt-1.5 text-[11px] font-semibold leading-[1.45] text-ink/48 sm:text-[12px]">
+              Подробности —{' '}
+              <Link href="/cookies" className="font-extrabold text-brand-blue underline decoration-brand-blue/30 underline-offset-2">
+                какие cookie мы используем
+              </Link>{' '}
+              и{' '}
+              <Link href="/privacy" className="font-extrabold text-brand-blue underline decoration-brand-blue/30 underline-offset-2">
+                политика конфиденциальности
+              </Link>
+              .{current ? (
+                <span className="ml-1">Сейчас аналитика {current.analytics ? 'включена' : 'выключена'}.</span>
+              ) : null}
+            </p>
+          </div>
+        </div>
+
+        {/* Кнопки равнозначны: отказаться так же просто, как согласиться. */}
+        <div className="mt-3 flex gap-2 sm:justify-end">
+          <button
+            type="button"
+            onClick={() => decide(false)}
+            className="inline-flex min-h-[42px] flex-1 items-center justify-center rounded-full border-2 border-ink/12 bg-white px-3 text-[12px] font-extrabold text-ink transition hover:border-ink/25 focus:outline-none focus:ring-4 focus:ring-ink/10 sm:flex-none sm:px-5 sm:text-[13px]"
+          >
+            Только необходимые
+          </button>
+          <button
+            type="button"
+            onClick={() => decide(true)}
+            className="inline-flex min-h-[42px] flex-1 items-center justify-center rounded-full bg-night px-3 text-[12px] font-extrabold text-porcelain transition hover:bg-ink focus:outline-none focus:ring-4 focus:ring-brand-blue/24 sm:flex-none sm:px-6 sm:text-[13px]"
+          >
+            Принять все
+          </button>
+        </div>
       </div>
     </div>
   );

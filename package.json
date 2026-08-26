@@ -16,7 +16,8 @@
     "test:academy": "node scripts/test-academy-game.mjs",
     "test:mental-game": "node scripts/test-mental-number-game.mjs",
     "test:school-prep": "node scripts/test-school-prep-day-one.mjs",
-    "test:multiplication": "node scripts/test-multiplication-course.mjs"
+    "test:multiplication": "node scripts/test-multiplication-course.mjs",
+    "test:consent": "node --experimental-strip-types --no-warnings scripts/test-consent.mjs"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",

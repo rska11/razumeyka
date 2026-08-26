@@ -2,6 +2,7 @@
 
 import { Icon } from './Icon.jsx';
 import { Logo } from './Logo.jsx';
+import { openConsentSettings } from '@/lib/consent';
 
 const navLinks = [
   ['Возраст', '/#age'],
@@ -101,6 +102,17 @@ export function Footer() {
             <a href="/offer" className="text-sm font-bold text-white/38 transition hover:text-white">
               Публичная оферта
             </a>
+            <a href="/cookies" className="text-sm font-bold text-white/38 transition hover:text-white">
+              Использование cookie
+            </a>
+            {/* Отозвать/изменить согласие можно в любой момент — требование к информированному согласию. */}
+            <button
+              type="button"
+              onClick={openConsentSettings}
+              className="text-left text-sm font-bold text-white/38 underline decoration-white/20 underline-offset-4 transition hover:text-white"
+            >
+              Настройки cookie
+            </button>
           </div>
         </div>
       </div>

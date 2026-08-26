@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/admin", "/teacher", "/cabinet", "/login", "/spasibo", "/api/", "/privacy", "/offer"],
+      disallow: ["/admin", "/teacher", "/cabinet", "/login", "/spasibo", "/api/", "/privacy", "/offer", "/cookies"],
     },
     sitemap: "https://znayton.ru/sitemap.xml",
   };

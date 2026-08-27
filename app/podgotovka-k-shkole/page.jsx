@@ -9,7 +9,7 @@ import { CourseDiscovery } from '@/components/CourseDiscovery.jsx';
 import { GameLauncher } from '@/components/games/GameShell.jsx';
 import { TrackedLink } from '@/components/analytics/TrackedLink.jsx';
 import { gamesForWeek } from '@/data/games.js';
-import { schoolPrepProgram, schoolPrepWeekOne } from '@/data/school-prep-course.js';
+import { schoolPrepProgram, schoolPrepWeekOne, schoolPrepWeekTwo } from '@/data/school-prep-course.js';
 import { getAuthSession } from '@/lib/auth';
 import { reconcileUserPayments } from '@/lib/payments';
 import { directionPrice, getAccessUntil, hasActiveAccess } from '@/lib/subscription';
@@ -195,6 +195,7 @@ export default async function SchoolPrepPage() {
       }).format(until);
     }
   }
+  const hasFullCourseAccess = hasAccess || process.env.NODE_ENV !== 'production';
 
   return (
     <>
@@ -308,8 +309,30 @@ export default async function SchoolPrepPage() {
             <SchoolPrepAdventure
               week={schoolPrepWeekOne}
               price={SCHOOL_PREP_PRICE}
-              hasFullAccess={hasAccess || process.env.NODE_ENV !== 'production'}
+              hasFullAccess={hasFullCourseAccess}
+              nextWeekHref={hasFullCourseAccess ? '#week-two' : ''}
             />
+            {hasFullCourseAccess && (
+              <div id="week-two" className="scroll-mt-24 pt-20 sm:pt-24">
+                <div className="mb-7 max-w-3xl">
+                  <span className="inline-flex rounded-full border border-brand-pink/16 bg-brand-pink/[0.07] px-3.5 py-2 text-[10px] font-extrabold uppercase tracking-[0.18em] text-brand-pink">
+                    Продолжение маршрута · доступ открывается владельцам курса
+                  </span>
+                  <h2 className="mt-5 font-display text-3xl font-extrabold tracking-[-0.04em] text-ink sm:text-5xl">
+                    Неделя 2 · Улица живых слов
+                  </h2>
+                  <p className="mt-4 text-base font-semibold leading-7 text-ink/58">
+                    Звуки превращаются в слоги, слоги — в первые слова, а слова — в понятные предложения и небольшие истории.
+                  </p>
+                </div>
+                <SchoolPrepAdventure
+                  week={schoolPrepWeekTwo}
+                  price={SCHOOL_PREP_PRICE}
+                  hasFullAccess
+                  waitlistEmail={session?.user?.email ?? ''}
+                />
+              </div>
+            )}
           </div>
         </section>
 
@@ -319,7 +342,7 @@ export default async function SchoolPrepPage() {
           </div>
         </section>
 
-        <section className="px-5 pb-10 sm:px-8 lg:px-14">
+        <section id="school-prep-games" className="scroll-mt-24 px-5 pb-10 sm:px-8 lg:px-14">
           <div className="container-pad px-0">
             <div className="flex flex-col gap-5 rounded-[30px] border border-ink/7 bg-white/84 p-6 shadow-card sm:flex-row sm:items-center sm:justify-between sm:p-8">
               <div className="max-w-2xl">
@@ -448,7 +471,7 @@ export default async function SchoolPrepPage() {
                     <div className="flex items-center justify-between gap-4">
                       <span className="text-[11px] font-extrabold uppercase tracking-[0.14em]">Неделя {week.week}</span>
                       <span className={`rounded-full px-2.5 py-1 text-[9px] font-extrabold uppercase tracking-[0.1em] ${week.available ? 'bg-brand-green text-white' : week.bonus ? 'bg-brand-orange text-white' : 'bg-ink/6 text-ink/38'}`}>
-                        {week.available ? 'День 1 бесплатно' : week.bonus ? 'Бонусная неделя' : 'В полном курсе'}
+                        {week.week === 1 ? 'День 1 бесплатно' : week.available ? 'Доступна владельцам' : week.bonus ? 'Бонусная неделя' : 'В полном курсе'}
                       </span>
                     </div>
                     <h3 className="mt-4 font-display text-lg font-extrabold leading-tight text-ink">{week.title}</h3>

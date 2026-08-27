@@ -8,6 +8,7 @@ import { toggleAuth, unlockAllForMe, lockAllForMe, grantAccessToUser, revokeAcce
 
 // Читаемое название направления по слагу (для листа ожидания — там слаги неоткрытых направлений).
 function directionLabel(slug: string): string {
+  if (slug === "podgotovka-k-shkole-week-3") return "Подготовка к школе · ждут неделю 3";
   return (
     directionsData.find((d: { slug: string; title?: string }) => d.slug === slug)?.title ??
     landingsData.find((l: { slug: string; h1?: string }) => l.slug === slug)?.h1 ??

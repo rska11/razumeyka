@@ -3,6 +3,7 @@ import { schoolPrepDayTwoExtraMissions } from './school-prep-day-two.js';
 import { schoolPrepDayThreeExtraMissions } from './school-prep-day-three.js';
 import { schoolPrepDayFourExtraMissions } from './school-prep-day-four.js';
 import { schoolPrepDayFiveExtraMissions } from './school-prep-day-five.js';
+export { schoolPrepWeekTwo } from './school-prep-week-two.js';
 
 export const schoolPrepProgram = {
   title: 'Экспедиция в Город знаний',
@@ -35,7 +36,7 @@ export const schoolPrepProgram = {
   ],
   weeks: [
     { week: 1, title: 'Ключ от Города знаний', focus: 'Инструкция, внимание, звуки, числа и уверенный старт', color: 'blue', available: true },
-    { week: 2, title: 'Улица живых слов', focus: 'Звуки речи, слоги, первые слова и фонематический слух', color: 'pink' },
+    { week: 2, title: 'Улица живых слов', focus: 'Звуки речи, слоги, первые слова и фонематический слух', color: 'pink', available: true },
     { week: 3, title: 'Числовая мастерская', focus: 'Состав числа, сравнение, закономерности и устный счёт', color: 'orange' },
     { week: 4, title: 'Лаборатория внимания', focus: 'Рабочая память, переключение и точность по инструкции', color: 'purple' },
     { week: 5, title: 'Театр историй', focus: 'Связная речь, пересказ, причины и последовательность событий', color: 'green' },

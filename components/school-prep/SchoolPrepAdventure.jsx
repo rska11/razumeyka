@@ -6,7 +6,7 @@ import { SchoolPrepAutoNarration } from "./SchoolPrepAutoNarration.jsx";
 import { SchoolPrepScene, SchoolPrepShape, SchoolPrepVisual } from "./SchoolPrepVisual.jsx";
 import { reachGoal } from "@/lib/metrika";
 
-const STORAGE_KEY = "razumeyka_school_prep_week1";
+const WEEK_ONE_STORAGE_KEY = "razumeyka_school_prep_week1";
 
 const toneClasses = {
   "text-brand-blue": "text-brand-blue",
@@ -429,7 +429,7 @@ function QuizMission({ mission, done, onComplete, audioBase }) {
       )}
       {result === "question-success" && (
         <div className="mt-4 rounded-[18px] border border-brand-green/20 bg-brand-green/[0.07] px-4 py-3 text-sm font-bold text-forest-700">
-          ⭐ Верно! {last ? "Золотой ключ почти собран." : "Идём дальше."}
+          ⭐ Верно! {last ? "Награда дня почти получена." : "Идём дальше."}
         </div>
       )}
       {result === "success" && <ResultMessage state="success" success={mission.success} />}
@@ -680,15 +680,19 @@ function MissionCard({ mission, index, done, onComplete, dayId }) {
   );
 }
 
-export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490 }) {
+export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490, nextWeekHref = '', waitlistEmail = '' }) {
+  const storageKey = week.number === 1
+    ? WEEK_ONE_STORAGE_KEY
+    : `razumeyka_school_prep_${week.id || `week${week.number}`}`;
   const [selectedDay, setSelectedDay] = useState(0);
   const [missionIndex, setMissionIndex] = useState(0);
   const [completed, setCompleted] = useState([]);
   const [ready, setReady] = useState(false);
+  const [nextWeekRequest, setNextWeekRequest] = useState('idle');
 
   useEffect(() => {
     try {
-      const saved = JSON.parse(window.localStorage.getItem(STORAGE_KEY) || "[]");
+      const saved = JSON.parse(window.localStorage.getItem(storageKey) || "[]");
       if (Array.isArray(saved)) {
         setCompleted(saved);
         const firstOpen = week.days[0].missions.findIndex((mission) => !saved.includes(mission.id));
@@ -699,12 +703,12 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490 }
     } finally {
       setReady(true);
     }
-  }, []);
+  }, [storageKey, week.days]);
 
   useEffect(() => {
     if (!ready) return;
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(completed));
-  }, [completed, ready]);
+    window.localStorage.setItem(storageKey, JSON.stringify(completed));
+  }, [completed, ready, storageKey]);
 
   const allMissionIds = useMemo(
     () => week.days.flatMap((day) => day.missions.map((mission) => mission.id)),
@@ -723,6 +727,9 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490 }
   const weekComplete = allMissionIds.every((id) => completed.includes(id));
   const visibleCompleted = completed.filter((id) => visibleProgressIds.includes(id)).length;
   const progress = Math.round((visibleCompleted / visibleProgressIds.length) * 100);
+  const missionTotal = allMissionIds.length;
+  const practiceMin = week.days.length * 20;
+  const practiceMax = week.days.length * 25;
 
   function completeMission(id) {
     setCompleted((current) => {
@@ -765,10 +772,36 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490 }
   }
 
   function resetWeek() {
-    if (!window.confirm("Начать первую неделю заново? Все полученные звёзды будут сброшены.")) return;
+    if (!window.confirm(`Начать неделю ${week.number ?? 1} заново? Все полученные звёзды будут сброшены.`)) return;
     setCompleted([]);
     setSelectedDay(0);
     setMissionIndex(0);
+  }
+
+  async function requestNextWeek() {
+    if (nextWeekRequest !== 'idle') return;
+    setNextWeekRequest('sending');
+    reachGoal('prep_next_week_request', {
+      completed_week: week.number ?? 1,
+      requested_week: (week.number ?? 1) + 1,
+    });
+
+    if (waitlistEmail) {
+      try {
+        await fetch('/api/waitlist', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: waitlistEmail,
+            direction: `podgotovka-k-shkole-week-${(week.number ?? 1) + 1}`,
+            source: `week-${week.number ?? 1}`,
+          }),
+        });
+      } catch {
+        // Сигнал в Метрику уже отправлен; интерфейс ребёнка не прерываем.
+      }
+    }
+    setNextWeekRequest('sent');
   }
 
   return (
@@ -777,15 +810,15 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490 }
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
             <span className="inline-flex rounded-full border border-white/14 bg-white/8 px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.18em] text-white/72">
-              {hasFullAccess ? "Неделя 1 · полный маршрут" : "День 1 · полноценный пробный маршрут"}
+              {hasFullAccess ? `Неделя ${week.number ?? 1} · полный маршрут` : "День 1 · полноценный пробный маршрут"}
             </span>
             <h3 className="mt-4 font-display text-3xl font-extrabold tracking-[-0.035em] sm:text-5xl">{week.title}</h3>
             <p className="mt-3 text-base font-medium leading-7 text-white/62">{week.subtitle}</p>
             <div className="mt-5 flex flex-wrap gap-2">
               {[
-                ["5", "учебных дней"],
-                ["125", "игровых шагов"],
-                ["100–125", "минут практики"],
+                [String(week.days.length), "учебных дней"],
+                [String(missionTotal), "игровых шагов"],
+                [`${practiceMin}–${practiceMax}`, "минут практики"],
               ].map(([value, label]) => (
                 <span key={label} className="inline-flex items-baseline gap-1.5 rounded-full border border-white/10 bg-white/[0.07] px-3 py-2 text-xs font-bold text-white/58">
                   <strong className="font-display text-base font-extrabold text-white">{value}</strong>
@@ -979,7 +1012,11 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490 }
                     ? "Пробный маршрут завершён. В полном курсе приключение продолжается в новых районах Города знаний."
                     : selectedDay < week.days.length - 1
                       ? "Открыт следующий район Города знаний."
-                      : "Все районы пройдены — золотой ключ собран."}
+                      : nextWeekHref
+                        ? "Первая неделя пройдена — все пять печатей собраны! Следующая неделя уже открыта: приключение продолжается на Улице живых слов."
+                        : (week.number ?? 1) === 1
+                          ? "Первая неделя пройдена — все пять печатей собраны! Доступ к следующей неделе откроем в ближайшее время. А пока можно продолжить приключение в игровых тренажёрах."
+                          : "Вторая неделя пройдена — все пять фонарей снова горят! Новые районы Города знаний откроются в ближайшее время, а навыки можно закрепить в игровых тренажёрах."}
                 </p>
               </div>
               {!hasFullAccess && selectedDay === 0 ? (
@@ -990,10 +1027,18 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490 }
                 >
                   Открыть продолжение за {price} ₽ →
                 </a>
-              ) : selectedDay < week.days.length - 1 && (
+              ) : selectedDay < week.days.length - 1 ? (
                 <button type="button" onClick={() => selectDay(selectedDay + 1)} className="primary-btn shrink-0">
-                  Открыть день {selectedDay + 2} →
+                  Открыть день {week.days[selectedDay + 1].number} →
                 </button>
+              ) : nextWeekHref ? (
+                <a href={nextWeekHref || "#school-prep-games"} className="primary-btn shrink-0">
+                  Открыть следующую неделю →
+                </a>
+              ) : (
+                <a href="#school-prep-week-finale" className="primary-btn shrink-0">
+                  Получить награду недели →
+                </a>
               )}
             </div>
           </div>
@@ -1012,18 +1057,44 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490 }
       </section>
 
       {weekComplete && (
-        <section className="mt-7 relative overflow-hidden rounded-[36px] bg-gradient-to-br from-[#14264c] via-[#463081] to-[#a63b87] p-7 text-center text-white shadow-luxe sm:p-10">
+        <section id="school-prep-week-finale" className="scroll-mt-28 mt-7 relative overflow-hidden rounded-[36px] bg-gradient-to-br from-[#14264c] via-[#463081] to-[#a63b87] p-7 text-center text-white shadow-luxe sm:p-10">
           <div className="pointer-events-none absolute inset-0 opacity-30" style={{ backgroundImage: "radial-gradient(circle at 20% 20%, white 0 2px, transparent 3px), radial-gradient(circle at 78% 30%, white 0 2px, transparent 3px), radial-gradient(circle at 62% 76%, white 0 2px, transparent 3px)" }} />
           <div className="relative">
             <span className="mx-auto flex h-24 w-24 items-center justify-center rounded-[30px] border border-white/18 bg-white/14 text-5xl shadow-insetline">🗝️</span>
-            <p className="mt-5 text-xs font-extrabold uppercase tracking-[0.2em] text-gold-300">Первая неделя завершена</p>
-            <h3 className="mt-3 font-display text-3xl font-extrabold tracking-[-0.035em] sm:text-5xl">Золотой ключ твой!</h3>
+            <p className="mt-5 text-xs font-extrabold uppercase tracking-[0.2em] text-gold-300">Неделя {week.number ?? 1} завершена</p>
+            <h3 className="mt-3 font-display text-3xl font-extrabold tracking-[-0.035em] sm:text-5xl">
+              {(week.number ?? 1) === 1 ? "Золотой ключ твой!" : "Улица живых слов сияет!"}
+            </h3>
             <p className="mx-auto mt-4 max-w-2xl text-base font-medium leading-7 text-white/70">
-              Ребёнок прошёл 125 миссий: слушал инструкцию, находил закономерности, работал со звуками и числами и учился пробовать снова.
+              {(week.number ?? 1) === 1
+                ? `Ребёнок прошёл ${missionTotal} миссий: слушал инструкцию, находил закономерности, работал со звуками и числами и учился пробовать снова.`
+                : `Ребёнок прошёл ${missionTotal} миссий: научился слышать звуки в слове, делить слова на слоги, читать первые слова, собирать предложения и понимать короткие рассказы.`}
             </p>
             <div className="mx-auto mt-7 inline-flex rounded-full border border-white/16 bg-white/10 px-5 py-3 text-sm font-extrabold">
-              Награда: {week.reward} · 125 ⭐
+              Награда: {week.reward} · {missionTotal} ⭐
             </div>
+            {!nextWeekHref && (week.number ?? 1) >= 2 && (
+              <div className="mx-auto mt-8 max-w-xl rounded-[24px] border border-white/14 bg-white/[0.09] p-5 backdrop-blur-xl">
+                <p className="text-sm font-semibold leading-6 text-white/76">
+                  Следующая глава Города знаний откроется в ближайшее время. Нажмите кнопку — и мы сообщим, когда новое приключение будет доступно.
+                </p>
+                <button
+                  type="button"
+                  disabled={nextWeekRequest !== 'idle'}
+                  onClick={requestNextWeek}
+                  className="primary-btn mt-5 min-w-[250px] disabled:cursor-default disabled:opacity-80"
+                >
+                  {nextWeekRequest === 'idle'
+                    ? `Сообщить об открытии недели ${(week.number ?? 1) + 1} →`
+                    : nextWeekRequest === 'sending'
+                      ? 'Отправляем сигнал…'
+                      : 'Сигнал получен ✓'}
+                </button>
+                {nextWeekRequest === 'sent' && (
+                  <p className="mt-3 text-xs font-bold text-brand-cyan">Мы сообщим, как только следующий район откроется.</p>
+                )}
+              </div>
+            )}
           </div>
         </section>
       )}
@@ -1031,7 +1102,7 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490 }
       {ready && completed.length > 0 && (
         <div className="mt-5 text-center">
           <button type="button" onClick={resetWeek} className="text-xs font-bold text-ink/38 underline decoration-ink/18 underline-offset-4 transition hover:text-ink/62">
-            Сбросить прогресс первой недели
+            Сбросить прогресс недели {week.number ?? 1}
           </button>
         </div>
       )}

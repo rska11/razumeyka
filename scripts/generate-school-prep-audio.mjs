@@ -3,6 +3,7 @@ import fs from 'node:fs/promises';
 import fsSync from 'node:fs';
 import path from 'node:path';
 import { schoolPrepWeekOne } from '../data/school-prep-course.js';
+import { schoolPrepWeekTwo } from '../data/school-prep-week-two.js';
 
 dns.setDefaultResultOrder('ipv4first');
 
@@ -21,9 +22,12 @@ dns.setDefaultResultOrder('ipv4first');
 })();
 
 const outRoot = path.join(process.cwd(), 'public', 'audio', 'school-prep');
+const speechKitEndpoint = process.env.SPEECHKIT_ENDPOINT || 'https://tts.api.cloud.yandex.net/tts/v3/utteranceSynthesis';
 const force = process.argv.includes('--force');
 const dryRun = process.argv.includes('--dry-run');
 const dayArg = valueAfter('--day');
+const weekArg = valueAfter('--week');
+const queueOut = valueAfter('--queue-out');
 const concurrency = Math.max(1, Number(valueAfter('--concurrency') || 2));
 
 function valueAfter(name) {
@@ -40,7 +44,8 @@ function labels(items) {
 }
 
 function instructionText(mission) {
-  const parts = [mission.title + '.', mission.prompt];
+  const title = /[.!?…]$/u.test(mission.title) ? mission.title : mission.title + '.';
+  const parts = [title, mission.prompt];
   if (mission.type === 'choice' || mission.type === 'sequence') {
     parts.push(`Варианты: ${labels(mission.options)}.`);
   }
@@ -54,19 +59,19 @@ function instructionText(mission) {
 }
 
 function itemsForMission(day, mission) {
-  const prefix = path.join(day.id, mission.id);
-  const items = [{ relativePath: path.join(prefix, 'instruction.mp3'), text: instructionText(mission) }];
+  const prefix = path.posix.join(day.id, mission.id);
+  const items = [{ relativePath: path.posix.join(prefix, 'instruction.mp3'), text: instructionText(mission) }];
 
   for (const [index, question] of (mission.questions || []).entries()) {
     items.push({
-      relativePath: path.join(prefix, `question-${index + 1}.mp3`),
+      relativePath: path.posix.join(prefix, `question-${index + 1}.mp3`),
       text: clean(`${question.prompt} Варианты ответа: ${labels(question.options)}.`),
     });
   }
 
   for (const [index, action] of (mission.actions || []).entries()) {
     items.push({
-      relativePath: path.join(prefix, `action-${index + 1}.mp3`),
+      relativePath: path.posix.join(prefix, `action-${index + 1}.mp3`),
       text: clean(`${action.title}. ${action.text}`),
     });
   }
@@ -82,13 +87,24 @@ const salesIntro = clean(`
   Нажимайте «Попробовать» — и соберите первый ключ к спокойному и уверенному школьному старту!
 `);
 
-const selectedDays = schoolPrepWeekOne.days.filter((day) => !dayArg || day.id === dayArg || String(day.number) === dayArg);
+const courseWeeks = [schoolPrepWeekOne, schoolPrepWeekTwo];
+const selectedDays = courseWeeks
+  .filter((week) => !weekArg || String(week.number) === weekArg || week.id === weekArg)
+  .flatMap((week) => week.days)
+  .filter((day) => !dayArg || day.id === dayArg || String(day.number) === dayArg);
 if (!selectedDays.length) throw new Error(`День не найден: ${dayArg}`);
 
 const queue = [
-  { relativePath: path.join('method', 'intro-hero-v1.mp3'), text: salesIntro },
+  ...(!weekArg || weekArg === '1' ? [{ relativePath: path.posix.join('method', 'intro-hero-v1.mp3'), text: salesIntro }] : []),
   ...selectedDays.flatMap((day) => day.missions.flatMap((mission) => itemsForMission(day, mission))),
 ];
+
+if (queueOut) {
+  await fs.mkdir(path.dirname(path.resolve(queueOut)), { recursive: true });
+  await fs.writeFile(queueOut, JSON.stringify(queue), 'utf8');
+  console.log(`Очередь сохранена: ${queueOut}. Файлов: ${queue.length}.`);
+  process.exit(0);
+}
 
 async function fileExists(file) {
   try {
@@ -127,11 +143,13 @@ async function synthesizeChunk(text) {
   let lastError;
   for (let attempt = 1; attempt <= 6; attempt += 1) {
     try {
-      const response = await fetch('https://tts.api.cloud.yandex.net/tts/v3/utteranceSynthesis', {
+      const response = await fetch(speechKitEndpoint, {
         method: 'POST',
+        signal: AbortSignal.timeout(30_000),
         headers: {
           Authorization: `Api-Key ${apiKey}`,
           'Content-Type': 'application/json',
+          ...(process.env.SPEECHKIT_HOST ? { Host: process.env.SPEECHKIT_HOST } : {}),
         },
         body: JSON.stringify(body),
       });

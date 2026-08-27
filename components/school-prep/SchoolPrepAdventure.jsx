@@ -1015,8 +1015,8 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490, 
                       : nextWeekHref
                         ? "Первая неделя пройдена — все пять печатей собраны! Следующая неделя уже открыта: приключение продолжается на Улице живых слов."
                         : (week.number ?? 1) === 1
-                          ? "Первая неделя пройдена — все пять печатей собраны! Доступ к следующей неделе откроем в ближайшее время. А пока можно продолжить приключение в игровых тренажёрах."
-                          : "Вторая неделя пройдена — все пять фонарей снова горят! Новые районы Города знаний откроются в ближайшее время, а навыки можно закрепить в игровых тренажёрах."}
+                          ? "Первая неделя пройдена — все пять печатей собраны! Получите награду недели и продолжайте закреплять навыки в игровых тренажёрах."
+                          : "Вторая неделя пройдена — все пять фонарей снова горят! Получите награду и отметьте завершение маршрута, чтобы перейти к следующей главе Города знаний."}
                 </p>
               </div>
               {!hasFullAccess && selectedDay === 0 ? (
@@ -1076,7 +1076,7 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490, 
             {!nextWeekHref && (week.number ?? 1) >= 2 && (
               <div className="mx-auto mt-8 max-w-xl rounded-[24px] border border-white/14 bg-white/[0.09] p-5 backdrop-blur-xl">
                 <p className="text-sm font-semibold leading-6 text-white/76">
-                  Следующая глава Города знаний откроется в ближайшее время. Нажмите кнопку — и мы сообщим, когда новое приключение будет доступно.
+                  Маршрут недели {week.number ?? 1} завершён. Подтвердите результат — мы отметим прохождение и активируем для профиля следующий район Города знаний.
                 </p>
                 <button
                   type="button"
@@ -1085,13 +1085,13 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490, 
                   className="primary-btn mt-5 min-w-[250px] disabled:cursor-default disabled:opacity-80"
                 >
                   {nextWeekRequest === 'idle'
-                    ? `Сообщить об открытии недели ${(week.number ?? 1) + 1} →`
+                    ? `Завершить неделю ${week.number ?? 1} →`
                     : nextWeekRequest === 'sending'
-                      ? 'Отправляем сигнал…'
-                      : 'Сигнал получен ✓'}
+                      ? 'Сохраняем результат…'
+                      : `Неделя ${week.number ?? 1} завершена ✓`}
                 </button>
                 {nextWeekRequest === 'sent' && (
-                  <p className="mt-3 text-xs font-bold text-brand-cyan">Мы сообщим, как только следующий район откроется.</p>
+                  <p className="mt-3 text-xs font-bold text-brand-cyan">Результат сохранён. Следующий район будет добавлен в маршрут.</p>
                 )}
               </div>
             )}

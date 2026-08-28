@@ -9,7 +9,7 @@ import { CourseDiscovery } from '@/components/CourseDiscovery.jsx';
 import { GameLauncher } from '@/components/games/GameShell.jsx';
 import { TrackedLink } from '@/components/analytics/TrackedLink.jsx';
 import { gamesForWeek } from '@/data/games.js';
-import { schoolPrepProgram, schoolPrepWeekOne, schoolPrepWeekTwo, schoolPrepWeekThree } from '@/data/school-prep-course.js';
+import { schoolPrepProgram, schoolPrepWeekOne, schoolPrepWeekTwo, schoolPrepWeekThree, schoolPrepWeekFour, schoolPrepWeekFive } from '@/data/school-prep-course.js';
 import { getAuthSession } from '@/lib/auth';
 import { reconcileUserPayments } from '@/lib/payments';
 import { directionPrice, getAccessUntil, hasActiveAccess } from '@/lib/subscription';
@@ -83,7 +83,7 @@ const courseSchema = {
   description: 'Игровой онлайн-курс подготовки к школе для детей 5–7 лет: речь, чтение, счёт, логика, внимание и уверенность.',
   provider: { '@type': 'Organization', name: 'Знайтон', url: 'https://znayton.ru' },
   educationalLevel: 'Дошкольное образование',
-  timeRequired: 'P12W',
+  timeRequired: 'P5W',
   inLanguage: 'ru',
   offers: {
     '@type': 'Offer',
@@ -250,7 +250,7 @@ export default async function SchoolPrepPage() {
                   {[
                     ['3', 'задания', 'сразу без регистрации'],
                     ['20–25', 'минут', 'одно занятие'],
-                    [String(SCHOOL_PREP_PRICE) + ' ₽', '30 дней', 'без автосписаний'],
+                    [String(SCHOOL_PREP_PRICE) + ' ₽', '45 дней', 'без автосписаний'],
                   ].map(([value, unit, note]) => (
                     <div key={note} className="rounded-[20px] border border-ink/7 bg-white/82 p-4 shadow-card backdrop-blur-xl sm:p-5">
                       <div className="flex items-baseline gap-1.5">
@@ -350,7 +350,49 @@ export default async function SchoolPrepPage() {
                   week={schoolPrepWeekThree}
                   price={SCHOOL_PREP_PRICE}
                   hasFullAccess
-                  waitlistEmail={session?.user?.email ?? ''}
+                  nextWeekHref="#week-four"
+                />
+              </div>
+            )}
+            {hasFullCourseAccess && (
+              <div id="week-four" className="scroll-mt-24 pt-20 sm:pt-24">
+                <div className="mb-7 max-w-3xl">
+                  <span className="inline-flex rounded-full border border-brand-purple/18 bg-brand-purple/[0.08] px-3.5 py-2 text-[10px] font-extrabold uppercase tracking-[0.18em] text-brand-purple">
+                    Следующий уровень · исследуем и рассуждаем
+                  </span>
+                  <h2 className="mt-5 font-display text-3xl font-extrabold tracking-[-0.04em] text-ink sm:text-5xl">
+                    Неделя 4 · Лаборатория открытий
+                  </h2>
+                  <p className="mt-4 text-base font-semibold leading-7 text-ink/58">
+                    Ребёнок исследует живую природу и свойства материалов, отличает факт от догадки, классифицирует по существенным признакам и решает логические задачи.
+                  </p>
+                </div>
+                <SchoolPrepAdventure
+                  week={schoolPrepWeekFour}
+                  price={SCHOOL_PREP_PRICE}
+                  hasFullAccess
+                  nextWeekHref="#week-five"
+                />
+              </div>
+            )}
+            {hasFullCourseAccess && (
+              <div id="week-five" className="scroll-mt-24 pt-20 sm:pt-24">
+                <div className="mb-7 max-w-3xl">
+                  <span className="inline-flex rounded-full border border-brand-pink/18 bg-brand-pink/[0.08] px-3.5 py-2 text-[10px] font-extrabold uppercase tracking-[0.18em] text-brand-pink">
+                    Финальная глава · уверенные учебные действия
+                  </span>
+                  <h2 className="mt-5 font-display text-3xl font-extrabold tracking-[-0.04em] text-ink sm:text-5xl">
+                    Неделя 5 · Академия будущего первоклассника
+                  </h2>
+                  <p className="mt-4 text-base font-semibold leading-7 text-ink/58">
+                    Подготовка руки и графический диктант переходят в работу по инструкции, самостоятельную проверку и итоговый маршрут по главным навыкам курса.
+                  </p>
+                </div>
+                <SchoolPrepAdventure
+                  week={schoolPrepWeekFive}
+                  price={SCHOOL_PREP_PRICE}
+                  hasFullAccess
+                  isCourseFinal
                 />
               </div>
             )}
@@ -407,7 +449,7 @@ export default async function SchoolPrepPage() {
                   {[
                     ['01 · Занятие', '20–25', 'минут', 'достаточно для практики без усталости', 'from-[#168ED9] to-[#34C9D3]', 'shadow-[0_22px_55px_rgba(52,201,211,.18)]'],
                     ['02 · Ритм', '5', 'дней', 'короткие занятия в течение недели', 'from-[#F59E0B] to-[#F6C945]', 'shadow-[0_22px_55px_rgba(245,158,11,.16)]'],
-                    ['03 · Программа', '12+1', 'недель', 'основной маршрут и бонус по умножению', 'from-[#E74887] to-[#8C5BE8]', 'shadow-[0_22px_55px_rgba(231,72,135,.18)]'],
+                    ['03 · Программа', '5', 'недель', '25 дней и бонусный тренажёр умножения', 'from-[#E74887] to-[#8C5BE8]', 'shadow-[0_22px_55px_rgba(231,72,135,.18)]'],
                     ['04 · Старт', '1', 'занятие', 'можно пройти бесплатно прямо сейчас', 'from-[#10A875] to-[#22B8A7]', 'shadow-[0_22px_55px_rgba(16,168,117,.16)]'],
                   ].map(([period, value, unit, note, tone, shadow]) => (
                     <article key={value} className={`relative min-h-[178px] overflow-hidden rounded-[26px] bg-gradient-to-br ${tone} p-5 text-white ${shadow} sm:min-h-[196px] sm:p-6`}>
@@ -477,7 +519,7 @@ export default async function SchoolPrepPage() {
           <div className="container-pad px-0">
             <div className="grid gap-8 lg:grid-cols-[.72fr_1.28fr] lg:gap-14">
               <div>
-                <span className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-brand-purple">12 недель + бонусная неделя</span>
+                <span className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-brand-purple">5 недель · 25 учебных дней</span>
                 <h2 className="mt-5 font-display text-4xl font-extrabold leading-[1.05] tracking-[-0.045em] sm:text-5xl">Каждая неделя открывает новый район</h2>
                 <p className="mt-5 text-base font-semibold leading-7 text-ink/58">Навыки возвращаются в новых сюжетах и постепенно усложняются. Ребёнок видит приключение, взрослый — продуманную образовательную траекторию.</p>
                 <div className="mt-8 rounded-[24px] bg-ink p-5 text-white">
@@ -558,18 +600,18 @@ export default async function SchoolPrepPage() {
               <div className="relative grid gap-10 lg:grid-cols-[1.08fr_.72fr] lg:items-center">
                 <div>
                   <span className="inline-flex rounded-full border border-white/14 bg-white/10 px-3.5 py-2 text-[10px] font-extrabold uppercase tracking-[0.18em] text-brand-cyan">
-                    Маршрут первого месяца
+                    Полный маршрут подготовки
                   </span>
                   <h2 className="mt-6 max-w-3xl font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.05em] sm:text-6xl">
-                    500 умных шагов в месяц — по цене одного семейного похода в кафе.
+                    625 умных шагов — по цене одного семейного похода в кафе.
                   </h2>
                   <p className="mt-5 max-w-2xl text-base font-medium leading-7 text-white/66 sm:text-lg">
-                    20 полноценных занятий, понятный прогресс и спокойный маршрут к школе. Ребёнок занимается дома, а родитель видит не обещания, а выполненные шаги и растущие навыки.
+                    25 полноценных занятий, понятный прогресс и спокойный маршрут к школе. Ребёнок занимается дома, а родитель видит не обещания, а выполненные шаги и растущие навыки.
                   </p>
                   <div className="mt-8 grid gap-3 sm:grid-cols-2">
                     {[
-                      '4 тематические недели · 20 учебных дней',
-                      'До 500 интерактивных заданий в месяц',
+                      '5 тематических недель · 25 учебных дней',
+                      '625 интерактивных заданий в полном маршруте',
                       'Результат дня понятным языком для родителя',
                       'Без автосписания и скрытых платежей',
                     ].map((perk) => (
@@ -582,7 +624,7 @@ export default async function SchoolPrepPage() {
                 </div>
 
                 <div className="rounded-[30px] border border-white/70 bg-white p-6 text-ink shadow-[0_30px_80px_rgba(7,17,42,.34)] sm:p-8">
-                  <p className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-brand-purple">30 дней полного доступа</p>
+                  <p className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-brand-purple">45 дней полного доступа</p>
                   <div className="mt-4 text-lg font-extrabold text-ink/38">
                     <del>1 490 ₽</del>
                   </div>
@@ -590,11 +632,11 @@ export default async function SchoolPrepPage() {
                     <strong className="font-display text-6xl font-extrabold tracking-[-0.06em]">{SCHOOL_PREP_PRICE}</strong>
                     <span className="pb-2 text-lg font-extrabold text-ink/48">₽</span>
                   </div>
-                  <p className="mt-2 text-sm font-bold text-ink/48">≈ {Math.round(SCHOOL_PREP_PRICE / 20)} ₽ за учебный день</p>
+                  <p className="mt-2 text-sm font-bold text-ink/48">≈ {Math.round(SCHOOL_PREP_PRICE / 25)} ₽ за учебный день</p>
                   <div className="my-6 h-px bg-ink/8" />
                   <div className="space-y-3 text-sm font-semibold text-ink/64">
-                    <p className="flex items-center justify-between gap-4"><span>Учебных дней</span><strong className="text-ink">20</strong></p>
-                    <p className="flex items-center justify-between gap-4"><span>Шагов в маршруте</span><strong className="text-ink">до 500</strong></p>
+                    <p className="flex items-center justify-between gap-4"><span>Учебных дней</span><strong className="text-ink">25</strong></p>
+                    <p className="flex items-center justify-between gap-4"><span>Шагов в маршруте</span><strong className="text-ink">625</strong></p>
                     <p className="flex items-center justify-between gap-4"><span>Первый день</span><strong className="text-brand-green">бесплатно</strong></p>
                     <p className="flex items-center justify-between gap-4"><span>Тренажёр умножения 2–9</span><strong className="text-brand-purple">включён</strong></p>
                   </div>
@@ -607,7 +649,7 @@ export default async function SchoolPrepPage() {
                     loginCallback="/podgotovka-k-shkole#podpiska"
                   />
                   <p className="mt-4 text-center text-[11px] font-semibold leading-5 text-ink/40">
-                    {SCHOOL_PREP_PRICE} ₽ открывают программу на 30 дней. Продление — только вручную, автосписаний нет.
+                    {SCHOOL_PREP_PRICE} ₽ открывают программу на 45 дней. Продление — только вручную, автосписаний нет.
                   </p>
                 </div>
               </div>

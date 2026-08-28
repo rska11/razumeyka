@@ -5,6 +5,7 @@ import { createYooKassaPayment, isYooKassaConfigured } from "@/lib/yookassa";
 import {
   DIRECTIONS,
   SUBSCRIPTION_MONTHS,
+  directionAccessLabel,
   directionFromReturnTo,
   directionPrice,
 } from "@/lib/subscription";
@@ -38,7 +39,7 @@ export async function POST(req: Request) {
   }
 
   const amount = directionPrice(direction);
-  const description = `«Знайтон» · доступ · ${DIRECTIONS[direction].title} · ${SUBSCRIPTION_MONTHS} мес`;
+  const description = `«Знайтон» · доступ · ${DIRECTIONS[direction].title} · ${directionAccessLabel(direction)}`;
 
   const payment = await prisma.payment.create({
     data: {

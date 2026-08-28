@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 
 export const SUBSCRIPTION_PRICE = 490; // ₽ за период (по умолчанию)
 export const SUBSCRIPTION_MONTHS = 1;
+export const SCHOOL_PREP_ACCESS_DAYS = 45;
 
 // Направления, которые продаются как self-study доступ.
 export const DIRECTIONS = {
@@ -27,6 +28,10 @@ export const DIRECTION_PRICE: Record<DirectionSlug, number> = {
 /** Цена доступа к направлению в рублях. */
 export function directionPrice(direction: DirectionSlug): number {
   return DIRECTION_PRICE[direction] ?? SUBSCRIPTION_PRICE;
+}
+
+export function directionAccessLabel(direction: DirectionSlug): string {
+  return direction === "podgotovka-k-shkole" ? `${SCHOOL_PREP_ACCESS_DAYS} дней` : `${SUBSCRIPTION_MONTHS} мес`;
 }
 
 export function isDirectionSlug(v: unknown): v is DirectionSlug {
@@ -76,7 +81,12 @@ export async function extendAccess(userId: string, direction: DirectionSlug, mon
   });
   const now = Date.now();
   const base = existing?.until && existing.until.getTime() > now ? new Date(existing.until) : new Date();
-  base.setMonth(base.getMonth() + Math.max(1, months));
+  const periods = Math.max(1, months);
+  if (direction === "podgotovka-k-shkole") {
+    base.setDate(base.getDate() + SCHOOL_PREP_ACCESS_DAYS * periods);
+  } else {
+    base.setMonth(base.getMonth() + periods);
+  }
   await prisma.access.upsert({
     where: { userId_direction: { userId, direction } },
     create: { userId, direction, until: base },

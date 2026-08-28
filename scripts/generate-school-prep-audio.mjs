@@ -5,6 +5,8 @@ import path from 'node:path';
 import { schoolPrepWeekOne } from '../data/school-prep-course.js';
 import { schoolPrepWeekTwo } from '../data/school-prep-week-two.js';
 import { schoolPrepWeekThree } from '../data/school-prep-week-three.js';
+import { schoolPrepWeekFour } from '../data/school-prep-week-four-discovery.js';
+import { schoolPrepWeekFive } from '../data/school-prep-week-five.js';
 
 dns.setDefaultResultOrder('ipv4first');
 
@@ -56,6 +58,15 @@ function instructionText(mission) {
   if (mission.type === 'recall') {
     parts.push(`Запомни: ${labels(mission.study)}. Варианты ответа: ${labels(mission.options)}.`);
   }
+  if (mission.type === 'attention-grid') {
+    parts.push(`Клетки поля: ${labels(mission.cells)}.`);
+  }
+  if (mission.type === 'go-no-go') {
+    parts.push(`Правило: ${mission.rule}`);
+  }
+  if (mission.type === 'rule-switch') {
+    parts.push('Правило будет меняться перед каждым раундом.');
+  }
   return clean(parts.join(' '));
 }
 
@@ -76,6 +87,18 @@ function itemsForMission(day, mission) {
       text: clean(`${action.title}. ${action.text}`),
     });
   }
+  for (const [index, cue] of (mission.cues || []).entries()) {
+    items.push({
+      relativePath: path.posix.join(prefix, `cue-${index + 1}.mp3`),
+      text: clean(cue.label),
+    });
+  }
+  for (const [index, round] of (mission.rounds || []).entries()) {
+    items.push({
+      relativePath: path.posix.join(prefix, `round-${index + 1}.mp3`),
+      text: clean(`Новое правило: ${round.rule}. Сигнал: ${round.stimulus}. Варианты ответа: ${labels(round.options)}.`),
+    });
+  }
   return items;
 }
 
@@ -88,7 +111,7 @@ const salesIntro = clean(`
   Нажимайте «Попробовать» — и соберите первый ключ к спокойному и уверенному школьному старту!
 `);
 
-const courseWeeks = [schoolPrepWeekOne, schoolPrepWeekTwo, schoolPrepWeekThree];
+const courseWeeks = [schoolPrepWeekOne, schoolPrepWeekTwo, schoolPrepWeekThree, schoolPrepWeekFour, schoolPrepWeekFive];
 const selectedDays = courseWeeks
   .filter((week) => !weekArg || String(week.number) === weekArg || week.id === weekArg)
   .flatMap((week) => week.days)

@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { getAuthSession } from "@/lib/auth";
 import { getCabinetData } from "@/lib/cabinet";
 import { SubscribeButton } from "@/components/drawing/SubscribeButton.jsx";
-import { DIRECTION_COMPARE_PRICE, DIRECTIONS, directionPrice, isDirectionSlug, type DirectionSlug } from "@/lib/subscription";
+import { DIRECTION_COMPARE_PRICE, DIRECTIONS, directionAccessLabel, directionPrice, isDirectionSlug, type DirectionSlug } from "@/lib/subscription";
 
 const COURSE_VISUALS: Record<
   DirectionSlug,
@@ -181,7 +181,7 @@ export default async function CabinetOverview() {
               </span>
               <h3 className="mt-5 font-display text-3xl font-extrabold tracking-[-0.035em] sm:text-4xl">Выберите первый курс прямо сейчас</h3>
               <p className="mt-3 text-base font-medium leading-7 text-white/68">
-                Три направления уже открыты. Сначала попробуйте бесплатные занятия, затем откройте выбранный курс на 30 дней.
+                Три направления уже открыты. Сначала попробуйте бесплатные занятия, затем откройте полный доступ к выбранному курсу.
               </p>
               <Link href="/tarify" className="mt-7 inline-flex min-h-[54px] items-center rounded-full bg-white px-7 py-3 text-sm font-extrabold text-night shadow-color transition hover:-translate-y-1">
                 Посмотреть три курса <span className="ml-2 text-lg">→</span>
@@ -221,7 +221,7 @@ export default async function CabinetOverview() {
                       <div className="mb-4 flex items-end gap-2">
                         <del className="pb-0.5 text-sm font-extrabold text-white/48">{DIRECTION_COMPARE_PRICE.toLocaleString("ru-RU")} ₽</del>
                         <strong className="font-display text-3xl font-black text-white">{directionPrice(slug)} ₽</strong>
-                        <span className="pb-1 text-[10px] font-extrabold uppercase tracking-[0.12em] text-white/54">на 30 дней</span>
+                        <span className="pb-1 text-[10px] font-extrabold uppercase tracking-[0.12em] text-white/54">на {directionAccessLabel(slug)}</span>
                       </div>
                       <Link href={`${meta.path}#uroki`} scroll className="inline-flex min-h-[46px] w-full items-center justify-center rounded-full border border-white/22 bg-white/14 px-5 py-2.5 text-xs font-extrabold text-white backdrop-blur-xl transition hover:-translate-y-0.5 hover:bg-white/20">
                         Попробовать бесплатно

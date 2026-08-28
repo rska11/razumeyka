@@ -762,6 +762,158 @@ function NumberLineMission({ mission, done, onComplete, onAttempt = () => {} }) 
   );
 }
 
+function AttentionGridMission({ mission, done, onComplete, onAttempt = () => {} }) {
+  const [selected, setSelected] = useState(done ? mission.correct : []);
+  const [result, setResult] = useState(done ? 'success' : '');
+
+  function toggle(id) {
+    setSelected((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
+    setResult('');
+  }
+  function check() {
+    const correct = sameAnswers(selected, mission.correct);
+    onAttempt({ correct, hint: !correct });
+    setResult(correct ? 'success' : 'hint');
+    if (correct) onComplete({ verified: true });
+  }
+
+  return (
+    <>
+      <div className="mt-5 rounded-[26px] border border-brand-purple/16 bg-gradient-to-br from-brand-purple/[0.055] to-brand-blue/[0.05] p-4 sm:p-6">
+        <p className="text-center text-xs font-extrabold uppercase tracking-[0.15em] text-brand-purple">Поисковое поле · двигайся по клеткам по порядку</p>
+        <div className="mx-auto mt-5 grid max-w-2xl grid-cols-3 gap-2.5 sm:grid-cols-4">
+          {mission.cells.map((cell) => {
+            const active = selected.includes(cell.id);
+            return <button key={cell.id} type="button" onClick={() => toggle(cell.id)} aria-label={cell.label} className={`grid min-h-[92px] place-items-center rounded-[18px] border text-4xl font-black transition sm:min-h-[108px] sm:text-5xl ${active ? 'border-brand-purple bg-white shadow-[0_0_0_3px_rgba(121,87,232,.1)]' : 'border-white bg-white/80 hover:-translate-y-0.5 hover:border-brand-purple/25'}`}><span className={toneClasses[cell.tone] ?? 'text-ink'}>{cell.symbol}</span></button>;
+          })}
+        </div>
+      </div>
+      <button type="button" onClick={check} disabled={!selected.length} className="mt-5 inline-flex min-h-[50px] items-center justify-center rounded-full bg-ink px-6 py-3 text-sm font-extrabold text-white disabled:opacity-35">Проверить поле</button>
+      <ResultMessage state={result} success={mission.success} hint={mission.hint} />
+    </>
+  );
+}
+
+function GoNoGoMission({ mission, done, onComplete, onAttempt = () => {}, audioBase }) {
+  const [index, setIndex] = useState(done ? mission.cues.length : 0);
+  const [result, setResult] = useState(done ? 'success' : '');
+  const cue = mission.cues[index];
+
+  function answer(tapped) {
+    if (!cue) return;
+    const correct = tapped === cue.shouldTap;
+    onAttempt({ correct, hint: !correct, subKey: `cue-${index + 1}` });
+    if (!correct) {
+      setResult('hint');
+      return;
+    }
+    const next = index + 1;
+    setIndex(next);
+    setResult(next === mission.cues.length ? 'success' : '');
+    if (next === mission.cues.length) onComplete({ verified: true, seriesTotal: mission.cues.length });
+  }
+
+  return (
+    <>
+      <div className="mt-5 overflow-hidden rounded-[26px] border border-brand-cyan/18 bg-gradient-to-br from-brand-cyan/[0.08] via-white to-brand-purple/[0.06] p-5 text-center sm:p-7">
+        <div className="flex gap-1.5">{mission.cues.map((_, cueIndex) => <span key={cueIndex} className={`h-2 flex-1 rounded-full ${cueIndex < index ? 'bg-brand-green' : cueIndex === index ? 'bg-brand-cyan' : 'bg-ink/8'}`} />)}</div>
+        {cue ? <><p className="mt-5 text-xs font-extrabold uppercase tracking-[0.15em] text-brand-cyan">Сигнал {index + 1} из {mission.cues.length}</p><div className="mt-4 text-7xl" aria-label={cue.label}>{cue.symbol}</div><p className="mt-3 font-display text-2xl font-extrabold text-ink">{cue.label}</p><SchoolPrepAudioButton src={`${audioBase}/cue-${index + 1}.mp3`} label="Послушать сигнал" className="mt-4" /><div className="mt-5 grid grid-cols-2 gap-3"><button type="button" onClick={() => answer(true)} className="min-h-[62px] rounded-[18px] bg-brand-green px-5 py-3 text-base font-extrabold text-white">Лови!</button><button type="button" onClick={() => answer(false)} className="min-h-[62px] rounded-[18px] bg-ink px-5 py-3 text-base font-extrabold text-white">Пропусти</button></div></> : <div className="py-7 text-6xl">🎯</div>}
+      </div>
+      <ResultMessage state={result} success={mission.success} hint={mission.hint} />
+    </>
+  );
+}
+
+function RuleSwitchMission({ mission, done, onComplete, onAttempt = () => {}, audioBase }) {
+  const [index, setIndex] = useState(done ? mission.rounds.length : 0);
+  const [selected, setSelected] = useState('');
+  const [result, setResult] = useState(done ? 'success' : '');
+  const round = mission.rounds[index];
+
+  function answer(id) {
+    if (!round) return;
+    const correct = id === round.correct;
+    setSelected(id);
+    onAttempt({ correct, hint: !correct, subKey: `round-${index + 1}` });
+    setResult(correct ? 'question-success' : 'hint');
+  }
+  function next() {
+    if (!round || selected !== round.correct) return;
+    const nextIndex = index + 1;
+    setIndex(nextIndex);
+    setSelected('');
+    setResult(nextIndex === mission.rounds.length ? 'success' : '');
+    if (nextIndex === mission.rounds.length) onComplete({ verified: true, switchRounds: mission.rounds.length });
+  }
+
+  return (
+    <>
+      <div className="mt-5 rounded-[26px] border border-brand-orange/18 bg-gradient-to-br from-brand-orange/[0.07] via-white to-brand-purple/[0.05] p-5 sm:p-7">
+        <div className="flex gap-1.5">{mission.rounds.map((_, roundIndex) => <span key={roundIndex} className={`h-2 flex-1 rounded-full ${roundIndex < index ? 'bg-brand-green' : roundIndex === index ? 'bg-brand-orange' : 'bg-ink/8'}`} />)}</div>
+        {round ? <><div className="mt-5 rounded-[18px] bg-ink px-4 py-3 text-center text-sm font-extrabold text-white">Новое правило: {round.rule}</div><p className="mt-5 text-center font-display text-3xl font-extrabold text-ink">{round.stimulus}</p><SchoolPrepAudioButton src={`${audioBase}/round-${index + 1}.mp3`} label="Послушать правило" className="mx-auto mt-4" /><div className="mt-5 grid gap-2 sm:grid-cols-3">{round.options.map((option) => <button key={option.id} type="button" onClick={() => answer(option.id)} className={`min-h-[58px] rounded-[17px] border px-4 py-3 text-sm font-extrabold ${selected === option.id ? option.id === round.correct ? 'border-brand-green/30 bg-brand-green/10' : 'border-brand-orange/30 bg-brand-orange/10' : 'border-ink/8 bg-white'}`}>{option.label}</button>)}</div>{selected === round.correct && <button type="button" onClick={next} className="mt-4 inline-flex min-h-[48px] items-center justify-center rounded-full bg-ink px-6 py-3 text-sm font-extrabold text-white">{index === mission.rounds.length - 1 ? 'Завершить серию' : 'Новое правило →'}</button>}</> : <div className="py-7 text-center text-6xl">🔄</div>}
+      </div>
+      {result === 'hint' && <ResultMessage state="hint" hint={mission.hint} />}
+      {result === 'question-success' && <ResultMessage state="success" success={`Верно! Ты применил правило «${round?.rule}».`} />}
+      {result === 'success' && <ResultMessage state="success" success={mission.success} />}
+    </>
+  );
+}
+
+function TraceLineMission({ mission, done, onComplete, onAttempt = () => {} }) {
+  const [step, setStep] = useState(done ? mission.points.length : 0);
+  const [result, setResult] = useState(done ? "success" : "");
+  const points = mission.points;
+  const completedPoints = points.slice(0, step);
+  const linePoints = completedPoints.map(([x, y]) => `${x},${y}`).join(" ");
+
+  function selectPoint(index) {
+    if (index !== step || done) {
+      if (!done) {
+        onAttempt({ correct: false, hint: true });
+        setResult("hint");
+      }
+      return;
+    }
+    const nextStep = step + 1;
+    setStep(nextStep);
+    setResult("");
+    if (nextStep === points.length) {
+      onAttempt({ correct: true, hint: false });
+      setResult("success");
+      onComplete({ verified: true, checkpoints: points.length });
+    }
+  }
+
+  function restart() {
+    setStep(0);
+    setResult("");
+  }
+
+  return (
+    <>
+      <div className="mt-5 rounded-[26px] border border-brand-pink/18 bg-gradient-to-br from-brand-pink/[0.07] via-white to-brand-cyan/[0.08] p-4 sm:p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-xs font-extrabold uppercase tracking-[0.15em] text-brand-pink">Дорожка для руки · веди по порядку</p>
+          <span className="rounded-full bg-white px-3 py-1 text-xs font-extrabold text-ink/55">{Math.min(step, points.length)} / {points.length}</span>
+        </div>
+        <div className="relative mx-auto mt-4 aspect-[5/3] w-full max-w-2xl overflow-hidden rounded-[22px] border border-ink/8 bg-[radial-gradient(circle_at_center,rgba(20,36,61,0.07)_1px,transparent_1.5px)] bg-[length:22px_22px]">
+          <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 60" aria-hidden="true">
+            <polyline points={points.map(([x, y]) => `${x},${y}`).join(" ")} fill="none" stroke="rgba(20,36,61,.12)" strokeWidth="2.2" strokeDasharray="3 3" strokeLinecap="round" strokeLinejoin="round" />
+            {linePoints && <polyline points={linePoints} fill="none" stroke="rgb(236 72 153)" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" />}
+          </svg>
+          {points.map(([x, y], index) => {
+            const reached = index < step;
+            const next = index === step;
+            return <button key={`${x}-${y}-${index}`} type="button" aria-label={`Точка ${index + 1}`} onClick={() => selectPoint(index)} style={{ left: `${x}%`, top: `${(y / 60) * 100}%` }} className={`absolute grid h-9 w-9 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-2 text-xs font-black shadow-sm transition sm:h-11 sm:w-11 ${reached ? "border-brand-green bg-brand-green text-white" : next ? "scale-110 border-brand-pink bg-white text-brand-pink ring-4 ring-brand-pink/12" : "border-ink/12 bg-white text-ink/35"}`}>{reached ? "✓" : index + 1}</button>;
+          })}
+        </div>
+        <div className="mt-4 flex items-center justify-between gap-3 text-sm font-bold text-ink/55"><span>Начинай с 1 и не перепрыгивай точки.</span><button type="button" onClick={restart} className="rounded-full border border-ink/10 bg-white px-4 py-2 text-ink">Начать заново</button></div>
+      </div>
+      <ResultMessage state={result} success={mission.success} hint={mission.hint} />
+    </>
+  );
+}
+
 function ActionMission({ mission, done, onComplete, audioBase }) {
   const [step, setStep] = useState(done ? mission.actions.length : 0);
   const finished = step >= mission.actions.length;
@@ -902,12 +1054,16 @@ function MissionCard({ mission, index, done, onComplete, onAttempt, dayId, adapt
       {mission.type === "part-whole" && <PartWholeMission mission={mission} done={done} onComplete={onComplete} onAttempt={onAttempt} />}
       {mission.type === "math-balance" && <MathBalanceMission mission={mission} done={done} onComplete={onComplete} onAttempt={onAttempt} />}
       {mission.type === "number-line" && <NumberLineMission mission={mission} done={done} onComplete={onComplete} onAttempt={onAttempt} />}
+      {mission.type === "attention-grid" && <AttentionGridMission mission={mission} done={done} onComplete={onComplete} onAttempt={onAttempt} />}
+      {mission.type === "go-no-go" && <GoNoGoMission mission={mission} done={done} onComplete={onComplete} onAttempt={onAttempt} audioBase={audioBase} />}
+      {mission.type === "rule-switch" && <RuleSwitchMission mission={mission} done={done} onComplete={onComplete} onAttempt={onAttempt} audioBase={audioBase} />}
+      {mission.type === "trace-line" && <TraceLineMission mission={mission} done={done} onComplete={onComplete} onAttempt={onAttempt} />}
       {mission.type === "action" && <ActionMission mission={mission} done={done} onComplete={onComplete} audioBase={audioBase} />}
     </article>
   );
 }
 
-export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490, nextWeekHref = '', waitlistEmail = '' }) {
+export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490, nextWeekHref = '', waitlistEmail = '', isCourseFinal = false }) {
   const adaptive = week.learningMode === 'adaptive-v1';
   const storageKey = week.number === 1
     ? WEEK_ONE_STORAGE_KEY
@@ -1387,7 +1543,7 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490, 
                     : selectedDay < week.days.length - 1
                       ? "Открыт следующий район Города знаний."
                       : nextWeekHref
-                        ? "Первая неделя пройдена — все пять печатей собраны! Следующая неделя уже открыта: приключение продолжается на Улице живых слов."
+                        ? `Неделя ${week.number ?? 1} пройдена — все пять наград собраны! Следующая неделя уже открыта, приключение продолжается.`
                         : (week.number ?? 1) === 1
                           ? "Первая неделя пройдена — все пять печатей собраны! Получите награду недели и продолжайте закреплять навыки в игровых тренажёрах."
                           : week.completionLead ?? "Вторая неделя пройдена — все пять фонарей снова горят! Получите награду и отметьте завершение маршрута, чтобы перейти к следующей главе Города знаний."}
@@ -1452,7 +1608,7 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490, 
             <div className="mx-auto mt-7 inline-flex rounded-full border border-white/16 bg-white/10 px-5 py-3 text-sm font-extrabold">
               Награда: {week.reward} · {adaptive ? `${coreMissionTotal} основных ⭐` : `${missionTotal} ⭐`}
             </div>
-            {!nextWeekHref && (week.number ?? 1) >= 2 && (
+            {!nextWeekHref && !isCourseFinal && (week.number ?? 1) >= 2 && (
               <div className="mx-auto mt-8 max-w-xl rounded-[24px] border border-white/14 bg-white/[0.09] p-5 backdrop-blur-xl">
                 <p className="text-sm font-semibold leading-6 text-white/76">
                   Маршрут недели {week.number ?? 1} завершён. Подтвердите результат — мы отметим прохождение и активируем для профиля следующий район Города знаний.
@@ -1472,6 +1628,14 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490, 
                 {nextWeekRequest === 'sent' && (
                   <p className="mt-3 text-xs font-bold text-brand-cyan">Результат сохранён. Следующий район будет добавлен в маршрут.</p>
                 )}
+              </div>
+            )}
+            {isCourseFinal && (
+              <div className="mx-auto mt-8 max-w-xl rounded-[24px] border border-white/14 bg-white/[0.09] p-5 backdrop-blur-xl">
+                <p className="text-sm font-semibold leading-6 text-white/78">
+                  Полный маршрут завершён. Итоговые результаты сохранены в прогрессе: теперь можно возвращаться к любимым дням и Бонусным мастерским для спокойного закрепления.
+                </p>
+                <a href="#program" className="primary-btn mt-5 min-w-[250px]">Посмотреть весь маршрут ✓</a>
               </div>
             )}
           </div>

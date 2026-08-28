@@ -5,11 +5,13 @@ import { schoolPrepDayFourExtraMissions } from './school-prep-day-four.js';
 import { schoolPrepDayFiveExtraMissions } from './school-prep-day-five.js';
 export { schoolPrepWeekTwo } from './school-prep-week-two.js';
 export { schoolPrepWeekThree } from './school-prep-week-three.js';
+export { schoolPrepWeekFour } from './school-prep-week-four-discovery.js';
+export { schoolPrepWeekFive } from './school-prep-week-five.js';
 
 export const schoolPrepProgram = {
   title: 'Экспедиция в Город знаний',
   age: '5–7 лет',
-  duration: '12 недель + бонусная неделя',
+  duration: '5 недель · 25 учебных дней',
   rhythm: '5 коротких занятий в неделю',
   lessonTime: '20–25 минут',
   promise: 'Не натаскиваем на ответы — учим понимать инструкцию, рассуждать, говорить и не бояться ошибок.',
@@ -39,16 +41,8 @@ export const schoolPrepProgram = {
     { week: 1, title: 'Ключ от Города знаний', focus: 'Инструкция, внимание, звуки, числа и уверенный старт', color: 'blue', available: true },
     { week: 2, title: 'Улица живых слов', focus: 'Звуки речи, слоги, первые слова и фонематический слух', color: 'pink', available: true },
     { week: 3, title: 'Числовая мастерская', focus: 'Состав числа, сравнение, закономерности и устный счёт', color: 'orange', available: true },
-    { week: 4, title: 'Лаборатория внимания', focus: 'Рабочая память, переключение и точность по инструкции', color: 'purple' },
-    { week: 5, title: 'Театр историй', focus: 'Связная речь, пересказ, причины и последовательность событий', color: 'green' },
-    { week: 6, title: 'Мастерская умной руки', focus: 'Графомоторика, клетка, линия, ритм и ориентация на листе', color: 'cyan' },
-    { week: 7, title: 'Бюро маленьких задач', focus: 'Логика, бытовые задачи, части и целое, поиск решения', color: 'yellow' },
-    { week: 8, title: 'Читающий детектив', focus: 'Чтение коротких слов, понимание смысла и поиск деталей', color: 'blue' },
-    { week: 9, title: 'Порт времени и природы', focus: 'Дни недели, часы, сезоны и окружающий мир', color: 'green' },
-    { week: 10, title: 'Школа спокойной смелости', focus: 'Правила класса, просьба о помощи, ошибки и самостоятельность', color: 'pink' },
-    { week: 11, title: 'Команда исследователей', focus: 'Планирование, выбор стратегии и мини-проект ребёнка', color: 'purple' },
-    { week: 12, title: 'Большая экспедиция', focus: 'Итоговый квест, мягкая диагностика и праздник готовности', color: 'orange' },
-    { week: 13, title: 'Первые шаги к умножению', focus: 'Пары, равные группы, счёт двойками, тройками и пятёрками, сложение одинаковых чисел и первые примеры на умножение', color: 'yellow', bonus: true },
+    { week: 4, title: 'Лаборатория открытий', focus: 'Окружающий мир, безопасные исследования и гибкая логика', color: 'green', available: true },
+    { week: 5, title: 'Академия будущего первоклассника', focus: 'Подготовка руки, работа по инструкции и итоговая диагностика', color: 'purple', available: true },
   ],
 };
 

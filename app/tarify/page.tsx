@@ -7,6 +7,7 @@ import { getAuthSession } from "@/lib/auth";
 import { reconcileUserPayments } from "@/lib/payments";
 import {
   DIRECTION_COMPARE_PRICE,
+  directionAccessLabel,
   directionPrice,
   getAccessMap,
   type DirectionSlug,
@@ -15,7 +16,7 @@ import {
 export const metadata = {
   title: "Тарифы на детские онлайн-курсы",
   description:
-    "Три открытых курса Знайтона: рисование, ментальная арифметика и подготовка к школе. Первые занятия бесплатно, полный доступ на 30 дней — от 390 ₽.",
+    "Три открытых курса Знайтона: рисование, ментальная арифметика и подготовка к школе. Первые занятия бесплатно, полный доступ — от 390 ₽.",
   alternates: canonical("/tarify"),
 };
 
@@ -91,7 +92,7 @@ export default async function TariffsPage() {
               <div className="mx-auto mt-7 inline-flex flex-wrap items-center justify-center gap-3 rounded-[24px] border border-white/90 bg-white/82 px-5 py-4 shadow-card backdrop-blur-xl">
                 <del className="text-xl font-extrabold text-ink/30">1 490 ₽</del>
                 <strong className="font-display text-4xl font-black text-brand-blue">от 390 ₽</strong>
-                <span className="text-sm font-extrabold text-ink/48">за курс на 30 дней</span>
+                <span className="text-sm font-extrabold text-ink/48">за полный доступ к курсу</span>
               </div>
             </div>
 
@@ -126,7 +127,7 @@ export default async function TariffsPage() {
                       </ul>
 
                       <div className="mt-7 rounded-[26px] border border-white bg-white/88 p-5 shadow-card">
-                        <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-ink/42">Полный доступ на 30 дней</p>
+                        <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-ink/42">Полный доступ на {directionAccessLabel(course.slug)}</p>
                         <div className="mt-3 flex items-end gap-3">
                           <del className="pb-1 text-lg font-extrabold text-ink/30">{DIRECTION_COMPARE_PRICE.toLocaleString("ru-RU")} ₽</del>
                           <strong className="font-display text-5xl font-black tracking-[-0.06em] text-ink">{price} ₽</strong>

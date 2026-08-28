@@ -17,6 +17,15 @@ const toneClasses = {
   "text-brand-purple": "text-brand-purple",
 };
 
+const dayGradientClasses = {
+  blue: "from-[#2467d8] via-[#1955a8] to-[#173b78]",
+  pink: "from-[#d94d8c] via-[#a73f86] to-[#64377f]",
+  orange: "from-[#f08a24] via-[#db5f2d] to-[#9d3b3b]",
+  purple: "from-[#7654d8] via-[#5940ad] to-[#3b327c]",
+  green: "from-[#32a66b] via-[#27865e] to-[#24624f]",
+  cyan: "from-[#229db4] via-[#247ca6] to-[#285a86]",
+};
+
 function sameAnswers(selected, correct) {
   if (selected.length !== correct.length) return false;
   return [...selected].sort().every((item, index) => item === [...correct].sort()[index]);
@@ -98,7 +107,7 @@ function MissionPrompt({ mission }) {
   );
 }
 
-function ChoiceMission({ mission, done, onComplete }) {
+function ChoiceMission({ mission, done, onComplete, onAttempt = () => {} }) {
   const [selected, setSelected] = useState([]);
   const [result, setResult] = useState(done ? "success" : "");
 
@@ -115,9 +124,11 @@ function ChoiceMission({ mission, done, onComplete }) {
 
   function check() {
     if (sameAnswers(selected, mission.correct)) {
+      onAttempt({ correct: true });
       setResult("success");
-      onComplete();
+      onComplete({ verified: true });
     } else {
+      onAttempt({ correct: false, hint: true });
       setResult("hint");
     }
   }
@@ -156,7 +167,7 @@ function ChoiceMission({ mission, done, onComplete }) {
   );
 }
 
-function RecallMission({ mission, done, onComplete }) {
+function RecallMission({ mission, done, onComplete, onAttempt = () => {} }) {
   const [studying, setStudying] = useState(!done);
   const [selected, setSelected] = useState(done ? mission.correct : []);
   const [result, setResult] = useState(done ? "success" : "");
@@ -168,9 +179,11 @@ function RecallMission({ mission, done, onComplete }) {
 
   function check() {
     if (sameAnswers(selected, mission.correct)) {
+      onAttempt({ correct: true });
       setResult("success");
-      onComplete();
+      onComplete({ verified: true });
     } else {
+      onAttempt({ correct: false, hint: true });
       setResult("hint");
     }
   }
@@ -214,7 +227,7 @@ function RecallMission({ mission, done, onComplete }) {
     </>
   );
 }
-function SequenceMission({ mission, done, onComplete }) {
+function SequenceMission({ mission, done, onComplete, onAttempt = () => {} }) {
   const [sequence, setSequence] = useState([]);
   const [result, setResult] = useState(done ? "success" : "");
 
@@ -226,9 +239,11 @@ function SequenceMission({ mission, done, onComplete }) {
 
   function check() {
     if (sequence.length === mission.correct.length && sequence.every((id, index) => id === mission.correct[index])) {
+      onAttempt({ correct: true });
       setResult("success");
-      onComplete();
+      onComplete({ verified: true });
     } else {
+      onAttempt({ correct: false, hint: true });
       setResult("hint");
     }
   }
@@ -292,7 +307,7 @@ function SequenceMission({ mission, done, onComplete }) {
   );
 }
 
-function MemoryMission({ mission, done, onComplete }) {
+function MemoryMission({ mission, done, onComplete, onAttempt = () => {} }) {
   const [open, setOpen] = useState([]);
   const [matched, setMatched] = useState(done ? [...new Set(mission.cards.map((card) => card.pair))] : []);
   const [moves, setMoves] = useState(0);
@@ -302,18 +317,21 @@ function MemoryMission({ mission, done, onComplete }) {
     const [first, second] = open;
     const timer = window.setTimeout(() => {
       if (mission.cards[first].pair === mission.cards[second].pair) {
+        onAttempt({ correct: true, subKey: mission.cards[first].pair });
         setMatched((current) => {
           const next = current.includes(mission.cards[first].pair)
             ? current
             : [...current, mission.cards[first].pair];
-          if (next.length === new Set(mission.cards.map((card) => card.pair)).size) onComplete();
+          if (next.length === new Set(mission.cards.map((card) => card.pair)).size) onComplete({ verified: true, moves });
           return next;
         });
+      } else {
+        onAttempt({ correct: false, hint: false, subKey: `move-${moves}` });
       }
       setOpen([]);
     }, 650);
     return () => window.clearTimeout(timer);
-  }, [mission.cards, onComplete, open]);
+  }, [mission.cards, moves, onAttempt, onComplete, open]);
 
   function flip(index) {
     if (open.length >= 2 || open.includes(index) || matched.includes(mission.cards[index].pair)) return;
@@ -358,23 +376,33 @@ function MemoryMission({ mission, done, onComplete }) {
   );
 }
 
-function QuizMission({ mission, done, onComplete, audioBase }) {
+function QuizMission({ mission, done, onComplete, audioBase, onAttempt = () => {} }) {
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState("");
   const [result, setResult] = useState(done ? "success" : "");
+  const [mistakenQuestions, setMistakenQuestions] = useState([]);
   const question = mission.questions[index];
   const last = index === mission.questions.length - 1;
 
   function answer(id) {
     setSelected(id);
-    setResult(id === question.correct ? "question-success" : "hint");
+    const correct = id === question.correct;
+    onAttempt({ correct, hint: !correct, subKey: `question-${index + 1}` });
+    if (!correct) {
+      setMistakenQuestions((current) => current.includes(index) ? current : [...current, index]);
+    }
+    setResult(correct ? "question-success" : "hint");
   }
 
   function next() {
     if (selected !== question.correct) return;
     if (last) {
       setResult("success");
-      onComplete();
+      onComplete({
+        verified: true,
+        quizTotal: mission.questions.length,
+        quizFirstTry: mission.questions.length - mistakenQuestions.length,
+      });
       return;
     }
     setIndex((current) => current + 1);
@@ -429,10 +457,12 @@ function QuizMission({ mission, done, onComplete, audioBase }) {
       )}
       {result === "question-success" && (
         <div className="mt-4 rounded-[18px] border border-brand-green/20 bg-brand-green/[0.07] px-4 py-3 text-sm font-bold text-forest-700">
-          ⭐ Верно! {last ? "Награда дня почти получена." : "Идём дальше."}
+          ⭐ Верно: {question.options.find((option) => option.id === question.correct)?.label}. {last ? "Проверка завершена." : "Идём дальше."}
         </div>
       )}
-      {result === "success" && <ResultMessage state="success" success={mission.success} />}
+      {result === "success" && <ResultMessage state="success" success={mistakenQuestions.length === 0
+        ? `Отличный результат: ${mission.questions.length} из ${mission.questions.length} с первой попытки.`
+        : `Проверка завершена: ${mission.questions.length - mistakenQuestions.length} из ${mission.questions.length} с первой попытки. Ошибки сохранены в отчёте — это подсказка, что потренировать.`} />}
       {selected === question.correct && result !== "success" && (
         <button
           type="button"
@@ -446,7 +476,7 @@ function QuizMission({ mission, done, onComplete, audioBase }) {
   );
 }
 
-function SortMission({ mission, done, onComplete }) {
+function SortMission({ mission, done, onComplete, onAttempt = () => {} }) {
   const [itemIndex, setItemIndex] = useState(done ? mission.items.length : 0);
   const [result, setResult] = useState(done ? "success" : "");
   const current = mission.items[itemIndex];
@@ -454,14 +484,16 @@ function SortMission({ mission, done, onComplete }) {
   function place(groupId) {
     if (!current) return;
     if (current.group !== groupId) {
+      onAttempt({ correct: false, hint: true, subKey: `item-${itemIndex + 1}` });
       setResult("hint");
       return;
     }
+    onAttempt({ correct: true, subKey: `item-${itemIndex + 1}` });
     const next = itemIndex + 1;
     if (next === mission.items.length) {
       setItemIndex(next);
       setResult("success");
-      onComplete();
+      onComplete({ verified: true });
       return;
     }
     setItemIndex(next);
@@ -507,7 +539,7 @@ function SortMission({ mission, done, onComplete }) {
   );
 }
 
-function PathMission({ mission, done, onComplete }) {
+function PathMission({ mission, done, onComplete, onAttempt = () => {} }) {
   const checkpointKeys = (mission.checkpoints || []).map(([row, col]) => `${row}-${col}`);
   const [position, setPosition] = useState(done ? mission.goal : mission.start);
   const [visited, setVisited] = useState(done ? checkpointKeys : []);
@@ -519,6 +551,7 @@ function PathMission({ mission, done, onComplete }) {
     const nextKey = `${next[0]}-${next[1]}`;
     const outside = next[0] < 0 || next[0] >= mission.rows || next[1] < 0 || next[1] >= mission.cols;
     if (outside || blocked.has(nextKey)) {
+      onAttempt({ correct: false, hint: true });
       setResult("hint");
       return;
     }
@@ -532,8 +565,10 @@ function PathMission({ mission, done, onComplete }) {
     if (next[0] === mission.goal[0] && next[1] === mission.goal[1]) {
       if (checkpointKeys.every((key) => nextVisited.includes(key))) {
         setResult("success");
-        onComplete();
+        onAttempt({ correct: true });
+        onComplete({ verified: true });
       } else {
+        onAttempt({ correct: false, hint: true });
         setResult("hint");
       }
     } else {
@@ -600,6 +635,133 @@ function PathMission({ mission, done, onComplete }) {
     </>
   );
 }
+
+function QuantityBoardMission({ mission, done, onComplete, onAttempt = () => {} }) {
+  const [count, setCount] = useState(done ? mission.target : 0);
+  const [result, setResult] = useState(done ? "success" : "");
+
+  function check() {
+    const correct = count === mission.target;
+    onAttempt({ correct, hint: !correct });
+    setResult(correct ? "success" : "hint");
+    if (correct) onComplete({ verified: true });
+  }
+
+  return (
+    <>
+      <div className="mt-5 rounded-[26px] border border-brand-orange/18 bg-gradient-to-br from-brand-orange/[0.08] via-white to-brand-yellow/[0.08] p-5 sm:p-7">
+        <p className="text-center text-xs font-extrabold uppercase tracking-[0.15em] text-brand-orange">Счётное поле · нажимай по одному</p>
+        <div className="mx-auto mt-5 grid max-w-xl grid-cols-5 gap-3">
+          {Array.from({ length: mission.max }, (_, index) => {
+            const active = index < count;
+            return (
+              <button key={index} type="button" onClick={() => { setCount(index + 1); setResult(""); }} className={`grid aspect-square place-items-center rounded-[18px] border text-3xl transition ${active ? "border-brand-orange/30 bg-brand-orange/12 shadow-sm" : "border-ink/8 bg-white text-ink/18"}`} aria-label={`Отметить ${index + 1} предметов`}>
+                {active ? mission.itemEmoji : '·'}
+              </button>
+            );
+          })}
+        </div>
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+          <button type="button" onClick={() => { setCount(Math.max(0, count - 1)); setResult(""); }} className="grid h-12 w-12 place-items-center rounded-full border border-ink/10 bg-white text-xl font-black">−</button>
+          <span className="min-w-[130px] text-center font-display text-2xl font-extrabold text-ink">Насчитано: {count}</span>
+          <button type="button" onClick={() => { setCount(Math.min(mission.max, count + 1)); setResult(""); }} className="grid h-12 w-12 place-items-center rounded-full border border-ink/10 bg-white text-xl font-black">+</button>
+        </div>
+      </div>
+      <button type="button" onClick={check} className="mt-5 inline-flex min-h-[50px] items-center justify-center rounded-full bg-ink px-6 py-3 text-sm font-extrabold text-white">Проверить количество</button>
+      <ResultMessage state={result} success={`Верно! Ты отметил ровно ${mission.target} предметов: последнее названное число показывает всё количество.`} hint="Касайся каждого предмета один раз и называй числа по порядку." />
+    </>
+  );
+}
+
+function PartWholeMission({ mission, done, onComplete, onAttempt = () => {} }) {
+  const [part, setPart] = useState(done ? mission.correctPart : 0);
+  const [result, setResult] = useState(done ? "success" : "");
+
+  function check() {
+    const correct = part === mission.correctPart;
+    onAttempt({ correct, hint: !correct });
+    setResult(correct ? "success" : "hint");
+    if (correct) onComplete({ verified: true });
+  }
+
+  return (
+    <>
+      <div className="mt-5 rounded-[26px] border border-brand-green/18 bg-brand-green/[0.045] p-5 sm:p-7">
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="text-xs font-extrabold uppercase tracking-[0.15em] text-brand-green">Числовой домик</p>
+          <div className="mt-4 rounded-[22px] bg-ink p-4 text-white"><span className="text-xs font-bold text-white/60">Целое</span><strong className="mt-1 block font-display text-4xl">{mission.total}</strong></div>
+          <div className="mx-auto h-7 w-px bg-ink/16" />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="rounded-[22px] border border-brand-green/20 bg-white p-4"><span className="text-xs font-bold text-ink/46">Известная часть</span><strong className="mt-1 block text-3xl text-ink">{mission.known}</strong><div className="mt-2 text-2xl">{mission.itemEmoji.repeat(mission.known)}</div></div>
+            <div className="rounded-[22px] border border-brand-orange/20 bg-white p-4"><span className="text-xs font-bold text-ink/46">Найди часть</span><strong className="mt-1 block text-3xl text-brand-orange">{part}</strong><div className="mt-3 flex justify-center gap-2"><button type="button" onClick={() => { setPart(Math.max(0, part - 1)); setResult(""); }} className="h-10 w-10 rounded-full bg-ink text-white">−</button><button type="button" onClick={() => { setPart(Math.min(mission.total, part + 1)); setResult(""); }} className="h-10 w-10 rounded-full bg-ink text-white">+</button></div></div>
+          </div>
+        </div>
+      </div>
+      <button type="button" onClick={check} className="mt-5 inline-flex min-h-[50px] items-center justify-center rounded-full bg-ink px-6 py-3 text-sm font-extrabold text-white">Собрать целое</button>
+      <ResultMessage state={result} success={`Верно! ${mission.known} и ${mission.correctPart} вместе составляют ${mission.total}.`} hint={`Покажи все ${mission.total} предметов и убери известные ${mission.known}. Пересчитай остаток.`} />
+    </>
+  );
+}
+
+function MathBalanceMission({ mission, done, onComplete, onAttempt = () => {} }) {
+  const [selected, setSelected] = useState(done ? mission.correctRelation : '');
+  const [result, setResult] = useState(done ? "success" : "");
+  const relations = [{ id: 'more', label: 'Слева больше', symbol: '>' }, { id: 'equal', label: 'Поровну', symbol: '=' }, { id: 'less', label: 'Слева меньше', symbol: '<' }];
+
+  function check() {
+    const correct = selected === mission.correctRelation;
+    onAttempt({ correct, hint: !correct });
+    setResult(correct ? "success" : "hint");
+    if (correct) onComplete({ verified: true });
+  }
+
+  return (
+    <>
+      <div className="mt-5 rounded-[26px] border border-brand-blue/16 bg-gradient-to-br from-brand-blue/[0.06] to-brand-cyan/[0.08] p-5 sm:p-7">
+        <p className="text-center text-xs font-extrabold uppercase tracking-[0.15em] text-brand-blue">Математические весы · составь пары</p>
+        <div className="mt-5 grid grid-cols-[1fr_auto_1fr] items-end gap-3 text-center">
+          <div className="rounded-[22px] bg-white p-4 shadow-sm"><div className="flex min-h-24 flex-wrap content-center justify-center gap-2 text-3xl">{Array.from({ length: mission.left }, (_, i) => <span key={i}>{mission.itemEmoji}</span>)}</div><strong className="mt-3 block text-2xl">{mission.left}</strong></div>
+          <span className="pb-10 text-4xl">⚖️</span>
+          <div className="rounded-[22px] bg-white p-4 shadow-sm"><div className="flex min-h-24 flex-wrap content-center justify-center gap-2 text-3xl">{Array.from({ length: mission.right }, (_, i) => <span key={i}>{mission.itemEmoji}</span>)}</div><strong className="mt-3 block text-2xl">{mission.right}</strong></div>
+        </div>
+        <div className="mt-4 grid gap-2 sm:grid-cols-3">{relations.map((relation) => <button key={relation.id} type="button" onClick={() => { setSelected(relation.id); setResult(""); }} className={`rounded-[18px] border px-4 py-3 text-sm font-extrabold ${selected === relation.id ? 'border-brand-blue bg-brand-blue/10' : 'border-ink/8 bg-white'}`}><span className="mr-2 text-xl">{relation.symbol}</span>{relation.label}</button>)}</div>
+      </div>
+      <button type="button" disabled={!selected} onClick={check} className="mt-5 inline-flex min-h-[50px] items-center justify-center rounded-full bg-ink px-6 py-3 text-sm font-extrabold text-white disabled:opacity-35">Проверить весы</button>
+      <ResultMessage state={result} success={`Верно! ${mission.left} больше ${mission.right} на ${mission.left - mission.right}: после составления пар слева остались лишние предметы.`} hint="Соединяй по одному предмету слева и справа. Где останутся предметы без пары?" />
+    </>
+  );
+}
+
+function NumberLineMission({ mission, done, onComplete, onAttempt = () => {} }) {
+  const [position, setPosition] = useState(done ? mission.target : mission.start);
+  const [moves, setMoves] = useState(0);
+  const [result, setResult] = useState(done ? "success" : "");
+
+  function move(delta) {
+    setPosition((current) => Math.max(mission.min, Math.min(mission.max, current + delta)));
+    setMoves((current) => current + 1);
+    setResult("");
+  }
+  function check() {
+    const correct = position === mission.target;
+    onAttempt({ correct, hint: !correct });
+    setResult(correct ? "success" : "hint");
+    if (correct) onComplete({ verified: true, moves });
+  }
+
+  return (
+    <>
+      <div className="mt-5 rounded-[26px] border border-brand-purple/16 bg-brand-purple/[0.045] p-5 sm:p-7">
+        <p className="text-center text-xs font-extrabold uppercase tracking-[0.15em] text-brand-purple">Числовая дорожка</p>
+        <div className="mt-7 flex items-end justify-between gap-1">{Array.from({ length: mission.max - mission.min + 1 }, (_, index) => { const number = mission.min + index; const active = number === position; return <div key={number} className="flex min-w-0 flex-1 flex-col items-center"><span className="mb-2 h-8 text-2xl">{active ? '🦊' : ''}</span><span className={`grid h-9 w-full max-w-10 place-items-center rounded-full text-sm font-black ${active ? 'bg-brand-purple text-white' : 'bg-white text-ink/55'}`}>{number}</span><span className="mt-2 h-1 w-full bg-ink/10" /></div>; })}</div>
+        <div className="mt-5 flex items-center justify-center gap-3"><button type="button" onClick={() => move(-1)} className="rounded-full bg-ink px-5 py-3 text-sm font-extrabold text-white">← шаг назад</button><button type="button" onClick={() => move(1)} className="rounded-full bg-ink px-5 py-3 text-sm font-extrabold text-white">шаг вперёд →</button></div>
+      </div>
+      <button type="button" onClick={check} className="mt-5 inline-flex min-h-[50px] items-center justify-center rounded-full bg-ink px-6 py-3 text-sm font-extrabold text-white">Проверить остановку</button>
+      <ResultMessage state={result} success={`Верно! От ${mission.start} два шага вперёд: ${mission.start + 1}, ${mission.target}. Ответ — ${mission.target}.`} hint={`Вернись к ${mission.start} и сделай ровно два шага вперёд, называя каждую остановку.`} />
+    </>
+  );
+}
+
 function ActionMission({ mission, done, onComplete, audioBase }) {
   const [step, setStep] = useState(done ? mission.actions.length : 0);
   const finished = step >= mission.actions.length;
@@ -608,7 +770,7 @@ function ActionMission({ mission, done, onComplete, audioBase }) {
   function next() {
     const nextStep = step + 1;
     setStep(nextStep);
-    if (nextStep === mission.actions.length) onComplete();
+    if (nextStep === mission.actions.length) onComplete({ verified: false });
   }
 
   return (
@@ -641,7 +803,61 @@ function ActionMission({ mission, done, onComplete, audioBase }) {
   );
 }
 
-function MissionCard({ mission, index, done, onComplete, dayId }) {
+function WorkedExample({ example }) {
+  if (!example) return null;
+  return (
+    <div className="mt-5 rounded-[28px] border border-brand-cyan/20 bg-gradient-to-br from-brand-cyan/[0.08] via-white to-brand-blue/[0.07] p-5 shadow-card sm:p-7">
+      <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-brand-blue">Сначала учимся вместе · без оценки</p>
+      <h4 className="mt-2 font-display text-2xl font-extrabold text-ink">{example.title}</h4>
+      <p className="mt-3 rounded-[18px] bg-white px-4 py-3 text-base font-extrabold leading-7 text-ink/72">{example.task}</p>
+      <div className="mt-4 grid gap-3 sm:grid-cols-3">{example.steps.map((step, index) => <div key={step} className="rounded-[18px] border border-ink/7 bg-white p-4 text-sm font-semibold leading-6 text-ink/62"><span className="mb-2 flex h-7 w-7 items-center justify-center rounded-full bg-brand-blue text-xs font-black text-white">{index + 1}</span>{step}</div>)}</div>
+      <p className="mt-4 rounded-[18px] border border-brand-green/18 bg-brand-green/[0.07] px-4 py-3 text-sm font-extrabold leading-6 text-forest-700">⭐ {example.answer}</p>
+    </div>
+  );
+}
+
+function ParentProgressReport({ day, learningData, completed, coreComplete }) {
+  const coreMissions = day.missions.filter((mission) => mission.route !== 'bonus');
+  const records = coreMissions.map((mission) => ({ mission, record: learningData.missions?.[mission.id] })).filter(({ record }) => record?.completedAt);
+  const evaluated = records.filter(({ record }) => record.verified !== false && record.attempts > 0);
+  const attempts = evaluated.reduce((sum, { record }) => sum + record.attempts, 0);
+  const correct = evaluated.reduce((sum, { record }) => sum + record.correctAttempts, 0);
+  const firstTry = evaluated.filter(({ record }) => record.errors === 0).length;
+  const seconds = records.reduce((sum, { record }) => sum + (record.elapsedSeconds || 0), 0);
+  const weak = evaluated.filter(({ record }) => record.errors > 0 || record.hints > 0).sort((a, b) => (b.record.errors + b.record.hints) - (a.record.errors + a.record.hints)).slice(0, 2);
+  const strong = evaluated.filter(({ record }) => record.errors === 0).slice(0, 3);
+  const diagnosticRecord = records.find(({ mission, record }) => mission.type === 'quiz' && record.quizTotal);
+  const accuracy = attempts ? Math.round((correct / attempts) * 100) : null;
+  const doneCore = coreMissions.filter((mission) => completed.includes(mission.id)).length;
+
+  return (
+    <aside className="mt-5 rounded-[28px] border border-white/80 bg-white/82 p-5 shadow-card backdrop-blur-xl sm:p-7">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div><p className="text-xs font-extrabold uppercase tracking-[0.16em] text-brand-purple">Отчёт для родителя · по реальному выполнению</p><h4 className="mt-2 font-display text-2xl font-extrabold text-ink">{coreComplete ? 'Основной маршрут дня завершён' : `Выполнено ${doneCore} из ${coreMissions.length}`}</h4></div>
+        {records.length > 0 && <span className="rounded-full bg-brand-green/10 px-4 py-2 text-xs font-extrabold text-brand-green">Данные сохранены на этом устройстве</span>}
+      </div>
+      {records.length === 0 ? (
+        <p className="mt-4 text-sm font-semibold leading-6 text-ink/58">После первых заданий здесь появятся попытки, подсказки, время и навыки, которые стоит закрепить.</p>
+      ) : (
+        <>
+          <div className={`mt-5 grid grid-cols-2 gap-3 ${diagnosticRecord ? 'lg:grid-cols-5' : 'lg:grid-cols-4'}`}>
+            {[[`${doneCore}/${coreMissions.length}`, 'основных миссий'], [accuracy === null ? '—' : `${accuracy}%`, 'точность попыток'], [evaluated.length ? `${firstTry}/${evaluated.length}` : '—', 'миссий без ошибок'], ...(diagnosticRecord ? [[`${diagnosticRecord.record.quizFirstTry}/${diagnosticRecord.record.quizTotal}`, 'диагностика с первой попытки']] : []), [seconds ? `${Math.max(1, Math.round(seconds / 60))} мин` : '—', 'активной работы']].map(([value, label]) => <div key={label} className="rounded-[18px] bg-ink/[0.035] p-4"><strong className="font-display text-2xl font-extrabold text-ink">{value}</strong><p className="mt-1 text-xs font-bold text-ink/44">{label}</p></div>)}
+          </div>
+          <div className="mt-5 grid gap-4 lg:grid-cols-2">
+            <div className="rounded-[20px] border border-brand-green/15 bg-brand-green/[0.055] p-4"><p className="text-xs font-extrabold uppercase tracking-[0.13em] text-brand-green">Получается уверенно</p><p className="mt-2 text-sm font-semibold leading-6 text-ink/64">{strong.length ? strong.map(({ mission }) => mission.skill).join(' · ') : 'Пока собираем данные — важнее спокойное понимание, чем скорость.'}</p></div>
+            <div className="rounded-[20px] border border-brand-orange/15 bg-brand-orange/[0.055] p-4"><p className="text-xs font-extrabold uppercase tracking-[0.13em] text-brand-orange">Что закрепить</p><p className="mt-2 text-sm font-semibold leading-6 text-ink/64">{weak.length ? weak.map(({ mission }) => mission.skill).join(' · ') : 'Явных затруднений пока не обнаружено.'}</p></div>
+          </div>
+        </>
+      )}
+      <div className="mt-5 grid gap-4 sm:grid-cols-2">
+        <div><p className="text-xs font-extrabold uppercase tracking-[0.16em] text-brand-blue">Цель дня</p><p className="mt-2 text-sm font-semibold leading-6 text-ink/64">{day.parentOutcome}</p></div>
+        <div><p className="text-xs font-extrabold uppercase tracking-[0.16em] text-brand-orange">Практика на 3 минуты</p><p className="mt-2 text-sm font-semibold leading-6 text-ink/64">{weak.length ? day.practiceTip : day.offline}</p></div>
+      </div>
+    </aside>
+  );
+}
+
+function MissionCard({ mission, index, done, onComplete, onAttempt, dayId, adaptive, learnerLevel, day }) {
   const audioBase = `/audio/school-prep/${dayId}/${mission.id}`;
   return (
     <article className={`rounded-[28px] border bg-white/88 p-5 shadow-card backdrop-blur-xl sm:p-7 ${
@@ -660,33 +876,49 @@ function MissionCard({ mission, index, done, onComplete, dayId }) {
           </div>
         </div>
         <span className={`rounded-full px-3 py-1.5 text-[11px] font-extrabold ${
-          done ? "bg-brand-green/12 text-brand-green" : "bg-ink/6 text-ink/44"
+          done ? "bg-brand-green/12 text-brand-green" : mission.route === 'bonus' ? "bg-brand-purple/10 text-brand-purple" : "bg-ink/6 text-ink/44"
         }`}>
-          {done ? "Звезда получена" : "1 звезда"}
+          {done ? "Звезда получена" : mission.route === 'bonus' ? "Бонусная мастерская" : "1 звезда"}
         </span>
       </div>
       <MissionPrompt mission={mission} />
       <SchoolPrepAudioButton src={`${audioBase}/instruction.mp3`} className="mt-4" />
 
-      {mission.type === "choice" && <ChoiceMission mission={mission} done={done} onComplete={onComplete} />}
-      {mission.type === "recall" && <RecallMission mission={mission} done={done} onComplete={onComplete} />}
-      {mission.type === "sequence" && <SequenceMission mission={mission} done={done} onComplete={onComplete} />}
-      {mission.type === "memory" && <MemoryMission mission={mission} done={done} onComplete={onComplete} />}
-      {mission.type === "quiz" && <QuizMission mission={mission} done={done} onComplete={onComplete} audioBase={audioBase} />}
-      {mission.type === "sort" && <SortMission mission={mission} done={done} onComplete={onComplete} />}
-      {mission.type === "path" && <PathMission mission={mission} done={done} onComplete={onComplete} />}
+      {adaptive && (
+        <div className={`mt-4 rounded-[18px] border px-4 py-3 text-sm font-bold leading-6 ${learnerLevel === 'foundation' ? 'border-brand-cyan/18 bg-brand-cyan/[0.06] text-ink/64' : 'border-brand-purple/18 bg-brand-purple/[0.06] text-ink/64'}`}>
+          <span className="mr-2">{learnerLevel === 'foundation' ? '🧱' : '🚀'}</span>
+          {learnerLevel === 'foundation' ? day.foundationAid : day.challengeTask}
+        </div>
+      )}
+
+      {mission.type === "choice" && <ChoiceMission mission={mission} done={done} onComplete={onComplete} onAttempt={onAttempt} />}
+      {mission.type === "recall" && <RecallMission mission={mission} done={done} onComplete={onComplete} onAttempt={onAttempt} />}
+      {mission.type === "sequence" && <SequenceMission mission={mission} done={done} onComplete={onComplete} onAttempt={onAttempt} />}
+      {mission.type === "memory" && <MemoryMission mission={mission} done={done} onComplete={onComplete} onAttempt={onAttempt} />}
+      {mission.type === "quiz" && <QuizMission mission={mission} done={done} onComplete={onComplete} audioBase={audioBase} onAttempt={onAttempt} />}
+      {mission.type === "sort" && <SortMission mission={mission} done={done} onComplete={onComplete} onAttempt={onAttempt} />}
+      {mission.type === "path" && <PathMission mission={mission} done={done} onComplete={onComplete} onAttempt={onAttempt} />}
+      {mission.type === "quantity-board" && <QuantityBoardMission mission={mission} done={done} onComplete={onComplete} onAttempt={onAttempt} />}
+      {mission.type === "part-whole" && <PartWholeMission mission={mission} done={done} onComplete={onComplete} onAttempt={onAttempt} />}
+      {mission.type === "math-balance" && <MathBalanceMission mission={mission} done={done} onComplete={onComplete} onAttempt={onAttempt} />}
+      {mission.type === "number-line" && <NumberLineMission mission={mission} done={done} onComplete={onComplete} onAttempt={onAttempt} />}
       {mission.type === "action" && <ActionMission mission={mission} done={done} onComplete={onComplete} audioBase={audioBase} />}
     </article>
   );
 }
 
 export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490, nextWeekHref = '', waitlistEmail = '' }) {
+  const adaptive = week.learningMode === 'adaptive-v1';
   const storageKey = week.number === 1
     ? WEEK_ONE_STORAGE_KEY
     : `razumeyka_school_prep_${week.id || `week${week.number}`}`;
+  const learningStorageKey = `${storageKey}_learning_v1`;
+  const levelStorageKey = `${storageKey}_level_v1`;
   const [selectedDay, setSelectedDay] = useState(0);
   const [missionIndex, setMissionIndex] = useState(0);
   const [completed, setCompleted] = useState([]);
+  const [learningData, setLearningData] = useState({ missions: {} });
+  const [learnerLevel, setLearnerLevel] = useState('foundation');
   const [ready, setReady] = useState(false);
   const [nextWeekRequest, setNextWeekRequest] = useState('idle');
 
@@ -695,51 +927,155 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490, 
       const saved = JSON.parse(window.localStorage.getItem(storageKey) || "[]");
       if (Array.isArray(saved)) {
         setCompleted(saved);
-        const firstOpen = week.days[0].missions.findIndex((mission) => !saved.includes(mission.id));
-        setMissionIndex(firstOpen === -1 ? week.days[0].missions.length - 1 : firstOpen);
+        if (adaptive) {
+          const resumeDayIndex = week.days.findIndex((day) => day.missions.some((mission) => mission.route !== 'bonus' && !saved.includes(mission.id)));
+          const safeDayIndex = resumeDayIndex === -1 ? week.days.length - 1 : resumeDayIndex;
+          const resumeDay = week.days[safeDayIndex];
+          const firstOpenCore = resumeDay.missions.findIndex((mission) => mission.route !== 'bonus' && !saved.includes(mission.id));
+          const lastCoreIndex = resumeDay.missions.reduce((last, mission, index) => mission.route !== 'bonus' ? index : last, 0);
+          setSelectedDay(safeDayIndex);
+          setMissionIndex(firstOpenCore === -1 ? lastCoreIndex : firstOpenCore);
+        } else {
+          const firstOpen = week.days[0].missions.findIndex((mission) => !saved.includes(mission.id));
+          setMissionIndex(firstOpen === -1 ? week.days[0].missions.length - 1 : firstOpen);
+        }
+      }
+      if (adaptive) {
+        const savedLearning = JSON.parse(window.localStorage.getItem(learningStorageKey) || '{"missions":{}}');
+        if (savedLearning && typeof savedLearning === 'object' && savedLearning.missions) setLearningData(savedLearning);
+        const savedLevel = window.localStorage.getItem(levelStorageKey);
+        if (savedLevel === 'foundation' || savedLevel === 'challenge') setLearnerLevel(savedLevel);
       }
     } catch {
       setCompleted([]);
     } finally {
       setReady(true);
     }
-  }, [storageKey, week.days]);
+  }, [adaptive, learningStorageKey, levelStorageKey, storageKey, week.days]);
 
   useEffect(() => {
     if (!ready) return;
     window.localStorage.setItem(storageKey, JSON.stringify(completed));
   }, [completed, ready, storageKey]);
 
+  useEffect(() => {
+    if (!ready || !adaptive) return;
+    window.localStorage.setItem(learningStorageKey, JSON.stringify(learningData));
+  }, [adaptive, learningData, learningStorageKey, ready]);
+
+  useEffect(() => {
+    if (!ready || !adaptive) return;
+    window.localStorage.setItem(levelStorageKey, learnerLevel);
+  }, [adaptive, learnerLevel, levelStorageKey, ready]);
+
   const allMissionIds = useMemo(
     () => week.days.flatMap((day) => day.missions.map((mission) => mission.id)),
     [week.days],
   );
+  const allCoreMissionIds = useMemo(
+    () => week.days.flatMap((day) => day.missions.filter((mission) => !adaptive || mission.route !== 'bonus').map((mission) => mission.id)),
+    [adaptive, week.days],
+  );
   const visibleProgressIds = hasFullAccess
-    ? allMissionIds
-    : week.days[0].missions.map((mission) => mission.id);
-  const dayComplete = (day) => day.missions.every((mission) => completed.includes(mission.id));
+    ? allCoreMissionIds
+    : week.days[0].missions.filter((mission) => !adaptive || mission.route !== 'bonus').map((mission) => mission.id);
+  const coreMissionsForDay = (day) => day.missions.filter((mission) => !adaptive || mission.route !== 'bonus');
+  const bonusMissionsForDay = (day) => day.missions.filter((mission) => adaptive && mission.route === 'bonus');
+  const dayComplete = (day) => coreMissionsForDay(day).every((mission) => completed.includes(mission.id));
   const unlocked = (index) => index === 0 || (hasFullAccess && dayComplete(week.days[index - 1]));
   const currentDay = week.days[selectedDay];
   const currentMission = currentDay.missions[missionIndex] ?? currentDay.missions[0];
   const currentMissionDone = completed.includes(currentMission.id);
-  const completedToday = currentDay.missions.filter((mission) => completed.includes(mission.id)).length;
+  const currentCoreMissions = coreMissionsForDay(currentDay);
+  const currentBonusMissions = bonusMissionsForDay(currentDay);
+  const completedToday = currentCoreMissions.filter((mission) => completed.includes(mission.id)).length;
+  const completedBonusToday = currentBonusMissions.filter((mission) => completed.includes(mission.id)).length;
   const currentComplete = dayComplete(currentDay);
-  const weekComplete = allMissionIds.every((id) => completed.includes(id));
+  const weekComplete = allCoreMissionIds.every((id) => completed.includes(id));
+  const currentCoreErrors = currentCoreMissions.reduce((sum, mission) => sum + (learningData.missions?.[mission.id]?.errors || 0), 0);
+  const recommendedBonusCount = adaptive
+    ? learnerLevel === 'challenge' ? Math.min(3, currentBonusMissions.length) : Math.min(3, currentCoreErrors)
+    : 0;
+  const recommendedBonusLabel = `${recommendedBonusCount} ${recommendedBonusCount === 1 ? 'задание' : recommendedBonusCount < 5 ? 'задания' : 'заданий'}`;
   const visibleCompleted = completed.filter((id) => visibleProgressIds.includes(id)).length;
   const progress = Math.round((visibleCompleted / visibleProgressIds.length) * 100);
   const missionTotal = allMissionIds.length;
+  const coreMissionTotal = allCoreMissionIds.length;
   const practiceMin = week.days.length * 20;
   const practiceMax = week.days.length * 25;
+  const currentDayGradient = currentDay.color?.includes('from-')
+    ? currentDay.color
+    : dayGradientClasses[currentDay.color] ?? dayGradientClasses.blue;
 
-  function completeMission(id) {
+  useEffect(() => {
+    if (!ready || !adaptive || !currentMission?.id || completed.includes(currentMission.id)) return;
+    setLearningData((current) => {
+      if (current.missions?.[currentMission.id]?.startedAt) return current;
+      return {
+        ...current,
+        missions: {
+          ...(current.missions || {}),
+          [currentMission.id]: {
+            attempts: 0,
+            correctAttempts: 0,
+            errors: 0,
+            hints: 0,
+            startedAt: Date.now(),
+          },
+        },
+      };
+    });
+  }, [adaptive, completed, currentMission?.id, ready]);
+
+  function recordAttempt(id, result = {}) {
+    if (!adaptive) return;
+    setLearningData((current) => {
+      const previous = current.missions?.[id] || { attempts: 0, correctAttempts: 0, errors: 0, hints: 0, startedAt: Date.now() };
+      return {
+        ...current,
+        missions: {
+          ...(current.missions || {}),
+          [id]: {
+            ...previous,
+            attempts: previous.attempts + 1,
+            correctAttempts: previous.correctAttempts + (result.correct ? 1 : 0),
+            errors: previous.errors + (result.correct ? 0 : 1),
+            hints: previous.hints + (result.hint ? 1 : 0),
+            lastSubKey: result.subKey || previous.lastSubKey,
+          },
+        },
+      };
+    });
+  }
+
+  function completeMission(id, details = {}) {
+    if (adaptive) {
+      setLearningData((current) => {
+        const now = Date.now();
+        const previous = current.missions?.[id] || { attempts: 0, correctAttempts: 0, errors: 0, hints: 0, startedAt: now };
+        return {
+          ...current,
+          missions: {
+            ...(current.missions || {}),
+            [id]: {
+              ...previous,
+              ...details,
+              completedAt: now,
+              elapsedSeconds: Math.max(1, Math.min(600, Math.round((now - previous.startedAt) / 1000))),
+              firstTry: previous.errors === 0,
+            },
+          },
+        };
+      });
+    }
     setCompleted((current) => {
       if (current.includes(id)) return current;
       const next = [...current, id];
-      if (selectedDay === 0 && current.filter((missionId) => currentDay.missions.some((mission) => mission.id === missionId)).length === 0) {
-        reachGoal("prep_day_start");
+      if (current.filter((missionId) => currentCoreMissions.some((mission) => mission.id === missionId)).length === 0) {
+        reachGoal("prep_day_start", { week: week.number ?? 1, day: currentDay.number });
       }
-      if (selectedDay === 0 && currentDay.missions.every((mission) => next.includes(mission.id))) {
-        reachGoal("prep_day_complete", { missions: currentDay.missions.length });
+      if (currentCoreMissions.every((mission) => next.includes(mission.id))) {
+        reachGoal("prep_day_complete", { week: week.number ?? 1, day: currentDay.number, missions: currentCoreMissions.length });
       }
       return next;
     });
@@ -756,6 +1092,11 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490, 
 
   function missionIsUnlocked(index) {
     if (index === 0) return true;
+    if (adaptive && currentDay.missions[index].route === 'bonus') {
+      if (!currentComplete) return false;
+      const previousBonus = currentDay.missions.slice(0, index).filter((mission) => mission.route === 'bonus').at(-1);
+      return !previousBonus || completed.includes(previousBonus.id);
+    }
     return completed.includes(currentDay.missions[index - 1].id);
   }
 
@@ -771,9 +1112,17 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490, 
     window.setTimeout(() => document.getElementById("school-prep-mission")?.scrollIntoView({ behavior: "smooth", block: "center" }), 40);
   }
 
+  function openBonusWorkshop() {
+    const firstBonusIndex = currentDay.missions.findIndex((mission) => mission.route === 'bonus' && !completed.includes(mission.id));
+    if (firstBonusIndex === -1) return;
+    setMissionIndex(firstBonusIndex);
+    window.setTimeout(() => document.getElementById("school-prep-mission")?.scrollIntoView({ behavior: "smooth", block: "center" }), 40);
+  }
+
   function resetWeek() {
     if (!window.confirm(`Начать неделю ${week.number ?? 1} заново? Все полученные звёзды будут сброшены.`)) return;
     setCompleted([]);
+    setLearningData({ missions: {} });
     setSelectedDay(0);
     setMissionIndex(0);
   }
@@ -817,7 +1166,7 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490, 
             <div className="mt-5 flex flex-wrap gap-2">
               {[
                 [String(week.days.length), "учебных дней"],
-                [String(missionTotal), "игровых шагов"],
+                [adaptive ? `${coreMissionTotal} + ${missionTotal - coreMissionTotal}` : String(missionTotal), adaptive ? "основных + бонусных" : "игровых шагов"],
                 [`${practiceMin}–${practiceMax}`, "минут практики"],
               ].map(([value, label]) => (
                 <span key={label} className="inline-flex items-baseline gap-1.5 rounded-full border border-white/10 bg-white/[0.07] px-3 py-2 text-xs font-bold text-white/58">
@@ -826,6 +1175,15 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490, 
                 </span>
               ))}
             </div>
+            {adaptive && (
+              <div className="mt-5 rounded-[20px] border border-white/12 bg-white/[0.07] p-3.5">
+                <p className="text-[10px] font-extrabold uppercase tracking-[0.15em] text-white/52">Маршрут по возрасту ребёнка</p>
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  <button type="button" onClick={() => setLearnerLevel('foundation')} className={`rounded-[15px] border px-3 py-3 text-left transition ${learnerLevel === 'foundation' ? 'border-brand-cyan/50 bg-brand-cyan/16 text-white' : 'border-white/10 bg-white/5 text-white/60'}`}><strong className="block text-sm">5–6 лет</strong><span className="mt-1 block text-[10px] font-semibold">Больше предметных подсказок</span></button>
+                  <button type="button" onClick={() => setLearnerLevel('challenge')} className={`rounded-[15px] border px-3 py-3 text-left transition ${learnerLevel === 'challenge' ? 'border-brand-purple/60 bg-brand-purple/24 text-white' : 'border-white/10 bg-white/5 text-white/60'}`}><strong className="block text-sm">6–7 лет</strong><span className="mt-1 block text-[10px] font-semibold">Объяснение и второй способ</span></button>
+                </div>
+              </div>
+            )}
           </div>
           <div className="min-w-[220px] rounded-[22px] border border-white/10 bg-white/8 p-4 backdrop-blur-xl">
             <div className="flex items-center justify-between text-xs font-extrabold text-white/60">
@@ -881,10 +1239,10 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490, 
                 <p className="mt-1 text-xs font-extrabold leading-5 text-white/88 sm:text-sm">{day.title}</p>
                 <div className="mt-3 rounded-[15px] border border-white/8 bg-white/[0.07] px-3 py-2.5">
                   <div className="flex items-baseline gap-1.5">
-                    <strong className="font-display text-[26px] font-extrabold leading-none tracking-[-0.045em] text-brand-cyan">{day.missions.length}</strong>
-                    <span className="text-[10px] font-extrabold uppercase tracking-[0.08em] text-white/74">шагов</span>
+                    <strong className="font-display text-[26px] font-extrabold leading-none tracking-[-0.045em] text-brand-cyan">{adaptive ? coreMissionsForDay(day).length : day.missions.length}</strong>
+                    <span className="text-[10px] font-extrabold uppercase tracking-[0.08em] text-white/74">{adaptive ? 'основных' : 'шагов'}</span>
                   </div>
-                  <p className="mt-1 text-[9px] font-bold text-white/42">20–25 минут</p>
+                  <p className="mt-1 text-[9px] font-bold text-white/42">{adaptive ? `+ ${bonusMissionsForDay(day).length} бонусных · 20–25 минут` : '20–25 минут'}</p>
                 </div>
                 {!isUnlocked && <p className="mt-2 text-[9px] font-extrabold uppercase tracking-[0.08em] text-brand-cyan/80">Откроется в полном курсе</p>}
               </button>
@@ -894,7 +1252,7 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490, 
       </div>
 
       <section id="school-prep-day" className="scroll-mt-28 mt-6">
-        <div className={`relative overflow-hidden rounded-[32px] bg-gradient-to-br ${currentDay.color} p-6 text-white shadow-color sm:p-8`}>
+        <div className={`relative overflow-hidden rounded-[32px] bg-gradient-to-br ${currentDayGradient} p-6 text-white shadow-color sm:p-8`}>
           {currentDay.image && (
             <img
               src={currentDay.image}
@@ -917,14 +1275,16 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490, 
             </div>
             <div className="min-w-[150px] rounded-[24px] border border-white/18 bg-[#0b1930]/48 p-4 shadow-insetline backdrop-blur-xl">
               <p className="text-[10px] font-extrabold uppercase tracking-[0.15em] text-white/52">Маршрут дня</p>
-              <p className="mt-1 font-display text-2xl font-extrabold">{currentDay.missions.length} шагов</p>
-              <p className="mt-1 text-xs font-bold text-white/62">20–25 минут</p>
+              <p className="mt-1 font-display text-2xl font-extrabold">{adaptive ? `${currentCoreMissions.length} основных` : `${currentDay.missions.length} шагов`}</p>
+              <p className="mt-1 text-xs font-bold text-white/62">{adaptive ? `${currentBonusMissions.length} бонусных · 20–25 минут` : '20–25 минут'}</p>
             </div>
           </div>
           <div className="relative mt-6 rounded-[20px] border border-white/14 bg-white/12 px-4 py-3.5 text-sm font-bold leading-6 text-white/86 backdrop-blur-xl">
             <span className="mr-2">⚡</span>{currentDay.warmup}
           </div>
         </div>
+
+        {adaptive && missionIndex === 0 && !currentMissionDone && <WorkedExample example={currentDay.workedExample} />}
 
         <div className="mt-5 rounded-[28px] border border-white/80 bg-white/82 p-5 shadow-card backdrop-blur-xl sm:p-7">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -933,17 +1293,23 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490, 
                 {currentMission.chapter ?? "Миссия дня " + (selectedDay + 1)}
               </p>
               <h4 className="mt-2 font-display text-2xl font-extrabold tracking-[-0.025em] text-ink">
-                Шаг {missionIndex + 1} из {currentDay.missions.length}
+                {adaptive
+                  ? currentMission.route === 'bonus'
+                    ? `Бонус ${currentDay.missions.slice(0, missionIndex + 1).filter((mission) => mission.route === 'bonus').length} из ${currentBonusMissions.length}`
+                    : `Основной шаг ${missionIndex + 1} из ${currentCoreMissions.length}`
+                  : `Шаг ${missionIndex + 1} из ${currentDay.missions.length}`}
               </h4>
               <p className="mt-1 text-sm font-semibold text-ink/48">
-                {completedToday} выполнено · {currentDay.missions.length - completedToday} осталось
+                {adaptive
+                  ? `${completedToday} основных выполнено · ${currentCoreMissions.length - completedToday} осталось${completedBonusToday > 0 ? ` · ${completedBonusToday} бонусов` : ''}`
+                  : `${completedToday} выполнено · ${currentDay.missions.length - completedToday} осталось`}
               </p>
             </div>
             <div className="w-full max-w-[300px]">
               <div className="h-2.5 overflow-hidden rounded-full bg-ink/7">
                 <div
                   className="h-full rounded-full bg-gradient-to-r from-brand-blue via-brand-purple to-brand-pink transition-all duration-500"
-                  style={{ width: Math.round((completedToday / currentDay.missions.length) * 100) + "%" }}
+                  style={{ width: Math.round((completedToday / currentCoreMissions.length) * 100) + "%" }}
                 />
               </div>
               <p className="mt-2 text-right text-[10px] font-extrabold uppercase tracking-[0.12em] text-ink/36">
@@ -970,7 +1336,7 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490, 
                       : done
                         ? "bg-brand-green/14 text-brand-green"
                         : available
-                          ? "bg-brand-blue/10 text-brand-blue hover:bg-brand-blue/18"
+                          ? mission.route === 'bonus' ? "bg-brand-purple/12 text-brand-purple hover:bg-brand-purple/20" : "bg-brand-blue/10 text-brand-blue hover:bg-brand-blue/18"
                           : "bg-ink/[0.035] text-ink/20"
                   )}
                 >
@@ -989,7 +1355,11 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490, 
             index={missionIndex}
             done={currentMissionDone}
             dayId={currentDay.id}
-            onComplete={() => completeMission(currentMission.id)}
+            day={currentDay}
+            adaptive={adaptive}
+            learnerLevel={learnerLevel}
+            onAttempt={(result) => recordAttempt(currentMission.id, result)}
+            onComplete={(details) => completeMission(currentMission.id, details)}
           />
 
           {currentMissionDone && missionIndex < currentDay.missions.length - 1 && (
@@ -1006,9 +1376,13 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490, 
             <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-brand-green">Печать дня получена</p>
-                <h4 className="mt-2 font-display text-2xl font-extrabold text-ink">Все {currentDay.missions.length} шагов выполнены!</h4>
+                <h4 className="mt-2 font-display text-2xl font-extrabold text-ink">{adaptive ? `Все ${currentCoreMissions.length} основных миссий выполнены!` : `Все ${currentDay.missions.length} шагов выполнены!`}</h4>
                 <p className="mt-2 max-w-xl text-sm font-medium leading-6 text-ink/58">
-                  {!hasFullAccess && selectedDay === 0
+                  {adaptive
+                    ? recommendedBonusCount > 0
+                      ? `Основной маршрут завершён. По возрастному режиму и попыткам рекомендуем пройти ${recommendedBonusLabel} Бонусной мастерской. Они необязательны и не задерживают следующий день.`
+                      : "Основной маршрут завершён уверенно. Можно перейти дальше или открыть Бонусную мастерскую по желанию."
+                    : !hasFullAccess && selectedDay === 0
                     ? "Пробный маршрут завершён. В полном курсе приключение продолжается в новых районах Города знаний."
                     : selectedDay < week.days.length - 1
                       ? "Открыт следующий район Города знаний."
@@ -1016,10 +1390,15 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490, 
                         ? "Первая неделя пройдена — все пять печатей собраны! Следующая неделя уже открыта: приключение продолжается на Улице живых слов."
                         : (week.number ?? 1) === 1
                           ? "Первая неделя пройдена — все пять печатей собраны! Получите награду недели и продолжайте закреплять навыки в игровых тренажёрах."
-                          : "Вторая неделя пройдена — все пять фонарей снова горят! Получите награду и отметьте завершение маршрута, чтобы перейти к следующей главе Города знаний."}
+                          : week.completionLead ?? "Вторая неделя пройдена — все пять фонарей снова горят! Получите награду и отметьте завершение маршрута, чтобы перейти к следующей главе Города знаний."}
                 </p>
               </div>
-              {!hasFullAccess && selectedDay === 0 ? (
+              {adaptive ? (
+                <div className="flex shrink-0 flex-col gap-2 sm:items-end">
+                  {completedBonusToday < currentBonusMissions.length && <button type="button" onClick={openBonusWorkshop} className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-brand-purple/20 bg-white px-5 py-3 text-sm font-extrabold text-brand-purple transition hover:-translate-y-0.5">{recommendedBonusCount > 0 ? `Пройти ${recommendedBonusLabel} →` : 'Открыть Бонусную мастерскую →'}</button>}
+                  {selectedDay < week.days.length - 1 ? <button type="button" onClick={() => selectDay(selectedDay + 1)} className="primary-btn">Открыть день {week.days[selectedDay + 1].number} →</button> : <a href="#school-prep-week-finale" className="primary-btn">Получить награду недели →</a>}
+                </div>
+              ) : !hasFullAccess && selectedDay === 0 ? (
                 <a
                   href="#podpiska"
                   onClick={() => reachGoal("prep_offer_click", { source: "day_complete" })}
@@ -1044,7 +1423,7 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490, 
           </div>
         )}
 
-        <aside className="mt-5 grid gap-4 rounded-[28px] border border-white/80 bg-white/78 p-5 shadow-card backdrop-blur-xl sm:grid-cols-2 sm:p-7">
+        {adaptive ? <ParentProgressReport day={currentDay} learningData={learningData} completed={completed} coreComplete={currentComplete} /> : <aside className="mt-5 grid gap-4 rounded-[28px] border border-white/80 bg-white/78 p-5 shadow-card backdrop-blur-xl sm:grid-cols-2 sm:p-7">
           <div>
             <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-brand-purple">Что тренировали</p>
             <p className="mt-2 text-sm font-semibold leading-6 text-ink/64">{currentDay.parentOutcome}</p>
@@ -1053,7 +1432,7 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490, 
             <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-brand-orange">Продолжить без экрана</p>
             <p className="mt-2 text-sm font-semibold leading-6 text-ink/64">{currentDay.offline}</p>
           </div>
-        </aside>
+        </aside>}
       </section>
 
       {weekComplete && (
@@ -1063,15 +1442,15 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490, 
             <span className="mx-auto flex h-24 w-24 items-center justify-center rounded-[30px] border border-white/18 bg-white/14 text-5xl shadow-insetline">🗝️</span>
             <p className="mt-5 text-xs font-extrabold uppercase tracking-[0.2em] text-gold-300">Неделя {week.number ?? 1} завершена</p>
             <h3 className="mt-3 font-display text-3xl font-extrabold tracking-[-0.035em] sm:text-5xl">
-              {(week.number ?? 1) === 1 ? "Золотой ключ твой!" : "Улица живых слов сияет!"}
+              {week.completionTitle ?? ((week.number ?? 1) === 1 ? "Золотой ключ твой!" : "Улица живых слов сияет!")}
             </h3>
             <p className="mx-auto mt-4 max-w-2xl text-base font-medium leading-7 text-white/70">
-              {(week.number ?? 1) === 1
+              {week.completionSummary ?? ((week.number ?? 1) === 1
                 ? `Ребёнок прошёл ${missionTotal} миссий: слушал инструкцию, находил закономерности, работал со звуками и числами и учился пробовать снова.`
-                : `Ребёнок прошёл ${missionTotal} миссий: научился слышать звуки в слове, делить слова на слоги, читать первые слова, собирать предложения и понимать короткие рассказы.`}
+                : `Ребёнок прошёл ${missionTotal} миссий: научился слышать звуки в слове, делить слова на слоги, читать первые слова, собирать предложения и понимать короткие рассказы.`)}
             </p>
             <div className="mx-auto mt-7 inline-flex rounded-full border border-white/16 bg-white/10 px-5 py-3 text-sm font-extrabold">
-              Награда: {week.reward} · {missionTotal} ⭐
+              Награда: {week.reward} · {adaptive ? `${coreMissionTotal} основных ⭐` : `${missionTotal} ⭐`}
             </div>
             {!nextWeekHref && (week.number ?? 1) >= 2 && (
               <div className="mx-auto mt-8 max-w-xl rounded-[24px] border border-white/14 bg-white/[0.09] p-5 backdrop-blur-xl">

@@ -4,6 +4,7 @@ import fsSync from 'node:fs';
 import path from 'node:path';
 import { schoolPrepWeekOne } from '../data/school-prep-course.js';
 import { schoolPrepWeekTwo } from '../data/school-prep-week-two.js';
+import { schoolPrepWeekThree } from '../data/school-prep-week-three.js';
 
 dns.setDefaultResultOrder('ipv4first');
 
@@ -87,7 +88,7 @@ const salesIntro = clean(`
   Нажимайте «Попробовать» — и соберите первый ключ к спокойному и уверенному школьному старту!
 `);
 
-const courseWeeks = [schoolPrepWeekOne, schoolPrepWeekTwo];
+const courseWeeks = [schoolPrepWeekOne, schoolPrepWeekTwo, schoolPrepWeekThree];
 const selectedDays = courseWeeks
   .filter((week) => !weekArg || String(week.number) === weekArg || week.id === weekArg)
   .flatMap((week) => week.days)

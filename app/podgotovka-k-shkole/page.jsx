@@ -9,7 +9,7 @@ import { CourseDiscovery } from '@/components/CourseDiscovery.jsx';
 import { GameLauncher } from '@/components/games/GameShell.jsx';
 import { TrackedLink } from '@/components/analytics/TrackedLink.jsx';
 import { gamesForWeek } from '@/data/games.js';
-import { schoolPrepProgram, schoolPrepWeekOne, schoolPrepWeekTwo } from '@/data/school-prep-course.js';
+import { schoolPrepProgram, schoolPrepWeekOne, schoolPrepWeekTwo, schoolPrepWeekThree } from '@/data/school-prep-course.js';
 import { getAuthSession } from '@/lib/auth';
 import { reconcileUserPayments } from '@/lib/payments';
 import { directionPrice, getAccessUntil, hasActiveAccess } from '@/lib/subscription';
@@ -327,6 +327,27 @@ export default async function SchoolPrepPage() {
                 </div>
                 <SchoolPrepAdventure
                   week={schoolPrepWeekTwo}
+                  price={SCHOOL_PREP_PRICE}
+                  hasFullAccess
+                  nextWeekHref="#week-three"
+                />
+              </div>
+            )}
+            {hasFullCourseAccess && (
+              <div id="week-three" className="scroll-mt-24 pt-20 sm:pt-24">
+                <div className="mb-7 max-w-3xl">
+                  <span className="inline-flex rounded-full border border-brand-orange/18 bg-brand-orange/[0.08] px-3.5 py-2 text-[10px] font-extrabold uppercase tracking-[0.18em] text-brand-orange">
+                    Следующий уровень · математика через понимание
+                  </span>
+                  <h2 className="mt-5 font-display text-3xl font-extrabold tracking-[-0.04em] text-ink sm:text-5xl">
+                    Неделя 3 · Числовая мастерская
+                  </h2>
+                  <p className="mt-4 text-base font-semibold leading-7 text-ink/58">
+                    Ребёнок запускает пять механизмов: точный счёт, состав числа, сравнение, устные вычисления и осмысленное решение первых задач.
+                  </p>
+                </div>
+                <SchoolPrepAdventure
+                  week={schoolPrepWeekThree}
                   price={SCHOOL_PREP_PRICE}
                   hasFullAccess
                   waitlistEmail={session?.user?.email ?? ''}

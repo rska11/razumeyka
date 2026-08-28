@@ -16,7 +16,7 @@
     "test:house": "node scripts/test-house-game.mjs",
     "test:academy": "node scripts/test-academy-game.mjs",
     "test:mental-game": "node scripts/test-mental-number-game.mjs",
-    "test:school-prep": "node scripts/test-school-prep-day-one.mjs && node scripts/test-school-prep-week-two.mjs",
+    "test:school-prep": "node scripts/test-school-prep-day-one.mjs && node scripts/test-school-prep-week-two.mjs && node scripts/test-school-prep-week-three.mjs",
     "test:multiplication": "node scripts/test-multiplication-course.mjs",
     "test:consent": "node --experimental-strip-types --no-warnings scripts/test-consent.mjs"
   },

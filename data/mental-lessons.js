@@ -201,8 +201,8 @@ export const mentalMonths = [
 ];
 
 export const mentalSubscription = {
-  price: 490,
-  oldPrice: 1490,
+  price: 1490,
+  oldPrice: 4490,
   period: '30 дней',
   perks: [
     '20 учебных дней и 200 игровых миссий месяца',

@@ -5953,8 +5953,8 @@ applyEightTenArtPilot(drawingLessons, drawingChapterGuides);
 applyPremiumPreschoolMonth(drawingLessons, drawingChapterGuides);
 
 export const drawingSubscription = {
-  price: 490,
-  oldPrice: 1490,
+  price: 1490,
+  oldPrice: 4490,
   period: 'месяц',
   perks: [
     'Полная библиотека уроков-игр — новые добавляем каждую неделю',

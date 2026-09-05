@@ -1063,7 +1063,7 @@ function MissionCard({ mission, index, done, onComplete, onAttempt, dayId, adapt
   );
 }
 
-export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 490, nextWeekHref = '', waitlistEmail = '', isCourseFinal = false }) {
+export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 1190, nextWeekHref = '', waitlistEmail = '', isCourseFinal = false }) {
   const adaptive = week.learningMode === 'adaptive-v1';
   const storageKey = week.number === 1
     ? WEEK_ONE_STORAGE_KEY

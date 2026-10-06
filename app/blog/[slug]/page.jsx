@@ -114,6 +114,7 @@ export default async function BlogPost({ params }) {
   };
   const coverGrad = coverThemes[post.cover?.theme] ?? coverThemes.blue;
   const editorialMeta = {
+    'kak-nauchit-rebenka-schitat-v-ume': { category: 'Математика', gradient: 'from-[#079A78] via-[#16A6A1] to-[#3B82F6]' },
     'razvitie-pamyati-u-detey': { category: 'Память', gradient: 'from-[#246BFD] via-[#7257E8] to-[#16A6A1]' },
     'razvitie-voobrazheniya-u-detey': { category: 'Воображение', gradient: 'from-[#7257E8] via-[#D946EF] to-[#F05A87]' },
     'umnozhenie-na-2-3-4-5': { category: 'Математика', gradient: 'from-[#F59E0B] via-[#F97316] to-[#EC4899]' },

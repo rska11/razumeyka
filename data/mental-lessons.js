@@ -1,5 +1,6 @@
 import { mentalWeekOneLessons } from './mental-week1-lessons.js';
 import { mentalWeekOneExpansion } from './mental-week1-expansion.js';
+import { COMPARE_PRICE, MENTAL_PRICE } from '../lib/access-prices.js';
 
 // Самостоятельные уроки ментальной арифметики (self-study, как /risovanie).
 // Ребёнок считает на ИНТЕРАКТИВНОМ абакусе прямо на экране (настоящие счёты не нужны),
@@ -201,8 +202,8 @@ export const mentalMonths = [
 ];
 
 export const mentalSubscription = {
-  price: 1490,
-  oldPrice: 4490,
+  price: MENTAL_PRICE,
+  oldPrice: COMPARE_PRICE,
   period: '30 дней',
   perks: [
     '20 учебных дней и 200 игровых миссий месяца',

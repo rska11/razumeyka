@@ -1,10 +1,11 @@
 import { prisma } from "@/lib/prisma";
+import { COMPARE_PRICE, DRAWING_PRICE, MENTAL_PRICE, SCHOOL_PREP_PRICE, SUBSCRIPTION_PRICE as DEFAULT_PRICE } from "@/lib/access-prices";
 
 // Доступ к self-study библиотеке — РАЗДЕЛЬНО ПО НАПРАВЛЕНИЯМ.
 // Оплата открывает конкретное направление; чтобы открыть второе — отдельная оплата.
 // Пилот: оплаченный период доступа без автосписания (продлевается вручную/новой оплатой).
 
-export const SUBSCRIPTION_PRICE = 1490; // ₽ за период (по умолчанию)
+export const SUBSCRIPTION_PRICE = DEFAULT_PRICE; // ₽ за период (по умолчанию)
 export const SUBSCRIPTION_MONTHS = 1;
 export const SCHOOL_PREP_ACCESS_DAYS = 45;
 
@@ -17,12 +18,12 @@ export const DIRECTIONS = {
 
 export type DirectionSlug = keyof typeof DIRECTIONS;
 
-// Цена доступа по направлению.
-export const DIRECTION_COMPARE_PRICE = 4490;
+// Цена доступа по направлению. Сами суммы живут в lib/access-prices.js.
+export const DIRECTION_COMPARE_PRICE = COMPARE_PRICE;
 export const DIRECTION_PRICE: Record<DirectionSlug, number> = {
-  risovanie: SUBSCRIPTION_PRICE,
-  "mentalnaya-arifmetika": SUBSCRIPTION_PRICE,
-  "podgotovka-k-shkole": 1190,
+  risovanie: DRAWING_PRICE,
+  "mentalnaya-arifmetika": MENTAL_PRICE,
+  "podgotovka-k-shkole": SCHOOL_PREP_PRICE,
 };
 
 /** Цена доступа к направлению в рублях. */

@@ -2,11 +2,12 @@
 
 import { useRef, useState } from 'react';
 import { Icon } from './Icon.jsx';
+import { MIN_PRICE, rub } from '@/lib/access-prices';
 
 const stats = [
   ['бесплатно', 'первые уроки'],
   ['3–10+', 'лет'],
-  ['от 1 190 ₽', 'доступ в месяц'],
+  [`от ${rub(MIN_PRICE)}`, 'доступ в месяц'],
 ];
 
 const benefits = ['интеллект', 'уверенность', 'креативность'];

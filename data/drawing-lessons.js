@@ -2,6 +2,7 @@ import { applyPremiumPreschoolMonth } from './preschool-premium-lessons.js';
 import { applyFiveSevenWeek1 } from './drawing-five-seven-week1.js';
 import { applyEightTenWeek1 } from './drawing-eight-ten-week1.js';
 import { applyEightTenArtPilot } from './drawing-eight-ten-art-pilot.js';
+import { COMPARE_PRICE, DRAWING_PRICE } from '../lib/access-prices.js';
 
 // Самостоятельные уроки правополушарного рисования (self-study).
 // Оценивает результат родитель — не педагог и не ИИ. Часть уроков бесплатна,
@@ -5953,8 +5954,8 @@ applyEightTenArtPilot(drawingLessons, drawingChapterGuides);
 applyPremiumPreschoolMonth(drawingLessons, drawingChapterGuides);
 
 export const drawingSubscription = {
-  price: 1490,
-  oldPrice: 4490,
+  price: DRAWING_PRICE,
+  oldPrice: COMPARE_PRICE,
   period: 'месяц',
   perks: [
     'Полная библиотека уроков-игр — новые добавляем каждую неделю',

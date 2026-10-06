@@ -5,6 +5,7 @@ import { SchoolPrepAudioButton } from "./SchoolPrepAudioButton.jsx";
 import { SchoolPrepAutoNarration } from "./SchoolPrepAutoNarration.jsx";
 import { SchoolPrepScene, SchoolPrepShape, SchoolPrepVisual } from "./SchoolPrepVisual.jsx";
 import { reachGoal } from "@/lib/metrika";
+import { SCHOOL_PREP_PRICE } from "@/lib/access-prices";
 
 const WEEK_ONE_STORAGE_KEY = "razumeyka_school_prep_week1";
 
@@ -1063,7 +1064,7 @@ function MissionCard({ mission, index, done, onComplete, onAttempt, dayId, adapt
   );
 }
 
-export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 1190, nextWeekHref = '', waitlistEmail = '', isCourseFinal = false }) {
+export function SchoolPrepAdventure({ week, hasFullAccess = false, price = SCHOOL_PREP_PRICE, nextWeekHref = '', waitlistEmail = '', isCourseFinal = false }) {
   const adaptive = week.learningMode === 'adaptive-v1';
   const storageKey = week.number === 1
     ? WEEK_ONE_STORAGE_KEY

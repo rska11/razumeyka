@@ -10,6 +10,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { SymmetryDraw } from '@/components/games/SymmetryDraw.jsx';
 import { reachGoal } from '@/lib/metrika';
+import { DRAWING_PRICE, rub } from '@/lib/access-prices';
 
 const HAND_LABEL = {
   left: 'Непишущей рукой',
@@ -512,7 +513,7 @@ export function LessonPlayer({ lesson, nextLesson, onComplete, onNext, onClose, 
                 ) : showUpgrade ? (
                   <div className="rounded-2xl border border-brand-pink/18 bg-gradient-to-r from-brand-pink/8 to-brand-orange/8 p-4 text-left">
                     <p className="font-display text-lg font-extrabold text-ink">Бесплатная ступень завершена!</p>
-                    <p className="mt-1 text-xs font-semibold leading-5 text-ink/58">Дальше — новые формы, детали и сюжеты полного маршрута. Доступ на 30 дней стоит 1 490 ₽, без автосписания.</p>
+                    <p className="mt-1 text-xs font-semibold leading-5 text-ink/58">Дальше — новые формы, детали и сюжеты полного маршрута. Доступ на 30 дней стоит {rub(DRAWING_PRICE)}, без автосписания.</p>
                     <a
                       href="#podpiska"
                       onClick={() => {
@@ -521,7 +522,7 @@ export function LessonPlayer({ lesson, nextLesson, onComplete, onNext, onClose, 
                       }}
                       className="primary-btn mt-3 w-full"
                     >
-                      Открыть мастерскую за 1 490 ₽ →
+                      Открыть мастерскую за {rub(DRAWING_PRICE)} →
                     </a>
                   </div>
                 ) : (

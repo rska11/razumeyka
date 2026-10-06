@@ -21,6 +21,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Soroban, columnsFor } from './Soroban.jsx';
 import { reachGoal } from '@/lib/metrika';
+import { MENTAL_PRICE, rub } from '@/lib/access-prices';
 
 function chainSum(chain) {
   return chain.reduce((a, b) => a + b, 0);
@@ -515,7 +516,7 @@ export function MentalLessonPlayer({ lesson, nextLesson, onComplete, onNext, onC
               ) : showUpgrade ? (
                 <div className="mt-5 rounded-2xl border border-brand-blue/18 bg-gradient-to-r from-brand-blue/8 to-brand-green/8 p-4 text-left">
                   <p className="font-display text-lg font-extrabold text-ink">Вы дошли до полного курса!</p>
-                  <p className="mt-1 text-xs font-semibold leading-5 text-ink/58">Дальше ребёнка ждут новые числа, цепочки, флеш-карты и игровые миссии. Доступ на 30 дней стоит 1 490 ₽, без автосписания.</p>
+                  <p className="mt-1 text-xs font-semibold leading-5 text-ink/58">Дальше ребёнка ждут новые числа, цепочки, флеш-карты и игровые миссии. Доступ на 30 дней стоит {rub(MENTAL_PRICE)}, без автосписания.</p>
                   <a
                     href="#podpiska"
                     onClick={() => {
@@ -524,7 +525,7 @@ export function MentalLessonPlayer({ lesson, nextLesson, onComplete, onNext, onC
                     }}
                     className="primary-btn mt-3 w-full"
                   >
-                    Открыть полный курс за 1 490 ₽ →
+                    Открыть полный курс за {rub(MENTAL_PRICE)} →
                   </a>
                 </div>
               ) : (

@@ -1,3 +1,5 @@
+import { COMPARE_PRICE, MENTAL_PRICE, SUBSCRIPTION_PRICE, rub } from '../lib/access-prices.js';
+
 export const directionsData = [
   {
     slug: 'mental-arithmetic',
@@ -35,7 +37,7 @@ export const directionsData = [
     accentBorder: 'border-brand-blue/16',
     heroGlow: 'bg-brand-blue/18',
     chips: ['устный счет', 'скорость мышления', 'концентрация'],
-    trustBadges: ['Первые уроки бесплатно', 'Сейчас 1 490 ₽ вместо 4 490 ₽', 'Результат заметен через 2–4 недели'],
+    trustBadges: ['Первые уроки бесплатно', `Сейчас ${rub(MENTAL_PRICE)} вместо ${rub(COMPARE_PRICE)}`, 'Результат заметен через 2–4 недели'],
     socialProof: '37 детей уже выбрали это направление в этом месяце',
     pains: [
       'Считает на пальцах и медленно',
@@ -121,7 +123,7 @@ export const directionsData = [
     ctaBullets: [
       'Первые уроки — бесплатно, без карты',
       'Ребёнок занимается сам, в своём темпе',
-      'Сейчас 1 490 ₽ вместо 4 490 ₽',
+      `Сейчас ${rub(MENTAL_PRICE)} вместо ${rub(COMPARE_PRICE)}`,
       'Без автосписаний и скрытых доплат',
     ],
   },
@@ -320,7 +322,7 @@ export const directionsData = [
       { v: 'бесплатно', l: 'первые уроки' },
       { v: '6–12', l: 'лет' },
       { v: 'в своём', l: 'темпе' },
-      { v: '1 490 ₽', l: 'доступ в месяц' },
+      { v: rub(SUBSCRIPTION_PRICE), l: 'доступ в месяц' },
     ],
     homeTip: {
       title: 'Игра «что изменилось»',

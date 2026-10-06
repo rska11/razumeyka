@@ -12,11 +12,12 @@ import {
   getAccessMap,
   type DirectionSlug,
 } from "@/lib/subscription";
+import { COMPARE_PRICE, MIN_PRICE, rub } from "@/lib/access-prices";
 
 export const metadata = {
   title: "Тарифы на детские онлайн-курсы",
   description:
-    "Три открытых курса Знайтона: рисование, ментальная арифметика и подготовка к школе. Первые занятия бесплатно, полный доступ — от 1 190 ₽.",
+    `Три открытых курса Знайтона: рисование, ментальная арифметика и подготовка к школе. Первые занятия бесплатно, полный доступ — от ${rub(MIN_PRICE)}.`,
   alternates: canonical("/tarify"),
 };
 
@@ -90,8 +91,8 @@ export default async function TariffsPage() {
                 Выберите подходящее направление. Без пакетов, скрытых доплат и автоматического продления.
               </p>
               <div className="mx-auto mt-7 inline-flex flex-wrap items-center justify-center gap-3 rounded-[24px] border border-white/90 bg-white/82 px-5 py-4 shadow-card backdrop-blur-xl">
-                <del className="text-xl font-extrabold text-ink/30">4 490 ₽</del>
-                <strong className="font-display text-4xl font-black text-brand-blue">от 1 190 ₽</strong>
+                <del className="text-xl font-extrabold text-ink/30">{rub(COMPARE_PRICE)}</del>
+                <strong className="font-display text-4xl font-black text-brand-blue">от {rub(MIN_PRICE)}</strong>
                 <span className="text-sm font-extrabold text-ink/48">за полный доступ к курсу</span>
               </div>
             </div>

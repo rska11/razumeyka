@@ -14,6 +14,7 @@ import { getAuthSession } from '@/lib/auth';
 import { reconcileUserPayments } from '@/lib/payments';
 import { directionPrice, getAccessUntil, hasActiveAccess } from '@/lib/subscription';
 import { canonical } from '@/lib/seo';
+import { COMPARE_PRICE, rub } from '@/lib/access-prices';
 
 const SCHOOL_PREP_DIRECTION = 'podgotovka-k-shkole';
 const SCHOOL_PREP_PRICE = directionPrice(SCHOOL_PREP_DIRECTION);
@@ -626,7 +627,7 @@ export default async function SchoolPrepPage() {
                 <div className="rounded-[30px] border border-white/70 bg-white p-6 text-ink shadow-[0_30px_80px_rgba(7,17,42,.34)] sm:p-8">
                   <p className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-brand-purple">45 дней полного доступа</p>
                   <div className="mt-4 text-lg font-extrabold text-ink/38">
-                    <del>4 490 ₽</del>
+                    <del>{rub(COMPARE_PRICE)}</del>
                   </div>
                   <div className="mt-1 flex items-end gap-2">
                     <strong className="font-display text-6xl font-extrabold tracking-[-0.06em]">{SCHOOL_PREP_PRICE}</strong>

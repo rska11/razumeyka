@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # Только для генерации клиента и сборки; к базе CI не подключается.
+      DATABASE_URL: file:./ci.db
+      NEXT_TELEMETRY_DISABLED: 1
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # В .npmrc прописано зеркало npmmirror (для сервера); в CI ставим из npmjs.
+      - run: npm ci --registry=https://registry.npmjs.org
+      - run: npx prisma generate
+
+      - name: Линтер
+        run: npm run lint
+      - name: Типы
+        run: npx tsc --noEmit
+      - name: Тесты
+        run: |
+          npm run test:games
+          npm run test:school-prep
+          npm run test:multiplication
+          npm run test:consent
+      - name: Сборка
+        run: npm run build

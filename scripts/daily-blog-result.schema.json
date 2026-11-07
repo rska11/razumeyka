@@ -1,0 +1,12 @@
+{
+  "type": "object",
+  "properties": {
+    "status": { "type": "string", "enum": ["published", "skipped", "failed"] },
+    "url": { "type": "string" },
+    "keyword": { "type": "string" },
+    "recrawlQueued": { "type": "boolean" },
+    "summary": { "type": "string" }
+  },
+  "required": ["status", "url", "keyword", "recrawlQueued", "summary"],
+  "additionalProperties": false
+}

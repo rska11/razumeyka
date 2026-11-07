@@ -49,3 +49,4 @@ tmp-edge-mental/
 # локальная БД разработки — у каждого своя, меняется при каждом запуске
 prisma/dev.db
 prisma/dev.db-journal
+/.daily-blog/

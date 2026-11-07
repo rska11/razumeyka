@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="810" viewBox="0 0 1440 810" role="img" aria-labelledby="title desc">
+  <title id="title">Продолжи дорожку</title>
+  <desc id="desc">Верхний ряд: круг, квадрат, круг, квадрат, круг, вопрос. Нижний: круг, круг, квадрат, круг, круг, вопрос. В каждом ряду найдите повторяющийся фрагмент.</desc>
+  <rect width="1440" height="810" rx="36" fill="#F6F2EB"/>
+  <circle cx="1380" cy="720" r="210" fill="#E3EFE7"/>
+  <g font-family="Arial, sans-serif" fill="#18334C">
+    <text x="90" y="105" font-size="32" font-weight="700" letter-spacing="4" fill="#287A69">ЗАМЕЧАЕМ ЗАКОНОМЕРНОСТЬ</text>
+    <text x="90" y="190" font-size="66" font-weight="700">Продолжи дорожку</text>
+    <text x="90" y="250" font-size="34" fill="#53677A">Что повторяется? Какая фигура будет следующей?</text>
+  </g>
+  <g fill="#FFF" stroke="#E7E1D8" stroke-width="2">
+    <rect x="90" y="304" width="1260" height="175" rx="30"/>
+    <rect x="90" y="514" width="1260" height="175" rx="30"/>
+  </g>
+  <g fill="#4075D8">
+    <circle cx="215" cy="391" r="50"/>
+    <circle cx="619" cy="391" r="50"/>
+    <circle cx="1023" cy="391" r="50"/>
+    <circle cx="215" cy="601" r="50"/>
+    <circle cx="417" cy="601" r="50"/>
+    <circle cx="821" cy="601" r="50"/>
+    <circle cx="1023" cy="601" r="50"/>
+  </g>
+  <g fill="#EE974E">
+    <rect x="367" y="341" width="100" height="100" rx="5"/>
+    <rect x="771" y="341" width="100" height="100" rx="5"/>
+    <rect x="569" y="551" width="100" height="100" rx="5"/>
+  </g>
+  <g fill="none" stroke="#8495A7" stroke-width="3" stroke-dasharray="8 8">
+    <rect x="1175" y="341" width="100" height="100" rx="18"/>
+    <rect x="1175" y="551" width="100" height="100" rx="18"/>
+  </g>
+  <g font-family="Arial, sans-serif" font-weight="700" font-size="64" text-anchor="middle" fill="#53677A">
+    <text x="1225" y="413">?</text>
+    <text x="1225" y="623">?</text>
+  </g>
+  <text x="90" y="757" font-family="Arial, sans-serif" font-size="32" fill="#53677A">Покажи весь кусочек, который повторяется.</text>
+</svg>

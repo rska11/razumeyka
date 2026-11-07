@@ -1,0 +1,16 @@
+User-Agent: *
+Allow: /
+Disallow: /admin
+Disallow: /teacher
+Disallow: /cabinet
+Disallow: /login
+Disallow: /spasibo
+Disallow: /api/
+Disallow: /privacy
+Disallow: /offer
+Disallow: /cookies
+
+# The game parameter opens a game in the same gallery; it is not a separate page.
+Clean-param: game /igry
+
+Sitemap: https://znayton.ru/sitemap.xml

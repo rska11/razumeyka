@@ -114,6 +114,7 @@ export default async function BlogPost({ params }) {
   };
   const coverGrad = coverThemes[post.cover?.theme] ?? coverThemes.blue;
   const editorialMeta = {
+    'risovanie-po-tochkam': { category: 'Рисование', gradient: 'from-[#7257E8] via-[#D946EF] to-[#F05A87]' },
     'logicheskoe-razvitie-rebenka': { category: 'Логика', gradient: 'from-[#079A78] via-[#246BFD] to-[#7257E8]' },
     'razvitie-pamyati-u-detey': { category: 'Память', gradient: 'from-[#246BFD] via-[#7257E8] to-[#16A6A1]' },
     'razvitie-voobrazheniya-u-detey': { category: 'Воображение', gradient: 'from-[#7257E8] via-[#D946EF] to-[#F05A87]' },

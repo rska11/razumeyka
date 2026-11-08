@@ -90,11 +90,15 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       console.log('Проверка доступа: node scripts/yandex-recrawl.mjs --check\nПереобход: node scripts/yandex-recrawl.mjs --submit https://znayton.ru/blog/slug\nПовторить очередь: node scripts/yandex-recrawl.mjs --retry-pending');
     } else if (args[0] === '--validate-url' && args.length === 2) {
       console.log(validateUrl(args[1]));
+    } else if (args[0] === '--enqueue' && args.length > 1) {
+      savePending(args.slice(1));
+      console.log('URL сохранены в локальную очередь переобхода.');
     } else if (args[0] === '--retry-pending' && args.length === 1) {
       submittedUrls = readPending();
       if (submittedUrls.length) {
         console.log(JSON.stringify(await recrawl({ token: process.env.YANDEX_WEBMASTER_TOKEN, urls: submittedUrls }), null, 2));
-        fs.writeFileSync(pendingFile, JSON.stringify({ urls: [] }) + '\n');
+        const remaining = readPending().filter((url) => !submittedUrls.includes(url));
+        fs.writeFileSync(pendingFile, JSON.stringify({ urls: remaining }) + '\n');
       } else console.log('Очередь переобхода пуста.');
     } else {
       if (!['--check', '--submit'].includes(args[0]) || (args[0] === '--check' && args.length !== 1) || (args[0] === '--submit' && args.length < 2)) throw new Error('Неверные аргументы. Используйте --help.');

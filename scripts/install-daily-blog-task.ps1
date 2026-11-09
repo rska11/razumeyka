@@ -12,9 +12,16 @@ if (!(Test-Path -LiteralPath (Join-Path $cliDirectory 'node_modules/.bin/codex.c
 }
 $identity = [Security.Principal.WindowsIdentity]::GetCurrent().Name
 $action = New-ScheduledTaskAction -Execute $powershellPath -Argument ('-NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -File "' + $runner + '" -Run') -WorkingDirectory $workspacePath
-$firstRun = (Get-Date).Date.AddDays(1).AddHours($Hour).AddMinutes($Minute)
-$trigger = @((New-ScheduledTaskTrigger -Daily -At $firstRun), (New-ScheduledTaskTrigger -AtLogOn -User $identity))
-$settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -WakeToRun -MultipleInstances IgnoreNew -ExecutionTimeLimit (New-TimeSpan -Hours 2) -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 30) -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
+# Explicit triggers also run when Windows does not honour RestartOnFailure.
+$scheduleBase = (Get-Date).Date.AddHours($Hour).AddMinutes($Minute)
+$trigger = @()
+foreach ($offset in @(0, 30, 60, 90, 120, 180, 360, 540)) {
+  $scheduledAt = $scheduleBase.AddMinutes($offset)
+  if ($scheduledAt -le (Get-Date)) { $scheduledAt = $scheduledAt.AddDays(1) }
+  $trigger += New-ScheduledTaskTrigger -Daily -At $scheduledAt
+}
+$trigger += New-ScheduledTaskTrigger -AtLogOn -User $identity
+$settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -WakeToRun -MultipleInstances IgnoreNew -ExecutionTimeLimit (New-TimeSpan -Hours 2) -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
 $principal = New-ScheduledTaskPrincipal -UserId $identity -LogonType Interactive -RunLevel Limited
 $task = New-ScheduledTask -Action $action -Trigger $trigger -Settings $settings -Principal $principal -Description 'One Znayton blog article per day using ChatGPT subscription; verify, publish and submit to Yandex Webmaster. No paid generation APIs.'
 Register-ScheduledTask -TaskName 'Znayton-Daily-Blog' -InputObject $task -Force | Select-Object TaskName, State

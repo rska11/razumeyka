@@ -87,6 +87,10 @@ try {
   else { $arguments += @('--sandbox', 'danger-full-access', '--output-schema', (Join-Path $PSScriptRoot 'daily-blog-result.schema.json')) }
   $arguments += '-'
   $runLog = Join-Path $statePath "$today-run.log"
+  if ($SmokeTest) { $runLog = Join-Path $statePath "$today-smoke-run.log" }
+  elseif (Test-Path -LiteralPath $runLog) {
+    Copy-Item -LiteralPath $runLog -Destination (Join-Path $statePath ("$today-run-before-attempt-$attempt.log"))
+  }
   # No API keys are passed to the child; the forced provider uses existing ChatGPT sign-in.
   $oldApiKey = $env:OPENAI_API_KEY
   Remove-Item Env:OPENAI_API_KEY -ErrorAction SilentlyContinue
@@ -110,6 +114,14 @@ try {
   if (!$SmokeTest) {
     & node scripts/daily-blog-state.mjs --snapshot $snapshotFile
     if ($LASTEXITCODE -ne 0) { throw 'The agent changed files outside the permitted article scope; manual review required.' }
+    if ($runExit -ne 0) {
+      $failedLog = [IO.File]::ReadAllText($runLog)
+      $connectionFailure = $failedLog -match 'workspace routing discovery failed|failed to refresh available models: request timed out|error sending request for url'
+      $workStarted = $failedLog -match '(?m)^(exec|codex|tool [^\r\n]+)\s*$'
+      if ($connectionFailure -and !$workStarted) {
+        @{ count = ($attempt - 1); lastConnectionFailureAt = [DateTime]::UtcNow.ToString('o') } | ConvertTo-Json | Set-Content -LiteralPath $attemptFile -Encoding UTF8
+      }
+    }
   }
   if ($runExit -ne 0) { throw "Codex exited with code $runExit. Review the local log in .daily-blog." }
   if ($SmokeTest) {

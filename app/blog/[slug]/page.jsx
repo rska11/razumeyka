@@ -114,6 +114,7 @@ export default async function BlogPost({ params }) {
   };
   const coverGrad = coverThemes[post.cover?.theme] ?? coverThemes.blue;
   const editorialMeta = {
+  'razvitie-svyaznoy-rechi-u-detey': { category: 'Речь', gradient: 'from-[#079A78] via-[#246BFD] to-[#7257E8]' },
   'kalligrafiya-dlya-detey': { category: 'Письмо', gradient: 'from-[#7257E8] via-[#D946EF] to-[#F05A87]' },
     'risovanie-po-tochkam': { category: 'Рисование', gradient: 'from-[#7257E8] via-[#D946EF] to-[#F05A87]' },
     'logicheskoe-razvitie-rebenka': { category: 'Логика', gradient: 'from-[#079A78] via-[#246BFD] to-[#7257E8]' },

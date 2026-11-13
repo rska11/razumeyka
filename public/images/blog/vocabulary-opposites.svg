@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="810" viewBox="0 0 1440 810" role="img" aria-labelledby="t d">
+<title id="t">Скажи наоборот: сначала прочитай фразу</title><desc id="d">Лёгкий рюкзак — тяжёлый рюкзак. Лёгкий вопрос — трудный вопрос.</desc>
+<rect width="1440" height="810" rx="36" fill="#f2f8f5"/>
+<g font-family="Arial,sans-serif" fill="#163348"><text x="80" y="110" font-size="52" font-weight="700">Скажи наоборот</text><text x="80" y="168" font-size="32">Значение выбираем по всей фразе</text>
+<rect x="70" y="225" width="1300" height="200" rx="28" fill="white"/>
+<rect x="70" y="460" width="1300" height="200" rx="28" fill="white"/>
+<text x="120" y="305" font-size="30" fill="#167c70">Сколько весит?</text><text x="120" y="370" font-size="46" font-weight="700">лёгкий рюкзак</text>
+<path d="M650 345h100m-22-18 22 18-22 18" fill="none" stroke="#167c70" stroke-width="7" stroke-linecap="round"/>
+<text x="800" y="370" font-size="46" font-weight="700">тяжёлый рюкзак</text>
+<text x="120" y="540" font-size="30" fill="#7257b8">Трудно ли ответить?</text><text x="120" y="605" font-size="46" font-weight="700">лёгкий вопрос</text>
+<path d="M650 580h100m-22-18 22 18-22 18" fill="none" stroke="#7257b8" stroke-width="7" stroke-linecap="round"/>
+<text x="800" y="605" font-size="46" font-weight="700">трудный вопрос</text>
+<text x="80" y="740" font-size="30">Твой ход: придумай две фразы со словом «мягкий».</text></g></svg>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="810" viewBox="0 0 1440 810" role="img" aria-labelledby="t d">
+<title id="t">Одно слово — разные значения</title><desc id="d">Художник промыл кисть: инструмент для рисования. На лозе созрела кисть: виноград. Придумай свою фразу.</desc>
+<rect width="1440" height="810" rx="36" fill="#f5f2fb"/>
+<g font-family="Arial,sans-serif" fill="#163348"><text x="80" y="110" font-size="52" font-weight="700">Что значит «кисть»?</text><text x="80" y="168" font-size="32">Слова рядом помогают понять значение</text>
+<rect x="70" y="220" width="1300" height="175" rx="28" fill="white"/><rect x="70" y="425" width="1300" height="175" rx="28" fill="white"/>
+<text x="110" y="288" font-size="40" font-weight="700">Художник промыл кисть.</text><text x="110" y="350" font-size="30">Чем можно рисовать?</text>
+<path d="M1100 335l95-75" stroke="#c89455" stroke-width="24" stroke-linecap="round"/><path d="M1090 326q-60 0-65 55 48 0 73-39" fill="#387eac"/>
+<text x="110" y="493" font-size="40" font-weight="700">На лозе созрела кисть.</text><text x="110" y="555" font-size="30">Что может созреть? Например, виноград.</text>
+<path d="M1150 456q-15-27 15-29" stroke="#27836c" stroke-width="9" fill="none"/>
+<g fill="#8060ae"><circle cx="1120" cy="480" r="22"/><circle cx="1165" cy="480" r="22"/><circle cx="1098" cy="518" r="22"/><circle cx="1143" cy="518" r="22"/><circle cx="1188" cy="518" r="22"/><circle cx="1120" cy="556" r="22"/><circle cx="1165" cy="556" r="22"/><circle cx="1143" cy="589" r="22"/></g>
+<text x="80" y="680" font-size="32" font-weight="700">Твоя фраза со словом «кисть»:</text><path d="M80 746h1280" stroke="#baa9d4" stroke-width="3" stroke-dasharray="12 8"/></g></svg>

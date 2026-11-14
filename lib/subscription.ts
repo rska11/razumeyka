@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 // Оплата открывает конкретное направление; чтобы открыть второе — отдельная оплата.
 // Пилот: оплаченный период доступа без автосписания (продлевается вручную/новой оплатой).
 
-export const SUBSCRIPTION_PRICE = 1490; // ₽ за период (по умолчанию)
+export const SUBSCRIPTION_PRICE = 490; // ₽ за период (по умолчанию)
 export const SUBSCRIPTION_MONTHS = 1;
 export const SCHOOL_PREP_ACCESS_DAYS = 45;
 
@@ -22,7 +22,7 @@ export const DIRECTION_COMPARE_PRICE = 4490;
 export const DIRECTION_PRICE: Record<DirectionSlug, number> = {
   risovanie: SUBSCRIPTION_PRICE,
   "mentalnaya-arifmetika": SUBSCRIPTION_PRICE,
-  "podgotovka-k-shkole": 1190,
+  "podgotovka-k-shkole": 390,
 };
 
 /** Цена доступа к направлению в рублях. */

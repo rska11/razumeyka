@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { canonical } from '@/lib/seo';
 import { Header } from '@/components/Header.jsx';
 import { Footer } from '@/components/Footer.jsx';
@@ -240,7 +241,6 @@ export default async function MultiplicationTrainerPage() {
                     <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-brand-green">Отдельный курс №1</p>
                     <h3 className="mt-3 font-display text-2xl font-extrabold">Ментальная арифметика</h3>
                     <p className="mt-2 min-h-[48px] text-xs font-semibold leading-5 text-ink/48">Абакус, устный счёт и полный тренажёр умножения.</p>
-                    <del className="mt-5 block text-sm font-extrabold text-ink/28">4 490 ₽</del>
                     <div className="mt-1 flex items-end gap-2"><strong className="font-display text-5xl font-extrabold tracking-[-0.06em]">{MENTAL_PRICE}</strong><span className="pb-1.5 text-base font-extrabold text-ink/44">₽</span></div>
                     <SubscribeButton isLoggedIn={Boolean(session?.user?.id)} hasAccess={mentalHasAccess} accessUntil={mentalAccessUntilLabel} returnTo="/mentalnaya-arifmetika" loginCallback="/trenazher-umnozheniya#dostup" buttonLabel={`Выбрать менталку · ${MENTAL_PRICE} ₽`} />
                   </article>
@@ -248,11 +248,16 @@ export default async function MultiplicationTrainerPage() {
                     <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-brand-purple">Отдельный курс №2</p>
                     <h3 className="mt-3 font-display text-2xl font-extrabold">Подготовка к школе</h3>
                     <p className="mt-2 min-h-[48px] text-xs font-semibold leading-5 text-ink/48">Чтение, речь, логика, письмо и полный тренажёр умножения.</p>
-                    <del className="mt-5 block text-sm font-extrabold text-ink/28">4 490 ₽</del>
                     <div className="mt-1 flex items-end gap-2"><strong className="font-display text-5xl font-extrabold tracking-[-0.06em]">{SCHOOL_PRICE}</strong><span className="pb-1.5 text-base font-extrabold text-ink/44">₽</span></div>
                     <SubscribeButton isLoggedIn={Boolean(session?.user?.id)} hasAccess={schoolHasAccess} accessUntil={schoolAccessUntilLabel} returnTo="/podgotovka-k-shkole" loginCallback="/trenazher-umnozheniya#dostup" buttonLabel={`Выбрать подготовку · ${SCHOOL_PRICE} ₽`} />
                   </article>
-                  <p className="text-center text-[11px] font-semibold leading-5 text-white/48 md:col-span-2">Вы покупаете только выбранный курс. Второй курс не откроется. Продление — вручную, без автосписания.</p>
+                  <p className="text-center text-[11px] font-semibold leading-5 text-white/48 md:col-span-2">
+                    Вы покупаете выбранный курс отдельно — или откройте{' '}
+                    <Link href="/tarify#vse-napravleniya" className="font-extrabold text-[#9AECD3] underline">
+                      пакет «Все направления» за 990 ₽
+                    </Link>{' '}
+                    (все 3 курса со скидкой 27%).
+                  </p>
                 </div>
               </div>
             </div>

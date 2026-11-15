@@ -3,10 +3,10 @@
 import { useState } from 'react';
 import { reachGoal } from '@/lib/metrika';
 
-// Кнопка оформления доступа к направлению self-study (раздельно по направлениям).
+// Кнопка оформления доступа к направлению self-study или пакету «Все направления» (product="vse-napravleniya").
 // Не залогинен → на вход; залогинен → принимает оферту, создаём платёж и уходим на ЮKassa.
-// returnTo определяет направление и страницу возврата после оплаты; после первого входа показываем витрину кабинета.
-export function SubscribeButton({ isLoggedIn, hasAccess, accessUntil = '', returnTo = '/risovanie', buttonLabel = 'Оформить доступ', loginCallback = '/cabinet' }) {
+// returnTo определяет направление (если не задан product); после первого входа показываем витрину кабинета.
+export function SubscribeButton({ isLoggedIn, hasAccess, accessUntil = '', returnTo = '/risovanie', product = '', buttonLabel = 'Оформить доступ', loginCallback = '/cabinet' }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [accepted, setAccepted] = useState(false);
@@ -20,8 +20,9 @@ export function SubscribeButton({ isLoggedIn, hasAccess, accessUntil = '', retur
   }
 
   async function go() {
+    const goalTarget = product || returnTo;
     if (!isLoggedIn) {
-      reachGoal('subscription_login_start', { return_to: returnTo });
+      reachGoal('subscription_login_start', { return_to: goalTarget });
       window.location.href = `/login?callbackUrl=${encodeURIComponent(loginCallback)}`;
       return;
     }
@@ -30,13 +31,13 @@ export function SubscribeButton({ isLoggedIn, hasAccess, accessUntil = '', retur
       return;
     }
     setError('');
-    reachGoal('checkout_start', { return_to: returnTo });
+    reachGoal('checkout_start', { return_to: goalTarget });
     setLoading(true);
     try {
       const res = await fetch('/api/subscription/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ returnTo, acceptedOffer: true }),
+        body: JSON.stringify({ returnTo, ...(product ? { product } : {}), acceptedOffer: true }),
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.url) {

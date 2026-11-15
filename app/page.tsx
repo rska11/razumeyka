@@ -40,7 +40,7 @@ export default function HomePage() {
             description:
               "Онлайн-платформа для развития детей 3–10+ лет: правополушарное рисование, ментальная арифметика, скорочтение и другие направления.",
             logo: "https://znayton.ru/images/logo.png",
-            email: "info@znayton.ru",
+            email: "znayton@genpic.ai",
             areaServed: "RU",
             audience: { "@type": "EducationalAudience", educationalRole: "student" },
           }),

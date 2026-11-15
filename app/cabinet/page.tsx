@@ -3,29 +3,45 @@ import { redirect } from "next/navigation";
 import { getAuthSession } from "@/lib/auth";
 import { getCabinetData } from "@/lib/cabinet";
 import { SubscribeButton } from "@/components/drawing/SubscribeButton.jsx";
-import { DIRECTION_COMPARE_PRICE, DIRECTIONS, directionAccessLabel, directionPrice, isDirectionSlug, type DirectionSlug } from "@/lib/subscription";
+import {
+  ALL_DIRECTION_SLUGS,
+  BUNDLE_PRICE,
+  BUNDLE_SLUG,
+  BUNDLE_TITLE,
+  bundleFullPrice,
+  bundleSavings,
+  DIRECTIONS,
+  directionAccessLabel,
+  directionPrice,
+  isBundleSlug,
+  isDirectionSlug,
+  type DirectionSlug,
+} from "@/lib/subscription";
 
 const COURSE_VISUALS: Record<
   DirectionSlug,
-  { kicker: string; description: string; gradient: string; glow: string }
+  { kicker: string; description: string; gradient: string; glow: string; unit: string }
 > = {
   risovanie: {
     kicker: "Творческая мастерская",
     description: "Пошаговые уроки, голосовое сопровождение и сотни идей для детского портфолио.",
     gradient: "from-[#246BFD] via-[#7257E8] to-[#EC4899]",
     glow: "bg-brand-pink/35",
+    unit: "уроков",
   },
   "mentalnaya-arifmetika": {
     kicker: "Тренировка мышления",
     description: "Абакус, уверенный счёт в уме и полноценный тренажёр таблицы умножения.",
     gradient: "from-[#079A78] via-[#16A6A1] to-[#3B82F6]",
     glow: "bg-brand-cyan/30",
+    unit: "уроков",
   },
   "podgotovka-k-shkole": {
     kicker: "Экспедиция в Город знаний",
     description: "Речь, счёт, внимание, письмо и полный тренажёр таблицы умножения 2–9.",
     gradient: "from-[#246BFD] via-[#7257E8] to-[#F05A87]",
     glow: "bg-brand-purple/30",
+    unit: "миссий",
   },
 };
 
@@ -77,20 +93,26 @@ export default async function CabinetOverview() {
   const session = await getAuthSession();
   if (!session?.user?.id) redirect("/login?callbackUrl=/cabinet");
 
-  const { children, payments, achievementsCount, accessMap } = await getCabinetData(session.user.id);
+  const { children, payments, achievementsCount, accessMap, courseProgress, totalCompletedLessons } =
+    await getCabinetData(session.user.id);
   const now = new Date();
-  const directionAccess = (Object.keys(DIRECTIONS) as DirectionSlug[]).map((slug) => {
+  const directionAccess = ALL_DIRECTION_SLUGS.map((slug) => {
     const until = accessMap[slug];
     return {
       slug,
       meta: DIRECTIONS[slug],
       until,
       active: Boolean(until && until.getTime() > now.getTime()),
+      done: courseProgress[slug]?.completedCount ?? 0,
+      lastAt: courseProgress[slug]?.lastActivityAt ?? null,
     };
   });
   const activeDirections = directionAccess.filter((direction) => direction.active);
   const lockedDirections = directionAccess.filter((direction) => !direction.active);
   const greetingName = session.user.name?.trim().split(/\s+/)[0];
+  const savings = bundleSavings();
+  const fullPrice = bundleFullPrice();
+  const recentAchievements = children.flatMap((c) => c.achievements.map((a) => ({ ...a, childName: c.name }))).slice(0, 6);
 
   return (
     <div className="grid gap-7 pb-8">
@@ -106,17 +128,77 @@ export default async function CabinetOverview() {
             Здесь начинается обучение: выбирайте направление и сразу переходите к урокам.
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <span className="rounded-full border border-white/80 bg-white/80 px-4 py-2 text-xs font-extrabold text-ink/60 shadow-sm">
             {openedDirectionsLabel(activeDirections.length)}
           </span>
+          {totalCompletedLessons > 0 && (
+            <span className="rounded-full border border-brand-green/18 bg-brand-green/10 px-4 py-2 text-xs font-extrabold text-brand-green">
+              ✓ {totalCompletedLessons} пройдено
+            </span>
+          )}
           {achievementsCount > 0 && (
             <span className="rounded-full border border-brand-orange/16 bg-brand-orange/8 px-4 py-2 text-xs font-extrabold text-brand-orange">
-              {achievementsCount} достижений
+              🏅 {achievementsCount} наград
             </span>
           )}
         </div>
       </header>
+
+      {/* Сводка прогресса ребёнка по направлениям */}
+      <section className="rounded-[28px] border border-white/80 bg-white/84 p-5 shadow-card backdrop-blur-xl sm:p-6">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-brand-blue">Дневник успехов</p>
+            <h2 className="mt-1 font-display text-xl font-extrabold text-ink sm:text-2xl">
+              Прогресс по курсам
+            </h2>
+          </div>
+          <Link href="/trenazher-umnozheniya" className="text-xs font-extrabold text-brand-blue hover:text-brand-blue/75">
+            Тренажёр умножения →
+          </Link>
+        </div>
+
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+          {directionAccess.map(({ slug, meta, done, lastAt }) => {
+            const visual = COURSE_VISUALS[slug];
+            return (
+              <Link
+                key={slug}
+                href={`${meta.path}#uroki`}
+                className="group flex items-center justify-between gap-3 rounded-[20px] border border-ink/6 bg-white p-4 transition hover:-translate-y-0.5 hover:border-brand-blue/25 hover:shadow-card"
+              >
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-extrabold text-ink group-hover:text-brand-blue">{meta.title}</p>
+                  <p className="mt-1 text-xs font-semibold text-ink/48">
+                    {done > 0
+                      ? `Пройдено: ${done} ${visual.unit}${lastAt ? ` · ${formatDate(lastAt)}` : ""}`
+                      : "Ещё не начинали — попробуйте первый урок"}
+                  </p>
+                </div>
+                <span className="flex h-11 min-w-[44px] shrink-0 items-center justify-center rounded-[14px] bg-brand-blue/10 px-2.5 font-display text-base font-black text-brand-blue">
+                  {done}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+
+        {recentAchievements.length > 0 && (
+          <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-ink/6 pt-4">
+            <span className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-ink/42">Награды:</span>
+            {recentAchievements.map((a) => (
+              <span
+                key={a.id}
+                className="inline-flex items-center gap-1.5 rounded-full bg-brand-orange/12 px-3 py-1 text-xs font-extrabold text-brand-orange"
+              >
+                <span>{a.icon ?? "🏅"}</span>
+                <span>{a.title}</span>
+              </span>
+            ))}
+          </div>
+        )}
+      </section>
 
       <section>
         <div className="mb-4 flex items-end justify-between gap-4">
@@ -130,7 +212,7 @@ export default async function CabinetOverview() {
 
         {activeDirections.length > 0 ? (
           <div className="grid gap-4 xl:grid-cols-2">
-            {activeDirections.map(({ slug, meta, until }) => {
+            {activeDirections.map(({ slug, meta, until, done }) => {
               const visual = COURSE_VISUALS[slug];
               return (
                 <article
@@ -144,10 +226,17 @@ export default async function CabinetOverview() {
                       <span className="flex h-14 w-14 items-center justify-center rounded-[20px] border border-white/18 bg-white/16 shadow-insetline backdrop-blur-xl">
                         <CourseIcon slug={slug} />
                       </span>
-                      <span className="inline-flex items-center gap-2 rounded-full border border-white/18 bg-white/16 px-3 py-1.5 text-xs font-extrabold backdrop-blur-xl">
-                        <span className="h-2 w-2 rounded-full bg-[#78F0A3] shadow-[0_0_0_4px_rgba(120,240,163,0.16)]" />
-                        Доступ открыт
-                      </span>
+                      <div className="flex flex-wrap items-center gap-2">
+                        {done > 0 && (
+                          <span className="rounded-full border border-white/18 bg-white/16 px-3 py-1.5 text-xs font-extrabold backdrop-blur-xl">
+                            Пройдено: {done}
+                          </span>
+                        )}
+                        <span className="inline-flex items-center gap-2 rounded-full border border-white/18 bg-white/16 px-3 py-1.5 text-xs font-extrabold backdrop-blur-xl">
+                          <span className="h-2 w-2 rounded-full bg-[#78F0A3] shadow-[0_0_0_4px_rgba(120,240,163,0.16)]" />
+                          Доступ открыт
+                        </span>
+                      </div>
                     </div>
 
                     <div className="mt-8">
@@ -177,15 +266,20 @@ export default async function CabinetOverview() {
           <div className="dark-rainbow relative overflow-hidden rounded-[32px] p-6 text-white shadow-luxe sm:p-9">
             <div className="relative max-w-2xl">
               <span className="inline-flex rounded-full border border-white/14 bg-white/10 px-3 py-1.5 text-xs font-extrabold text-white/78">
-                Бесплатный старт
+                Бесплатный старт · или все 3 курса со скидкой {savings.percent}%
               </span>
               <h3 className="mt-5 font-display text-3xl font-extrabold tracking-[-0.035em] sm:text-4xl">Выберите первый курс прямо сейчас</h3>
               <p className="mt-3 text-base font-medium leading-7 text-white/68">
-                Три направления уже открыты. Сначала попробуйте бесплатные занятия, затем откройте полный доступ к выбранному курсу.
+                Три направления уже открыты. Попробуйте бесплатные занятия, выберите один курс от 390 ₽ или откройте пакет «{BUNDLE_TITLE}» за {BUNDLE_PRICE} ₽ вместо {fullPrice} ₽.
               </p>
-              <Link href="/tarify" className="mt-7 inline-flex min-h-[54px] items-center rounded-full bg-white px-7 py-3 text-sm font-extrabold text-night shadow-color transition hover:-translate-y-1">
-                Посмотреть три курса <span className="ml-2 text-lg">→</span>
-              </Link>
+              <div className="mt-7 flex flex-wrap gap-3">
+                <Link href={`/tarify#${BUNDLE_SLUG}`} className="inline-flex min-h-[54px] items-center rounded-full bg-white px-7 py-3 text-sm font-extrabold text-night shadow-color transition hover:-translate-y-1">
+                  Все 3 курса за {BUNDLE_PRICE} ₽ <span className="ml-2 text-lg">→</span>
+                </Link>
+                <Link href="/tarify" className="inline-flex min-h-[54px] items-center rounded-full border border-white/24 bg-white/10 px-6 py-3 text-sm font-extrabold text-white transition hover:bg-white/18">
+                  Посмотреть по отдельности
+                </Link>
+              </div>
             </div>
           </div>
         )}
@@ -200,6 +294,29 @@ export default async function CabinetOverview() {
             </div>
             <p className="text-sm font-semibold text-ink/50">Первые уроки можно попробовать бесплатно</p>
           </div>
+
+          {lockedDirections.length >= 2 && (
+            <div className="mt-5 flex flex-col justify-between gap-4 rounded-[24px] bg-gradient-to-r from-[#0f1f3d] via-[#1f3168] to-[#3b1d5e] p-5 text-white sm:flex-row sm:items-center sm:p-6">
+              <div>
+                <span className="inline-flex rounded-full bg-brand-orange px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.12em] text-white">
+                  Выгодно · −{savings.percent}%
+                </span>
+                <h3 className="mt-2 font-display text-xl font-extrabold sm:text-2xl">
+                  Пакет «{BUNDLE_TITLE}» — все 3 курса за {BUNDLE_PRICE} ₽ вместо {fullPrice} ₽
+                </h3>
+                <p className="mt-1 text-xs font-semibold text-white/72 sm:text-sm">
+                  Рисование + ментальная арифметика + подготовка к школе одной оплатой (экономия {savings.rub} ₽).
+                </p>
+              </div>
+              <Link
+                href={`/tarify#${BUNDLE_SLUG}`}
+                className="inline-flex min-h-[48px] shrink-0 items-center justify-center rounded-full bg-white px-6 py-2.5 text-xs font-extrabold text-ink shadow-sm transition hover:-translate-y-0.5"
+              >
+                Открыть пакет за {BUNDLE_PRICE} ₽ →
+              </Link>
+            </div>
+          )}
+
           <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {lockedDirections.map(({ slug, meta }) => {
               const visual = COURSE_VISUALS[slug];
@@ -219,7 +336,6 @@ export default async function CabinetOverview() {
                     <p className="mt-5 text-sm font-semibold leading-6 text-white/74">{visual.description}</p>
                     <div className="mt-auto pt-6">
                       <div className="mb-4 flex items-end gap-2">
-                        <del className="pb-0.5 text-sm font-extrabold text-white/48">{DIRECTION_COMPARE_PRICE.toLocaleString("ru-RU")} ₽</del>
                         <strong className="font-display text-3xl font-black text-white">{directionPrice(slug)} ₽</strong>
                         <span className="pb-1 text-[10px] font-extrabold uppercase tracking-[0.12em] text-white/54">на {directionAccessLabel(slug)}</span>
                       </div>
@@ -251,10 +367,10 @@ export default async function CabinetOverview() {
               <div className="flex items-center gap-2">
                 <h2 className="font-display text-xl font-extrabold text-ink">Профили детей</h2>
                 {children.length === 0 && (
-                  <span className="rounded-full bg-ink/6 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.1em] text-ink/44">Необязательно</span>
+                  <span className="rounded-full bg-ink/6 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.1em] text-ink/44">Для наград</span>
                 )}
               </div>
-              <p className="mt-1 text-sm font-medium leading-6 text-ink/50">Для личного прогресса и достижений каждого ребёнка.</p>
+              <p className="mt-1 text-sm font-medium leading-6 text-ink/50">Для именных наград и тренажёра таблицы умножения.</p>
             </div>
             <Link href="/cabinet/children" className="shrink-0 text-sm font-extrabold text-brand-blue hover:text-brand-blue/70">
               Управлять →
@@ -264,7 +380,7 @@ export default async function CabinetOverview() {
             <Link href="/cabinet/children" className="mt-5 flex items-center justify-between rounded-[20px] border border-dashed border-brand-blue/24 bg-brand-blue/[0.04] px-5 py-5 transition hover:border-brand-blue/42 hover:bg-brand-blue/[0.07]">
               <span>
                 <span className="block text-sm font-extrabold text-ink">Добавить ребёнка</span>
-                <span className="mt-1 block text-xs font-semibold text-ink/48">Имя и возраст — займёт меньше минуты</span>
+                <span className="mt-1 block text-xs font-semibold text-ink/48">Имя и возраст — чтобы копить медали за уроки</span>
               </span>
               <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-blue text-xl font-bold text-white">+</span>
             </Link>
@@ -301,6 +417,7 @@ export default async function CabinetOverview() {
             )}
             {payments.slice(0, 3).map((payment) => {
               const direction = isDirectionSlug(payment.directionSlug) ? DIRECTIONS[payment.directionSlug] : null;
+              const isBundle = isBundleSlug(payment.directionSlug);
               return (
                 <div key={payment.id} className="flex flex-wrap items-center justify-between gap-3 rounded-[18px] border border-ink/6 bg-white px-4 py-3.5">
                   <div className="min-w-0 flex-1">
@@ -314,6 +431,11 @@ export default async function CabinetOverview() {
                       <Link href={`${direction.path}#uroki`} className="rounded-full bg-brand-green/12 px-3 py-1.5 text-[11px] font-extrabold text-brand-green transition hover:bg-brand-green/18">
                         К урокам →
                       </Link>
+                    )}
+                    {payment.status === "paid" && isBundle && (
+                      <span className="rounded-full bg-brand-green/12 px-3 py-1.5 text-[11px] font-extrabold text-brand-green">
+                        3 курса ✓
+                      </span>
                     )}
                   </div>
                 </div>

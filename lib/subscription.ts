@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 
 // Доступ к self-study библиотеке — РАЗДЕЛЬНО ПО НАПРАВЛЕНИЯМ.
-// Оплата открывает конкретное направление; чтобы открыть второе — отдельная оплата.
+// Оплата открывает конкретное направление либо пакет «Все направления» (BUNDLE_SLUG).
 // Пилот: оплаченный период доступа без автосписания (продлевается вручную/новой оплатой).
 
 export const SUBSCRIPTION_PRICE = 490; // ₽ за период (по умолчанию)
@@ -18,7 +18,6 @@ export const DIRECTIONS = {
 export type DirectionSlug = keyof typeof DIRECTIONS;
 
 // Цена доступа по направлению.
-export const DIRECTION_COMPARE_PRICE = 4490;
 export const DIRECTION_PRICE: Record<DirectionSlug, number> = {
   risovanie: SUBSCRIPTION_PRICE,
   "mentalnaya-arifmetika": SUBSCRIPTION_PRICE,
@@ -36,6 +35,79 @@ export function directionAccessLabel(direction: DirectionSlug): string {
 
 export function isDirectionSlug(v: unknown): v is DirectionSlug {
   return typeof v === "string" && Object.prototype.hasOwnProperty.call(DIRECTIONS, v);
+}
+
+// ── Пакет «Все направления» ────────────────────────────────────────────────
+// Одна оплата продлевает доступ сразу ко всем направлениям из DIRECTIONS
+// (каждое — на свой обычный период: 1 мес, подготовка к школе — 45 дней).
+// В Payment хранится directionSlug = BUNDLE_SLUG.
+export const BUNDLE_SLUG = "vse-napravleniya";
+export const BUNDLE_TITLE = "Все направления";
+export const BUNDLE_PRICE = 990;
+
+export type PurchaseSlug = DirectionSlug | typeof BUNDLE_SLUG;
+
+export const ALL_DIRECTION_SLUGS = Object.keys(DIRECTIONS) as DirectionSlug[];
+
+/** Сумма цен всех направлений по отдельности — для показа выгоды пакета. */
+export function bundleFullPrice(): number {
+  return ALL_DIRECTION_SLUGS.reduce((sum, slug) => sum + directionPrice(slug), 0);
+}
+
+/** Выгода пакета в рублях и процентах (округление вниз, чтобы не завышать). */
+export function bundleSavings(): { rub: number; percent: number } {
+  const full = bundleFullPrice();
+  const rub = Math.max(0, full - BUNDLE_PRICE);
+  return { rub, percent: full > 0 ? Math.floor((rub / full) * 100) : 0 };
+}
+
+export function isBundleSlug(v: unknown): v is typeof BUNDLE_SLUG {
+  return v === BUNDLE_SLUG;
+}
+
+export function isPurchaseSlug(v: unknown): v is PurchaseSlug {
+  return isDirectionSlug(v) || isBundleSlug(v);
+}
+
+export function purchasePrice(slug: PurchaseSlug): number {
+  return isBundleSlug(slug) ? BUNDLE_PRICE : directionPrice(slug);
+}
+
+export function purchaseTitle(slug: PurchaseSlug): string {
+  return isBundleSlug(slug) ? BUNDLE_TITLE : DIRECTIONS[slug].title;
+}
+
+export function purchaseAccessLabel(slug: PurchaseSlug): string {
+  return isBundleSlug(slug)
+    ? `${SUBSCRIPTION_MONTHS} мес, подготовка к школе — ${SCHOOL_PREP_ACCESS_DAYS} дней`
+    : directionAccessLabel(slug);
+}
+
+/** Куда вести после оплаты / в «К урокам». */
+export function purchasePath(slug: PurchaseSlug): string {
+  return isBundleSlug(slug) ? "/cabinet" : DIRECTIONS[slug].path;
+}
+
+/**
+ * Применить оплаченный платёж-подписку: продлить доступ к направлению или ко всем
+ * направлениям пакета. Вызывается ОДИН раз на платёж (идемпотентность — на стороне
+ * вызывающего: переход статуса pending → paid).
+ */
+export async function applyPaidSubscription(payment: {
+  userId: string;
+  directionSlug: string | null;
+  periodMonths: number | null;
+}): Promise<void> {
+  const months = payment.periodMonths ?? 1;
+  if (isBundleSlug(payment.directionSlug)) {
+    for (const slug of ALL_DIRECTION_SLUGS) {
+      await extendAccess(payment.userId, slug, months);
+    }
+    return;
+  }
+  if (isDirectionSlug(payment.directionSlug)) {
+    await extendAccess(payment.userId, payment.directionSlug, months);
+  }
 }
 
 /** Слаг направления по пути возврата (returnTo). null — если путь не относится к направлению. */

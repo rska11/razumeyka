@@ -1,4 +1,4 @@
-import { canonical } from '@/lib/seo';
+import { canonical } from "@/lib/seo";
 import Link from "next/link";
 import { Footer } from "@/components/Footer.jsx";
 import { Header } from "@/components/Header.jsx";
@@ -6,7 +6,12 @@ import { SubscribeButton } from "@/components/drawing/SubscribeButton.jsx";
 import { getAuthSession } from "@/lib/auth";
 import { reconcileUserPayments } from "@/lib/payments";
 import {
-  DIRECTION_COMPARE_PRICE,
+  ALL_DIRECTION_SLUGS,
+  BUNDLE_PRICE,
+  BUNDLE_SLUG,
+  BUNDLE_TITLE,
+  bundleFullPrice,
+  bundleSavings,
   directionAccessLabel,
   directionPrice,
   getAccessMap,
@@ -16,7 +21,7 @@ import {
 export const metadata = {
   title: "Тарифы на детские онлайн-курсы",
   description:
-    "Три открытых курса Знайтона: рисование, ментальная арифметика и подготовка к школе. Первые занятия бесплатно, полный доступ — от 390 ₽.",
+    `Три открытых курса Знайтона: рисование, ментальная арифметика и подготовка к школе. Первые занятия бесплатно, один курс — от 390 ₽, пакет «${BUNDLE_TITLE}» — ${BUNDLE_PRICE} ₽.`,
   alternates: canonical("/tarify"),
 };
 
@@ -53,6 +58,13 @@ const courses = [
   },
 ] as const;
 
+const bundlePerks = [
+  "Правополушарное рисование (30 дней) — все возрастные ступени",
+  "Ментальная арифметика (30 дней) + тренажёр умножения 2–9",
+  "Подготовка к школе (45 дней) — полный маршрут на 5 недель",
+  "Один аккаунт для всех детей в семье · прогресс сохраняется",
+];
+
 function accessDate(date: Date | null | undefined) {
   if (!date) return "";
   return new Intl.DateTimeFormat("ru-RU", {
@@ -71,6 +83,16 @@ export default async function TariffsPage() {
     accessMap = await getAccessMap(session.user.id);
   }
 
+  const now = Date.now();
+  const fullPrice = bundleFullPrice();
+  const savings = bundleSavings();
+  const allActive = Boolean(
+    accessMap && ALL_DIRECTION_SLUGS.every((slug) => accessMap[slug] && accessMap[slug]!.getTime() > now),
+  );
+  const minBundleUntil = allActive && accessMap
+    ? ALL_DIRECTION_SLUGS.map((s) => accessMap[s]!).sort((a, b) => a.getTime() - b.getTime())[0]
+    : null;
+
   return (
     <>
       <Header />
@@ -87,20 +109,89 @@ export default async function TariffsPage() {
                 Выберите курс сейчас — <span className="bg-gradient-to-r from-brand-blue via-brand-purple to-brand-pink bg-clip-text text-transparent">первые занятия бесплатно</span>
               </h1>
               <p className="mx-auto mt-6 max-w-2xl text-base font-semibold leading-8 text-ink/62 sm:text-lg">
-                Выберите подходящее направление. Без пакетов, скрытых доплат и автоматического продления.
+                Возьмите одно направление или сразу все три со скидкой {savings.percent}%. Без скрытых доплат и автоматического продления.
               </p>
               <div className="mx-auto mt-7 inline-flex flex-wrap items-center justify-center gap-3 rounded-[24px] border border-white/90 bg-white/82 px-5 py-4 shadow-card backdrop-blur-xl">
-                <del className="text-xl font-extrabold text-ink/30">4 490 ₽</del>
                 <strong className="font-display text-4xl font-black text-brand-blue">от 390 ₽</strong>
-                <span className="text-sm font-extrabold text-ink/48">за полный доступ к курсу</span>
+                <span className="text-sm font-extrabold text-ink/48">за курс · или {BUNDLE_PRICE} ₽ за все три</span>
               </div>
             </div>
 
-            <div className="mt-12 grid gap-5 xl:grid-cols-3">
+            {/* Пакет «Все направления» */}
+            <article
+              id={BUNDLE_SLUG}
+              className="relative isolate mt-12 overflow-hidden rounded-[36px] border border-white/90 bg-gradient-to-br from-[#0f1f3d] via-[#1c2f63] to-[#3b1d5e] p-6 text-white shadow-luxe sm:p-9"
+            >
+              <div className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-brand-pink/25 blur-3xl" />
+              <div className="pointer-events-none absolute -bottom-24 -left-20 h-72 w-72 rounded-full bg-brand-blue/25 blur-3xl" />
+
+              <div className="relative grid gap-8 lg:grid-cols-[1.25fr_0.75fr] lg:items-center">
+                <div>
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-brand-orange to-brand-pink px-3.5 py-1.5 text-xs font-extrabold uppercase tracking-[0.14em] text-white shadow-sm">
+                      ★ Выгодно · скидка {savings.percent}%
+                    </span>
+                    <span className="rounded-full border border-white/18 bg-white/10 px-3.5 py-1.5 text-xs font-extrabold text-white/86">
+                      Экономия {savings.rub} ₽
+                    </span>
+                  </div>
+
+                  <h2 className="mt-4 font-display text-3xl font-extrabold leading-tight tracking-[-0.035em] sm:text-5xl">
+                    Пакет «{BUNDLE_TITLE}»
+                  </h2>
+                  <p className="mt-3 max-w-2xl text-base font-semibold leading-7 text-white/76 sm:text-lg">
+                    Откройте сразу все три курса одной оплатой: сегодня ребёнок рисует, завтра считает на абакусе, а в выходные проходит миссии подготовки к школе.
+                  </p>
+
+                  <ul className="mt-6 grid gap-3 sm:grid-cols-2">
+                    {bundlePerks.map((perk) => (
+                      <li key={perk} className="flex items-start gap-3 text-sm font-bold leading-6 text-white/88">
+                        <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand-green text-xs font-black text-white shadow-sm">
+                          ✓
+                        </span>
+                        <span>{perk}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="rounded-[28px] border border-white/16 bg-white p-6 text-ink shadow-luxe sm:p-7">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-ink/46">
+                      Все 3 курса сразу
+                    </p>
+                    <span className="rounded-full bg-brand-green/12 px-2.5 py-1 text-[11px] font-extrabold text-brand-green">
+                      −{savings.rub} ₽
+                    </span>
+                  </div>
+                  <div className="mt-3 flex items-baseline gap-3">
+                    <strong className="font-display text-5xl font-black tracking-[-0.06em] text-ink">
+                      {BUNDLE_PRICE} ₽
+                    </strong>
+                    <del className="text-lg font-extrabold text-ink/36">{fullPrice} ₽</del>
+                  </div>
+                  <p className="mt-2 text-xs font-semibold leading-5 text-ink/52">
+                    По отдельности: 490 + 490 + 390 = {fullPrice} ₽. Если часть курсов уже открыта — их срок продлится.
+                  </p>
+
+                  <SubscribeButton
+                    isLoggedIn={Boolean(session?.user?.id)}
+                    hasAccess={allActive}
+                    accessUntil={accessDate(minBundleUntil)}
+                    product={BUNDLE_SLUG}
+                    returnTo="/cabinet"
+                    buttonLabel={`Открыть все 3 курса за ${BUNDLE_PRICE} ₽`}
+                    loginCallback={`/tarify#${BUNDLE_SLUG}`}
+                  />
+                </div>
+              </div>
+            </article>
+
+            <div className="mt-10 grid gap-5 xl:grid-cols-3">
               {courses.map((course) => {
                 const slug = course.slug as DirectionSlug;
                 const until = accessMap?.[slug] ?? null;
-                const active = Boolean(until && until.getTime() > Date.now());
+                const active = Boolean(until && until.getTime() > now);
                 const price = directionPrice(slug);
 
                 return (
@@ -129,7 +220,6 @@ export default async function TariffsPage() {
                       <div className="mt-7 rounded-[26px] border border-white bg-white/88 p-5 shadow-card">
                         <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-ink/42">Полный доступ на {directionAccessLabel(course.slug)}</p>
                         <div className="mt-3 flex items-end gap-3">
-                          <del className="pb-1 text-lg font-extrabold text-ink/30">{DIRECTION_COMPARE_PRICE.toLocaleString("ru-RU")} ₽</del>
                           <strong className="font-display text-5xl font-black tracking-[-0.06em] text-ink">{price} ₽</strong>
                         </div>
                         <p className="mt-2 text-xs font-semibold leading-5 text-ink/44">Доступ открывается сразу после оплаты. Автосписания нет.</p>
@@ -158,7 +248,7 @@ export default async function TariffsPage() {
             </div>
 
             <div className="mx-auto mt-8 max-w-3xl rounded-[26px] border border-white/90 bg-white/78 p-5 text-center text-sm font-semibold leading-6 text-ink/52 shadow-card">
-              Оплачивается одно выбранное направление. Первые занятия можно пройти без карты. Перед оплатой вы увидите публичную оферту и подтвердите согласие.
+              Можно выбрать один курс или пакет «{BUNDLE_TITLE}» со скидкой {savings.percent}%. Первые занятия открыты без карты. Перед оплатой вы увидите публичную оферту и подтвердите согласие.
             </div>
           </div>
         </section>

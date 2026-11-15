@@ -258,7 +258,7 @@ export default async function DrawingPage() {
           <div className="container-pad px-0">
             <div className="drawing-price-card">
               <div className="drawing-price-copy"><span>Полный доступ к мастерской</span><h2>Месяц, который останется<br />в детском портфолио</h2><p>Все уроки, пошаговый плеер, творческие задания и новые работы без ограничений.</p><ul>{drawingSubscription.perks.map((perk) => <li key={perk}><i>✓</i>{perk}</li>)}</ul></div>
-              <div className="drawing-price-box"><p>Стоимость доступа на 30 дней</p><del className="mt-3 block text-lg font-extrabold text-white/35">{drawingSubscription.oldPrice} ₽</del><strong>{drawingSubscription.price}<small> ₽ · один платёж</small></strong><span>Сначала пройдите 3 урока бесплатно · без карты</span><SubscribeButton isLoggedIn={Boolean(session?.user?.id)} hasAccess={hasSub} accessUntil={accessUntilLabel} returnTo="/risovanie" loginCallback="/risovanie#podpiska" buttonLabel={`Открыть мастерскую за ${drawingSubscription.price} ₽`} /><small>Доступ открывается сразу · автоматического продления нет</small></div>
+              <div className="drawing-price-box"><p>Стоимость доступа на 30 дней</p><strong>{drawingSubscription.price}<small> ₽ · один платёж</small></strong><span>Сначала пройдите 3 урока бесплатно · без карты</span><SubscribeButton isLoggedIn={Boolean(session?.user?.id)} hasAccess={hasSub} accessUntil={accessUntilLabel} returnTo="/risovanie" loginCallback="/risovanie#podpiska" buttonLabel={`Открыть мастерскую за ${drawingSubscription.price} ₽`} /><small>Доступ открывается сразу · автоматического продления нет</small></div>
             </div>
             <CourseDiscovery current="risovanie" />
           </div>

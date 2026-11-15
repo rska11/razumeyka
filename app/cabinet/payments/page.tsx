@@ -3,7 +3,7 @@ import Link from "next/link";
 import { getAuthSession } from "@/lib/auth";
 import { getCabinetData } from "@/lib/cabinet";
 import { reconcileUserPayments } from "@/lib/payments";
-import { DIRECTIONS, isDirectionSlug } from "@/lib/subscription";
+import { DIRECTIONS, isBundleSlug, isDirectionSlug } from "@/lib/subscription";
 
 function rub(n: number) {
   return n.toLocaleString("ru-RU") + " ₽";
@@ -65,6 +65,14 @@ export default async function PaymentsPage() {
                       className="rounded-full bg-brand-green px-4 py-2 text-xs font-extrabold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-brand-green/90"
                     >
                       Перейти к урокам →
+                    </Link>
+                  )}
+                  {p.status === "paid" && isBundleSlug(p.directionSlug) && (
+                    <Link
+                      href="/cabinet"
+                      className="rounded-full bg-brand-green px-4 py-2 text-xs font-extrabold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-brand-green/90"
+                    >
+                      К курсам →
                     </Link>
                   )}
                 </div>

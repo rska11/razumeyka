@@ -20,12 +20,33 @@ model User {
   pdConsentAt DateTime? // согласие на обработку ПД (152-ФЗ): дата ПЕРВОГО подтверждения галочки на /login
   accessUntil     DateTime? // LEGACY: единый доступ (до перехода на доступ по направлениям). Гейтинг теперь через Access.
   paymentMethodId String?   // сохранённый способ оплаты YooKassa — задел под автопродление
+  lastWeeklyReportAt DateTime? // когда в последний раз отправляли еженедельный отчёт о прогрессе
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   children  Child[]
   payments  Payment[]
   accesses  Access[]
+  courseProgress CourseProgress[]
   taughtEnrollments Enrollment[] @relation("TeacherEnrollments")
+}
+
+/// Прогресс по self-study курсу (рисование, ментальная арифметика, подготовка к школе).
+/// Хранится на аккаунте родителя по направлению: completedItems — JSON-массив пройдённых
+/// уроков/миссий, completedCount — их число (для быстрой сводки в кабинете и отчёте).
+model CourseProgress {
+  id             String   @id @default(cuid())
+  userId         String
+  direction      String   // risovanie | mentalnaya-arifmetika | podgotovka-k-shkole
+  completedItems String   @default("[]") // JSON string[]
+  completedCount Int      @default(0)
+  meta           String   @default("{}") // возрастная ступень, уровень и т.п.
+  lastActivityAt DateTime @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, direction])
+  @@index([userId])
 }
 
 /// Оплаченный доступ к конкретному направлению (self-study). Раздельно по направлениям:

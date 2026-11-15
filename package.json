@@ -19,7 +19,10 @@
     "test:mental-game": "node scripts/test-mental-number-game.mjs",
     "test:school-prep": "node scripts/test-school-prep-day-one.mjs && node scripts/test-school-prep-week-two.mjs && node scripts/test-school-prep-week-three.mjs && node scripts/test-school-prep-week-four.mjs && node scripts/test-school-prep-week-five.mjs",
     "test:multiplication": "node scripts/test-multiplication-course.mjs",
-    "test:consent": "node --experimental-strip-types --no-warnings scripts/test-consent.mjs"
+    "test:consent": "node --experimental-strip-types --no-warnings scripts/test-consent.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "npm run test:games && npm run test:school-prep && npm run test:multiplication && npm run test:consent",
+    "check": "npm run lint && npm run typecheck && npm run test"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",

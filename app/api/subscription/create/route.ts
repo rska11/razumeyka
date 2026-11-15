@@ -3,16 +3,20 @@ import { getAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createYooKassaPayment, isYooKassaConfigured } from "@/lib/yookassa";
 import {
-  DIRECTIONS,
   SUBSCRIPTION_MONTHS,
-  directionAccessLabel,
   directionFromReturnTo,
-  directionPrice,
+  isBundleSlug,
+  purchaseAccessLabel,
+  purchasePrice,
+  purchaseTitle,
+  type PurchaseSlug,
 } from "@/lib/subscription";
 
-// Оформление доступа к направлению self-study. Создаёт платёж purpose="subscription"
-// с directionSlug; доступ (Access.until) продлевается по направлению в вебхуке/reconcile.
-// Доступ раздельный: returnTo определяет направление (по allow-списку, без open redirect).
+// Оформление доступа self-study. Создаёт платёж purpose="subscription" с directionSlug;
+// доступ (Access.until) продлевается в вебхуке/reconcile (lib/payments.markPaymentPaid).
+// Что покупаем:
+//   • body.product = "vse-napravleniya" — пакет «Все направления» (все курсы одной оплатой);
+//   • иначе направление определяется по body.returnTo (allow-список путей, без open redirect).
 // Требуется акцепт оферты (acceptedOffer=true) — фиксируем offerAcceptedAt.
 
 export async function POST(req: Request) {
@@ -24,22 +28,25 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "PAYMENTS_DISABLED" }, { status: 503 });
   }
 
-  let returnTo = "/risovanie";
+  let product: PurchaseSlug = "risovanie";
   let acceptedOffer = false;
   try {
     const body = await req.json();
-    const direction = typeof body?.returnTo === "string" ? directionFromReturnTo(body.returnTo) : null;
-    if (direction) returnTo = DIRECTIONS[direction].path;
+    if (isBundleSlug(body?.product)) {
+      product = body.product;
+    } else {
+      const direction = typeof body?.returnTo === "string" ? directionFromReturnTo(body.returnTo) : null;
+      if (direction) product = direction;
+    }
     acceptedOffer = body?.acceptedOffer === true;
   } catch {}
 
-  const direction = directionFromReturnTo(returnTo)!; // returnTo всегда валиден выше
   if (!acceptedOffer) {
     return NextResponse.json({ error: "OFFER_NOT_ACCEPTED" }, { status: 400 });
   }
 
-  const amount = directionPrice(direction);
-  const description = `«Знайтон» · доступ · ${DIRECTIONS[direction].title} · ${directionAccessLabel(direction)}`;
+  const amount = purchasePrice(product);
+  const description = `«Знайтон» · доступ · ${purchaseTitle(product)} · ${purchaseAccessLabel(product)}`;
 
   const payment = await prisma.payment.create({
     data: {
@@ -49,7 +56,7 @@ export async function POST(req: Request) {
       provider: "yookassa",
       purpose: "subscription",
       periodMonths: SUBSCRIPTION_MONTHS,
-      directionSlug: direction,
+      directionSlug: product,
       offerAcceptedAt: new Date(),
       description,
     },

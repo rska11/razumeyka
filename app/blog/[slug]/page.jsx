@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation';
 import { Header } from '@/components/Header.jsx';
 import { Footer } from '@/components/Footer.jsx';
 import { Icon } from '@/components/Icon.jsx';
+import { TrackedLink } from '@/components/analytics/TrackedLink.jsx';
+import { BlogPracticeCta } from '@/components/blog/BlogPracticeCta.jsx';
 import { getDirectionBySlug } from '@/data/directions.js';
 import { getLandingBySlug } from '@/data/landings.js';
 import { blogPosts, getPostBySlug } from '@/data/blog.js';
@@ -425,6 +427,9 @@ export default async function BlogPost({ params }) {
               })}
             </div>
 
+            {/* Попробуйте на практике: игра + курс + пакет «Все направления» */}
+            <BlogPracticeCta post={post} category={editorialMeta.category} />
+
             {/* FAQ */}
             {post.faq?.length > 0 && (
               <section className="mt-14">
@@ -487,7 +492,14 @@ export default async function BlogPost({ params }) {
             <div className={'mt-14 overflow-hidden rounded-[28px] bg-gradient-to-br ' + (ctaThemes[cta.tone] ?? ctaThemes.blue) + ' p-8 text-center text-white shadow-color sm:p-12'}>
               <h2 className="font-display text-2xl font-extrabold sm:text-3xl">{cta.title}</h2>
               <p className="mx-auto mt-3 max-w-lg text-base font-medium text-white/85">{cta.text}</p>
-              <Link href={cta.href} className="mt-7 inline-flex rounded-full bg-white px-8 py-3.5 text-base font-extrabold text-brand-blue transition hover:-translate-y-0.5">{cta.label}</Link>
+              <TrackedLink
+                href={cta.href}
+                goal="blog_cta_course"
+                params={{ slug, href: cta.href, placement: 'bottom' }}
+                className="mt-7 inline-flex rounded-full bg-white px-8 py-3.5 text-base font-extrabold text-brand-blue transition hover:-translate-y-0.5"
+              >
+                {cta.label}
+              </TrackedLink>
             </div>
           </div>
         </article>

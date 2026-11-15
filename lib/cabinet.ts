@@ -1,12 +1,14 @@
 import { prisma } from "@/lib/prisma";
 import { getAccessMap } from "@/lib/subscription";
 import { reconcileUserPayments } from "@/lib/payments";
+import { getAllCourseProgress } from "@/lib/course-progress";
 
 export async function getCabinetData(userId: string) {
   // Подтверждаем оплаты, вернувшиеся из ЮKassa, чтобы доступ отобразился актуально.
   await reconcileUserPayments(userId);
-  const accessMap = await getAccessMap(userId);
-  const [children, payments] = await Promise.all([
+  const [accessMap, courseProgress, children, payments] = await Promise.all([
+    getAccessMap(userId),
+    getAllCourseProgress(userId),
     prisma.child.findMany({
       where: { parentId: userId },
       orderBy: { createdAt: "asc" },
@@ -40,8 +42,18 @@ export async function getCabinetData(userId: string) {
   );
 
   const achievementsCount = children.reduce((s, c) => s + c.achievements.length, 0);
+  const totalCompletedLessons = Object.values(courseProgress).reduce((s, p) => s + p.completedCount, 0);
 
-  return { children, payments, upcomingLessons, activeEnrollments, achievementsCount, accessMap };
+  return {
+    children,
+    payments,
+    upcomingLessons,
+    activeEnrollments,
+    achievementsCount,
+    accessMap,
+    courseProgress,
+    totalCompletedLessons,
+  };
 }
 
 export type CabinetData = Awaited<ReturnType<typeof getCabinetData>>;

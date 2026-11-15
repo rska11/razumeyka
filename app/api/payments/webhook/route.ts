@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getYooKassaPayment } from "@/lib/yookassa";
-import { extendAccess, isDirectionSlug } from "@/lib/subscription";
-import { issueReceiptForPayment } from "@/lib/receipts";
+import { markPaymentPaid } from "@/lib/payments";
 
 export const dynamic = "force-dynamic";
 
@@ -18,32 +17,15 @@ export async function POST(req: Request) {
     const paymentId = yk?.metadata?.paymentId;
     if (!paymentId) return NextResponse.json({ ok: true });
 
-    const payment = await prisma.payment.findUnique({ where: { id: paymentId } });
+    const payment = await prisma.payment.findUnique({ where: { id: paymentId }, select: { id: true } });
     if (!payment) return NextResponse.json({ ok: true });
 
     if (yk.status === "succeeded") {
-      // идемпотентно: применяем только один раз
-      if (payment.status !== "paid") {
-        await prisma.payment.update({
-          where: { id: payment.id },
-          data: { status: "paid", externalId: yk.id },
-        });
-        if (payment.purpose === "subscription" && isDirectionSlug(payment.directionSlug)) {
-          await extendAccess(payment.userId, payment.directionSlug, payment.periodMonths ?? 1);
-        } else if (payment.enrollmentId) {
-          await prisma.enrollment.updateMany({
-            where: { id: payment.enrollmentId },
-            data: { status: "active" },
-          });
-        }
-        console.info("[payments/webhook] оплачено", { paymentId: payment.id, ykId: yk.id });
-        // Чек НПД («Мой налог») + письмо клиенту. Не блокирует ответ вебхуку.
-        void issueReceiptForPayment(payment.id, payment.amount);
-      }
+      // идемпотентно: markPaymentPaid применяет оплату строго один раз
+      const applied = await markPaymentPaid(payment.id, yk.id);
+      if (applied) console.info("[payments/webhook] оплачено", { paymentId: payment.id, ykId: yk.id });
     } else if (yk.status === "canceled") {
-      if (payment.status === "pending") {
-        await prisma.payment.update({ where: { id: payment.id }, data: { status: "failed" } });
-      }
+      await prisma.payment.updateMany({ where: { id: payment.id, status: "pending" }, data: { status: "failed" } });
     }
 
     return NextResponse.json({ ok: true });

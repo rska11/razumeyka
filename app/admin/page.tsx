@@ -46,7 +46,7 @@ export default async function AdminPage() {
     isAuthDisabled(),
     prisma.user.findMany({
       orderBy: { createdAt: "desc" },
-      include: { children: { include: { enrollments: true } } },
+      include: { children: { include: { enrollments: true } }, courseProgress: true },
     }),
     prisma.payment.findMany({
       orderBy: { createdAt: "desc" },
@@ -258,6 +258,18 @@ export default async function AdminPage() {
                       )}
                     </span>
                   ))}
+                </div>
+              )}
+
+              {u.courseProgress.some((cp) => cp.completedCount > 0) && (
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {u.courseProgress
+                    .filter((cp) => cp.completedCount > 0)
+                    .map((cp) => (
+                      <span key={cp.id} className="rounded-full bg-brand-blue/10 px-2.5 py-0.5 text-[11px] font-extrabold text-brand-blue">
+                        {DIRECTIONS[cp.direction as DirectionSlug]?.title ?? cp.direction}: {cp.completedCount}
+                      </span>
+                    ))}
                 </div>
               )}
 

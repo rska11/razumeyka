@@ -115,7 +115,9 @@ export default async function ChildrenPage() {
               <p className="text-[11px] font-extrabold uppercase tracking-[0.12em] text-ink/44">Достижения</p>
               <div className="mt-2 flex flex-wrap gap-2">
                 {child.achievements.map((a) => (
-                  <span key={a.id} className="inline-flex items-center gap-1.5 rounded-full bg-brand-orange/12 px-3 py-1.5 text-xs font-extrabold text-brand-orange">🏅 {a.title}</span>
+                  <span key={a.id} className="inline-flex items-center gap-1.5 rounded-full bg-brand-orange/12 px-3 py-1.5 text-xs font-extrabold text-brand-orange">
+                    {a.icon ?? "🏅"} {a.title}
+                  </span>
                 ))}
               </div>
             </div>

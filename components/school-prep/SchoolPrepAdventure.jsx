@@ -1112,7 +1112,18 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 390, 
   useEffect(() => {
     if (!ready) return;
     window.localStorage.setItem(storageKey, JSON.stringify(completed));
-  }, [completed, ready, storageKey]);
+    if (completed.length > 0) {
+      fetch("/api/progress", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          direction: "podgotovka-k-shkole",
+          completedItems: completed,
+          meta: { week: week.number ?? 1, level: learnerLevel },
+        }),
+      }).catch(() => {});
+    }
+  }, [completed, learnerLevel, ready, storageKey, week.number]);
 
   useEffect(() => {
     if (!ready || !adaptive) return;
@@ -1128,6 +1139,24 @@ export function SchoolPrepAdventure({ week, hasFullAccess = false, price = 390, 
     () => week.days.flatMap((day) => day.missions.map((mission) => mission.id)),
     [week.days],
   );
+
+  useEffect(() => {
+    if (!ready) return;
+    fetch("/api/progress?direction=podgotovka-k-shkole")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!data?.authenticated) return;
+        const remote = Array.isArray(data.progress?.completedItems) ? data.progress.completedItems : [];
+        const weekIds = new Set(allMissionIds);
+        const remoteForWeek = remote.filter((id) => weekIds.has(id));
+        if (remoteForWeek.length === 0) return;
+        setCompleted((cur) => {
+          const merged = Array.from(new Set([...cur, ...remoteForWeek]));
+          return merged.length === cur.length ? cur : merged;
+        });
+      })
+      .catch(() => {});
+  }, [allMissionIds, ready]);
   const allCoreMissionIds = useMemo(
     () => week.days.flatMap((day) => day.missions.filter((mission) => !adaptive || mission.route !== 'bonus').map((mission) => mission.id)),
     [adaptive, week.days],

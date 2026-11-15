@@ -188,12 +188,32 @@ export function MentalLessons({ hasSubscription = false }) {
   const [active, setActive] = useState(null);
 
   useEffect(() => {
+    let localArr = [];
     try {
       const savedBand = localStorage.getItem(STORAGE_BAND);
       if (savedBand && mentalAgeBands.some((b) => b.key === savedBand)) setBand(savedBand);
-      const saved = JSON.parse(localStorage.getItem(STORAGE_DONE) || '[]');
-      setDoneSet(new Set(saved));
+      localArr = JSON.parse(localStorage.getItem(STORAGE_DONE) || '[]');
+      if (Array.isArray(localArr)) setDoneSet(new Set(localArr));
     } catch {}
+    fetch('/api/progress?direction=mentalnaya-arifmetika')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!data?.authenticated) return;
+        const remote = Array.isArray(data.progress?.completedItems) ? data.progress.completedItems : [];
+        const merged = Array.from(new Set([...(Array.isArray(localArr) ? localArr : []), ...remote]));
+        setDoneSet(new Set(merged));
+        try {
+          localStorage.setItem(STORAGE_DONE, JSON.stringify(merged));
+        } catch {}
+        if (merged.length > remote.length) {
+          fetch('/api/progress', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ direction: 'mentalnaya-arifmetika', completedItems: merged }),
+          }).catch(() => {});
+        }
+      })
+      .catch(() => {});
   }, []);
 
   function selectBand(key) {
@@ -209,9 +229,15 @@ export function MentalLessons({ hasSubscription = false }) {
     setDoneSet((prev) => {
       const next = new Set(prev);
       next.add(slug);
+      const arr = [...next];
       try {
-        localStorage.setItem(STORAGE_DONE, JSON.stringify([...next]));
+        localStorage.setItem(STORAGE_DONE, JSON.stringify(arr));
       } catch {}
+      fetch('/api/progress', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ direction: 'mentalnaya-arifmetika', completedItems: arr, meta: { band } }),
+      }).catch(() => {});
       return next;
     });
   }

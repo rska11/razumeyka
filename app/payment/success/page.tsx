@@ -4,7 +4,13 @@ import { PaymentStatusRefresh } from "@/components/payments/PaymentStatusRefresh
 import { getAuthSession } from "@/lib/auth";
 import { reconcileUserPayments } from "@/lib/payments";
 import { prisma } from "@/lib/prisma";
-import { DIRECTIONS, getAccessUntil, isDirectionSlug } from "@/lib/subscription";
+import {
+  BUNDLE_TITLE,
+  DIRECTIONS,
+  getAccessUntil,
+  isBundleSlug,
+  isDirectionSlug,
+} from "@/lib/subscription";
 
 export const dynamic = "force-dynamic";
 export const metadata = { robots: { index: false, follow: false } };
@@ -31,9 +37,15 @@ export default async function PaymentSuccessPage({
   const payment = p
     ? await prisma.payment.findFirst({ where: { id: p, userId: session.user.id } })
     : null;
+  const isBundle = isBundleSlug(payment?.directionSlug);
   const direction = isDirectionSlug(payment?.directionSlug) ? payment.directionSlug : null;
   const course = direction ? DIRECTIONS[direction] : null;
-  const accessUntil = direction ? await getAccessUntil(session.user.id, direction) : null;
+  const courseTitle = isBundle ? `Пакет «${BUNDLE_TITLE}»` : course?.title;
+  const accessUntil = direction
+    ? await getAccessUntil(session.user.id, direction)
+    : isBundle
+      ? await getAccessUntil(session.user.id, "risovanie")
+      : null;
   const paid = payment?.status === "paid";
   const pending = payment?.status === "pending";
   const failed = payment?.status === "failed";
@@ -91,7 +103,7 @@ export default async function PaymentSuccessPage({
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-base font-medium leading-7 text-ink/62 sm:text-lg">
             {paid
-              ? `${course?.title ?? "Выбранное направление"} уже открыто. Переходите к урокам — ничего дополнительно настраивать не нужно.`
+              ? `${courseTitle ?? "Выбранное направление"} уже открыто. Переходите к урокам — ничего дополнительно настраивать не нужно.`
               : pending
                 ? "Обычно это занимает несколько секунд. Страница обновится автоматически, как только ЮKassa подтвердит платёж."
                 : failed
@@ -105,12 +117,14 @@ export default async function PaymentSuccessPage({
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-ink/44">Ваш курс</p>
-                <p className="mt-1 font-display text-xl font-extrabold text-ink sm:text-2xl">{course?.title ?? "Знайтон"}</p>
+                <p className="mt-1 font-display text-xl font-extrabold text-ink sm:text-2xl">{courseTitle ?? "Знайтон"}</p>
               </div>
               <span className="rounded-full bg-brand-green/14 px-3 py-1.5 text-xs font-extrabold text-brand-green">Оплачено</span>
             </div>
             {accessUntil && (
-              <p className="mt-4 text-sm font-bold text-ink/58">Полный доступ открыт до {formatDate(accessUntil)}</p>
+              <p className="mt-4 text-sm font-bold text-ink/58">
+                {isBundle ? "Все три курса открыты (подготовка к школе — на 45 дней, остальные — до " + formatDate(accessUntil) + ")" : `Полный доступ открыт до ${formatDate(accessUntil)}`}
+              </p>
             )}
           </div>
         )}
@@ -119,14 +133,14 @@ export default async function PaymentSuccessPage({
           {paid ? (
             <>
               <Link href={courseHref} className="primary-btn w-full">
-                Перейти к урокам
+                {isBundle ? "Выбрать курс в кабинете" : "Перейти к урокам"}
                 <span aria-hidden="true" className="ml-2">→</span>
               </Link>
               <Link href="/cabinet" className="secondary-btn w-full">В личный кабинет</Link>
             </>
           ) : (
             <>
-              <Link href={course ? `${course.path}#podpiska` : "/cabinet/payments"} className="primary-btn w-full">
+              <Link href={course ? `${course.path}#podpiska` : isBundle ? "/tarify#vse-napravleniya" : "/cabinet/payments"} className="primary-btn w-full">
                 {failed ? "Попробовать снова" : "Проверить в кабинете"}
               </Link>
               <Link href="/cabinet" className="secondary-btn w-full">Вернуться в кабинет</Link>

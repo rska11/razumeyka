@@ -17,7 +17,7 @@ const OPERATOR_DETAILS = [
 ]
   .filter(Boolean)
   .join(", ");
-const CONTACT_EMAIL = "info@znayton.ru";
+const CONTACT_EMAIL = "znayton@genpic.ai";
 const UPDATED = "27 июля 2026 г.";
 
 function P({ children }: { children: React.ReactNode }) {

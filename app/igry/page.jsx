@@ -48,6 +48,24 @@ const gameView = {
     accent: 'bg-[#75E5C1] text-[#09152E]',
     text: 'text-[#9AF3D6]',
   },
+  'field-of-vision': {
+    icon: '👁️',
+    directionLabel: 'Скорочтение',
+    directionHref: '/speed-reading',
+    gradient: 'from-[#1F1235] via-[#5B2A86] to-[#D96B27]',
+    glow: 'bg-[#FFD166]/24',
+    accent: 'bg-[#FFD166] text-[#1F1235]',
+    text: 'text-[#FFE29A]',
+  },
+  'word-pyramid': {
+    icon: '🔺',
+    directionLabel: 'Скорочтение',
+    directionHref: '/speed-reading',
+    gradient: 'from-[#141E38] via-[#2E3A87] to-[#9B3675]',
+    glow: 'bg-[#FF9F68]/24',
+    accent: 'bg-[#FF9F68] text-[#141E38]',
+    text: 'text-[#FFC49B]',
+  },
 };
 
 export default async function GamesPage({ searchParams }) {

@@ -42,11 +42,16 @@ yarn-error.log*
 next-env.d.ts
 
 # local junk / temp
+tmp/
+.tmp/
 tmp-*
 tmp-edge-mental/
+tmp-logic-preview/
 *.log
 
-# локальная БД разработки — у каждого своя, меняется при каждом запуске
+# локальная БД разработки и CI — у каждого своя, меняется при каждом запуске
 prisma/dev.db
 prisma/dev.db-journal
+prisma/ci.db*
+ci.db*
 /.daily-blog/

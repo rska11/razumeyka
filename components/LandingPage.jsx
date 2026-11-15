@@ -5,9 +5,11 @@ import { Icon } from '@/components/Icon.jsx';
 import { getDirectionBySlug } from '@/data/directions.js';
 import { getLandingBySlug } from '@/data/landings.js';
 import { DirectionGame } from '@/components/games/DirectionGame.jsx';
+import { GameLauncher } from '@/components/games/GameShell.jsx';
 import { LanguagesHub } from '@/components/LanguagesHub.jsx';
 import { LaunchBadge } from '@/components/LaunchBadge.jsx';
 import { WaitlistForm } from '@/components/WaitlistForm.jsx';
+import { gamesForDirection } from '@/data/games.js';
 import { LAUNCH_LABEL } from '@/data/launch.js';
 
 const accents = {
@@ -53,6 +55,7 @@ export function LandingPage({ landing }) {
   const hg = h1grad[landing.theme] ?? h1grad.blue;
   const comingSoon = Boolean(landing.comingSoon);
   const waitlistDirection = landing.waitlistDirection ?? landing.slug;
+  const directionGames = gamesForDirection(landing.slug);
   const stats = landing.stats ?? [
     { v: 'бесплатно', l: 'первые уроки' },
     { v: 'онлайн', l: 'из любого города' },
@@ -341,7 +344,7 @@ export function LandingPage({ landing }) {
                   Первые уроки бесплатны — попробуйте формат, а понравится, откройте полный доступ на 30 дней.
                 </p>
                 <ul className="mt-6 grid gap-3">
-                  {['Первые уроки — бесплатно, без карты', 'Ребёнок рисует и решает сам, по шагам с экраном-наставником', 'Полный доступ — 490 ₽ вместо 4 490 ₽ на 30 дней'].map((t) => (
+                  {['Первые уроки — бесплатно, без карты', 'Ребёнок рисует и решает сам, по шагам с экраном-наставником', 'Полный доступ — 490 ₽ на 30 дней'].map((t) => (
                     <li key={t} className="flex items-center gap-3 text-base font-semibold text-ink/78">
                       <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white ${a.text} shadow-sm`}>
                         <Icon name="check" className="h-3.5 w-3.5" />
@@ -355,9 +358,37 @@ export function LandingPage({ landing }) {
                 <div className={`${PC} p-8`}>
                   <p className="text-center text-xs font-extrabold uppercase tracking-[0.16em] text-ink/44">Скоро открываем</p>
                   <WaitlistForm direction={waitlistDirection} source="landing" className="mt-4" />
+
+                  {directionGames.length > 0 && (
+                    <div className="mt-6 rounded-[18px] border border-brand-orange/20 bg-gradient-to-br from-brand-orange/[0.08] via-white to-brand-purple/[0.08] p-5">
+                      <p className="text-[11px] font-extrabold uppercase tracking-[0.15em] text-brand-orange">
+                        Попробуйте тренажёр уже сейчас
+                      </p>
+                      <p className="mt-1.5 text-sm font-semibold leading-6 text-ink/72">
+                        Пока готовим полный курс, запустите бесплатные тренажёры скорочтения прямо в браузере:
+                      </p>
+                      <div className="mt-3.5 grid gap-2.5">
+                        {directionGames.map((game) => (
+                          <GameLauncher
+                            key={game.id}
+                            gameId={game.id}
+                            className="flex w-full items-center justify-between gap-3 rounded-[14px] border border-ink/10 bg-white px-4 py-3 text-left text-sm font-extrabold text-ink shadow-sm transition hover:-translate-y-0.5 hover:border-brand-orange/40 hover:text-brand-orange"
+                          >
+                            <span>▶ {game.title}</span>
+                            <span className="shrink-0 rounded-full bg-brand-orange/12 px-2.5 py-1 text-[11px] font-extrabold text-brand-orange">
+                              Играть
+                            </span>
+                          </GameLauncher>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   <p className="mt-4 text-center text-xs font-semibold text-ink/48">
                     А пока попробуйте формат бесплатно на{' '}
-                    <Link href="/risovanie" className={`font-extrabold ${a.text} underline underline-offset-2`}>рисовании</Link>.
+                    <Link href="/risovanie" className={`font-extrabold ${a.text} underline underline-offset-2`}>рисовании</Link>
+                    {' '}или загляните в{' '}
+                    <Link href="/igry" className={`font-extrabold ${a.text} underline underline-offset-2`}>Игровой зал</Link>.
                   </p>
                 </div>
               ) : (

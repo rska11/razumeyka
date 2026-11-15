@@ -8,7 +8,7 @@ export const metadata = {
   robots: { index: false },
 };
 
-const CONTACT_EMAIL = "info@znayton.ru";
+const CONTACT_EMAIL = "znayton@genpic.ai";
 const UPDATED = "26 августа 2026 г.";
 
 type Row = { name: string; purpose: string; life: string };

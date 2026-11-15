@@ -56,6 +56,26 @@ export function CourseDiscovery({ current }) {
           </Link>
         ))}
       </div>
+
+      <div className="mt-4 flex flex-col justify-between gap-4 rounded-[24px] bg-gradient-to-r from-[#0f1f3d] via-[#1c2f63] to-[#3b1d5e] p-5 text-white sm:flex-row sm:items-center sm:p-6">
+        <div>
+          <span className="inline-flex rounded-full bg-gradient-to-r from-brand-orange to-brand-pink px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.12em] text-white">
+            ★ Пакет «Все направления» · скидка 27%
+          </span>
+          <h3 className="mt-2 font-display text-xl font-extrabold sm:text-2xl">
+            Все 3 курса сразу — за 990 ₽ вместо 1 370 ₽
+          </h3>
+          <p className="mt-1 text-xs font-semibold text-white/74 sm:text-sm">
+            Рисование (30 дней) + ментальная арифметика (30 дней) + подготовка к школе (45 дней) одной оплатой.
+          </p>
+        </div>
+        <Link
+          href="/tarify#vse-napravleniya"
+          className="inline-flex min-h-[48px] shrink-0 items-center justify-center rounded-full bg-white px-6 py-2.5 text-xs font-extrabold text-ink shadow-sm transition hover:-translate-y-0.5"
+        >
+          Открыть пакет за 990 ₽ →
+        </Link>
+      </div>
     </aside>
   );
 }

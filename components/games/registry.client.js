@@ -55,6 +55,18 @@ export const GAME_COMPONENTS = {
       import('@/components/games/SchulteTable.jsx').then((mod) => ({ default: mod.SchulteTable })),
     ),
   },
+  'field-of-vision': {
+    fill: false,
+    Comp: lazy(() =>
+      import('@/components/games/FieldOfVision.jsx').then((mod) => ({ default: mod.FieldOfVision })),
+    ),
+  },
+  'word-pyramid': {
+    fill: false,
+    Comp: lazy(() =>
+      import('@/components/games/WordPyramid.jsx').then((mod) => ({ default: mod.WordPyramid })),
+    ),
+  },
 };
 
 export function gameEntry(id) {

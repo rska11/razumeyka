@@ -78,13 +78,13 @@ export function Footer() {
             <ul className="mt-5 grid gap-4">
               <li>
                 <a
-                  href="mailto:info@znayton.ru"
+                  href="mailto:znayton@genpic.ai"
                   className="flex items-center gap-3 text-sm font-bold text-white/62 transition hover:text-white"
                 >
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10 text-gold-300">
                     <Icon name="mail" className="h-4 w-4" />
                   </span>
-                  info@znayton.ru
+                  znayton@genpic.ai
                 </a>
               </li>
             </ul>

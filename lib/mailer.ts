@@ -21,7 +21,7 @@ export function isMailConfigured() {
 }
 
 function getFrom() {
-  return env(process.env.MAIL_FROM) ?? "Знайтон <noreply@znayton.ru>";
+  return env(process.env.MAIL_FROM) ?? "Знайтон <znayton@genpic.ai>";
 }
 
 function createTransport() {
@@ -134,6 +134,79 @@ function buildReminderEmail(d: { childName: string; direction: string; whenText:
   ${d.topic ? `<p style="margin:6px 0 0;font-size:14px;color:#64748b">Тема: ${d.topic}</p>` : ""}
   ${button}
   <p style="margin:8px 0 0;font-size:13px;color:#94a3b8">Если кнопка не открывается — ссылка есть в личном кабинете.</p>
+</td></tr>
+<tr><td style="padding-top:20px;text-align:center"><p style="margin:0;font-size:12px;color:#94a3b8">Знайтон · znayton.ru</p></td></tr>
+</table></td></tr></table></body></html>`;
+}
+
+export async function sendWeeklyProgressEmail(
+  to: string,
+  data: {
+    parentName?: string | null;
+    childName?: string | null;
+    courses: { title: string; completedCount: number; unit: string }[];
+    achievements: { title: string; icon?: string | null }[];
+    cabinetUrl: string;
+  },
+): Promise<void> {
+  const total = data.courses.reduce((s, c) => s + c.completedCount, 0);
+  if (!isMailConfigured()) {
+    console.info(
+      `\n[Знайтон] Еженедельный отчёт для ${to}: пройдено всего ${total} (${data.courses.map((c) => `${c.title}: ${c.completedCount}`).join(", ")})\n`,
+    );
+    return;
+  }
+  const transport = createTransport();
+  const who = data.childName ? `Успехи ${data.childName}` : "Успехи за неделю";
+  const lines = data.courses.map((c) => `• ${c.title}: пройдено ${c.completedCount} ${c.unit}`).join("\n");
+  const ach = data.achievements.length
+    ? `\nНаграды: ${data.achievements.map((a) => `${a.icon ?? "🏅"} ${a.title}`).join(", ")}\n`
+    : "";
+  await transport.sendMail({
+    from: getFrom(),
+    to,
+    subject: `${who} в Знайтоне — ${total} занятий в копилке`,
+    text:
+      `Здравствуйте${data.parentName ? `, ${data.parentName}` : ""}!\n\n` +
+      `Сводка прогресса на платформе «Знайтон»:\n${lines}\n` +
+      ach +
+      `\nПродолжить занятия: ${data.cabinetUrl}\n\n— Знайтон`,
+    html: buildWeeklyProgressEmail(data, total),
+  });
+}
+
+function buildWeeklyProgressEmail(
+  d: {
+    parentName?: string | null;
+    childName?: string | null;
+    courses: { title: string; completedCount: number; unit: string }[];
+    achievements: { title: string; icon?: string | null }[];
+    cabinetUrl: string;
+  },
+  total: number,
+): string {
+  const rows = d.courses
+    .map(
+      (c) =>
+        `<tr><td style="padding:10px 0;border-bottom:1px solid #f1f5f9;font-size:14px;font-weight:700;color:#0b1f3a">${c.title}</td>` +
+        `<td align="right" style="padding:10px 0;border-bottom:1px solid #f1f5f9;font-size:14px;font-weight:800;color:#246bfd">${c.completedCount} ${c.unit}</td></tr>`,
+    )
+    .join("");
+  const badges = d.achievements.length
+    ? `<p style="margin:18px 0 8px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#64748b">Новые и полученные награды</p>` +
+      `<p style="margin:0;font-size:13px;color:#0b1f3a;line-height:1.7">${d.achievements.map((a) => `<span style="display:inline-block;background:#fff7ed;border:1px solid #fed7aa;border-radius:999px;padding:4px 11px;margin:0 6px 6px 0;font-weight:700;color:#ea580c">${a.icon ?? "🏅"} ${a.title}</span>`).join("")}</p>`
+    : "";
+  return `<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f5fbff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Manrope,sans-serif">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f5fbff"><tr><td align="center" style="padding:40px 16px">
+<table width="100%" style="max-width:500px" cellpadding="0" cellspacing="0">
+<tr><td style="padding-bottom:22px"><span style="font-size:22px;font-weight:800;color:#0b1f3a">Знайтон</span><span style="font-size:13px;color:#64748b;margin-left:10px">дневник успехов</span></td></tr>
+<tr><td style="background:#ffffff;border:1px solid #e2e8f0;border-radius:18px;padding:28px 30px;box-shadow:0 18px 54px rgba(59,130,246,0.10)">
+  <p style="margin:0 0 6px;font-size:18px;font-weight:800;color:#0b1f3a">${d.childName ? `Как занимается ${d.childName}` : "Сводка занятий ребёнка"}</p>
+  <p style="margin:0 0 18px;font-size:14px;color:#64748b;line-height:1.5">Всего в копилке уже <strong style="color:#0b1f3a">${total}</strong> выполненных уроков и миссий. Похвалите ребёнка — живая поддержка родителей работает лучше любых оценок!</p>
+  <table width="100%" cellpadding="0" cellspacing="0">${rows}</table>
+  ${badges}
+  <p style="margin:24px 0 6px"><a href="${d.cabinetUrl}" style="display:inline-block;background:#246bfd;color:#fff;text-decoration:none;padding:13px 26px;border-radius:999px;font-weight:800;font-size:14px">Открыть личный кабинет →</a></p>
 </td></tr>
 <tr><td style="padding-top:20px;text-align:center"><p style="margin:0;font-size:12px;color:#94a3b8">Знайтон · znayton.ru</p></td></tr>
 </table></td></tr></table></body></html>`;

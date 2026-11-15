@@ -20,6 +20,7 @@ cat > "$SCRIPT" <<'EOF'
 set -euo pipefail
 DB=/var/www/razumeyka-data/prod.db
 BACKUP_DIR=/var/www/razumeyka-data/backups
+ENV_FILE=/var/www/razumeyka/.env
 STAMP=$(date +%F_%H%M)
 OUT="$BACKUP_DIR/prod-$STAMP.db"
 [ -f "$DB" ] || { echo "[backup] нет базы $DB"; exit 1; }
@@ -28,6 +29,20 @@ gzip -f "$OUT"
 # Храним 14 дней
 find "$BACKUP_DIR" -name 'prod-*.db.gz' -mtime +14 -delete
 echo "[backup] ok: $OUT.gz"
+
+# Опциональная офсайт-копия через rclone (если задан BACKUP_RCLONE_REMOTE в окружении или в .env)
+RCLONE_REMOTE="${BACKUP_RCLONE_REMOTE:-}"
+if [ -z "$RCLONE_REMOTE" ] && [ -f "$ENV_FILE" ]; then
+  RCLONE_REMOTE=$(grep -E '^BACKUP_RCLONE_REMOTE=' "$ENV_FILE" 2>/dev/null | tail -1 | cut -d= -f2- | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/^"//' -e 's/"$//' -e "s/^'//" -e "s/'$//" || true)
+fi
+if [ -n "$RCLONE_REMOTE" ]; then
+  if command -v rclone >/dev/null 2>&1; then
+    rclone copy "$OUT.gz" "$RCLONE_REMOTE"
+    echo "[backup] offsite ok: $OUT.gz -> $RCLONE_REMOTE"
+  else
+    echo "[backup] WARN: BACKUP_RCLONE_REMOTE задан ($RCLONE_REMOTE), но rclone не установлен" >&2
+  fi
+fi
 EOF
 chmod +x "$SCRIPT"
 

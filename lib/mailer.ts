@@ -17,7 +17,11 @@ function env(value?: string | null) {
 }
 
 export function isMailConfigured() {
-  return Boolean(env(process.env.MAIL_HOST) && env(process.env.MAIL_USER) && env(process.env.MAIL_PASS));
+  return Boolean(
+    env(process.env.MAIL_HOST) &&
+    env(process.env.MAIL_USER) &&
+    env(process.env.MAIL_PASS),
+  );
 }
 
 function getFrom() {
@@ -41,7 +45,10 @@ function createTransport() {
 }
 
 /** Письмо со ссылкой на чек НПД после успешной оплаты. */
-export async function sendReceiptEmail(to: string, receiptUrl: string): Promise<void> {
+export async function sendReceiptEmail(
+  to: string,
+  receiptUrl: string,
+): Promise<void> {
   if (!isMailConfigured()) {
     console.info(`\n[Знайтон] Чек для ${to}: ${receiptUrl}\n`);
     return;
@@ -62,10 +69,15 @@ export async function sendReceiptEmail(to: string, receiptUrl: string): Promise<
   });
 }
 
-export async function sendLoginCodeEmail(to: string, code: string): Promise<void> {
+export async function sendLoginCodeEmail(
+  to: string,
+  code: string,
+): Promise<void> {
   // Dev-фоллбэк: без настроенного SMTP пишем код в консоль.
   if (!isMailConfigured()) {
-    console.info(`\n[Знайтон] Код входа для ${to}: ${code} (действует 10 минут)\n`);
+    console.info(
+      `\n[Знайтон] Код входа для ${to}: ${code} (действует 10 минут)\n`,
+    );
     return;
   }
 
@@ -88,7 +100,8 @@ export async function sendLoginCodeEmail(to: string, code: string): Promise<void
       return;
     } catch (e) {
       lastError = e;
-      const errCode = (e as { code?: string })?.code ?? (e as { message?: string })?.message;
+      const errCode =
+        (e as { code?: string })?.code ?? (e as { message?: string })?.message;
       console.warn(`[mailer] попытка ${attempt}/3 не удалась: ${errCode}`);
     }
   }
@@ -97,10 +110,18 @@ export async function sendLoginCodeEmail(to: string, code: string): Promise<void
 
 export async function sendLessonReminderEmail(
   to: string,
-  data: { childName: string; direction: string; whenText: string; topic?: string | null; joinUrl?: string | null },
+  data: {
+    childName: string;
+    direction: string;
+    whenText: string;
+    topic?: string | null;
+    joinUrl?: string | null;
+  },
 ): Promise<void> {
   if (!isMailConfigured()) {
-    console.info(`\n[Знайтон] Напоминание для ${to}: ${data.childName} · ${data.direction} · ${data.whenText} · ${data.joinUrl ?? "без ссылки"}\n`);
+    console.info(
+      `\n[Знайтон] Напоминание для ${to}: ${data.childName} · ${data.direction} · ${data.whenText} · ${data.joinUrl ?? "без ссылки"}\n`,
+    );
     return;
   }
   const transport = createTransport();
@@ -118,7 +139,13 @@ export async function sendLessonReminderEmail(
   });
 }
 
-function buildReminderEmail(d: { childName: string; direction: string; whenText: string; topic?: string | null; joinUrl?: string | null }): string {
+function buildReminderEmail(d: {
+  childName: string;
+  direction: string;
+  whenText: string;
+  topic?: string | null;
+  joinUrl?: string | null;
+}): string {
   const button = d.joinUrl
     ? `<p style="margin:22px 0"><a href="${d.joinUrl}" style="display:inline-block;background:#3b82f6;color:#fff;text-decoration:none;padding:13px 26px;border-radius:999px;font-weight:800">Подключиться к занятию</a></p>`
     : "";
@@ -158,7 +185,9 @@ export async function sendWeeklyProgressEmail(
   }
   const transport = createTransport();
   const who = data.childName ? `Успехи ${data.childName}` : "Успехи за неделю";
-  const lines = data.courses.map((c) => `• ${c.title}: пройдено ${c.completedCount} ${c.unit}`).join("\n");
+  const lines = data.courses
+    .map((c) => `• ${c.title}: пройдено ${c.completedCount} ${c.unit}`)
+    .join("\n");
   const ach = data.achievements.length
     ? `\nНаграды: ${data.achievements.map((a) => `${a.icon ?? "🏅"} ${a.title}`).join(", ")}\n`
     : "";

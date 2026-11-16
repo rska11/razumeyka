@@ -34,6 +34,7 @@ function readingMinutes(body) {
 }
 
 const postMeta = {
+  'razvitie-socialnyh-navykov-detey': { category: 'Общение', gradient: 'from-[#079A78] via-[#246BFD] to-[#7257E8]' },
   'razvitie-slovarya-detey': { category: 'Речь', gradient: 'from-[#079A78] via-[#246BFD] to-[#7257E8]' },
   'risovanie-s-natury': { category: 'Рисование', gradient: 'from-[#079A78] via-[#16A6A1] to-[#3B82F6]' },
   'razvitie-svyaznoy-rechi-u-detey': { category: 'Речь', gradient: 'from-[#079A78] via-[#246BFD] to-[#7257E8]' },

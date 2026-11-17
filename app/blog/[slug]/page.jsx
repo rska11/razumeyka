@@ -116,6 +116,7 @@ export default async function BlogPost({ params }) {
   };
   const coverGrad = coverThemes[post.cover?.theme] ?? coverThemes.blue;
   const editorialMeta = {
+  'razvitie-vospriyatiya-u-detey': { category: 'Восприятие', gradient: 'from-[#079A78] via-[#246BFD] to-[#7257E8]' },
   'razvitie-socialnyh-navykov-detey': { category: 'Общение', gradient: 'from-[#079A78] via-[#246BFD] to-[#7257E8]' },
   'razvitie-slovarya-detey': { category: 'Речь', gradient: 'from-[#079A78] via-[#246BFD] to-[#7257E8]' },
   'risovanie-s-natury': { category: 'Рисование', gradient: 'from-[#079A78] via-[#16A6A1] to-[#3B82F6]' },

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { todaysPost, verifyLive, snapshot, sameSnapshot } from './daily-blog-state.mjs';
+import { todaysPost, verifyLive, snapshot, sameSnapshot, canResumeSnapshot } from './daily-blog-state.mjs';
 
 const post = { slug: 'new-article', date: '2026-11-08', title: 'New article', cover: { image: '/images/blog/cover.webp' }, body: [{ type: 'image', src: '/images/blog/example.svg' }] };
 test('вчерашняя статья не закрывает сегодняшнее задание', () => {
@@ -38,6 +38,11 @@ test('повтор может продолжить только неизменё
     assert.equal(sameSnapshot(first, { ...first, head: 'another-commit' }), false);
     const otherGit = (args) => args.includes('--porcelain=v1') ? ' M school-next/scripts/other.js\0' : git(args);
     assert.throws(() => snapshot(dir, otherGit), /Unexpected file/);
+    const snapFile = path.join(dir, '2026-11-19-resume.json');
+    fs.writeFileSync(file, 'original draft');
+    fs.writeFileSync(snapFile, JSON.stringify(first, null, 2));
+    assert.equal(canResumeSnapshot(first, [path.join(dir, '2026-11-25-resume.json'), snapFile]), true);
+    fs.unlinkSync(snapFile);
   } finally {
     fs.unlinkSync(file);
     fs.rmdirSync(path.join(dir, 'data'));

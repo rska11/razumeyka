@@ -3,7 +3,8 @@ $ErrorActionPreference = 'Stop'
 if ($Hour -lt 0 -or $Hour -gt 23 -or $Minute -lt 0 -or $Minute -gt 59) { throw 'Invalid schedule time.' }
 if ((Get-TimeZone).Id -ne 'Russian Standard Time') { throw 'This installer expects the Windows Moscow timezone.' }
 $runner = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot 'run-daily-blog.ps1'))
-$powershellPath = Join-Path $PSHOME 'powershell.exe'
+$vbsLauncher = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot 'run-hidden.vbs'))
+$wscriptPath = Join-Path $env:SystemRoot 'System32\wscript.exe'
 $workspacePath = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $cliDirectory = Join-Path $workspacePath '.daily-blog/cli'
 if (!(Test-Path -LiteralPath (Join-Path $cliDirectory 'node_modules/.bin/codex.cmd'))) {
@@ -11,7 +12,7 @@ if (!(Test-Path -LiteralPath (Join-Path $cliDirectory 'node_modules/.bin/codex.c
   if ($LASTEXITCODE -ne 0) { throw 'Could not install the isolated Codex CLI.' }
 }
 $identity = [Security.Principal.WindowsIdentity]::GetCurrent().Name
-$action = New-ScheduledTaskAction -Execute $powershellPath -Argument ('-NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -File "' + $runner + '" -Run') -WorkingDirectory $workspacePath
+$action = New-ScheduledTaskAction -Execute $wscriptPath -Argument ('//B //Nologo "' + $vbsLauncher + '" -Run') -WorkingDirectory $workspacePath
 # Explicit triggers also run when Windows does not honour RestartOnFailure.
 $scheduleBase = (Get-Date).Date.AddHours($Hour).AddMinutes($Minute)
 $trigger = @()
@@ -28,7 +29,7 @@ Register-ScheduledTask -TaskName 'Znayton-Daily-Blog' -InputObject $task -Force 
 Write-Output ('Next run: ' + (Get-ScheduledTaskInfo -TaskName 'Znayton-Daily-Blog').NextRunTime.ToString('yyyy-MM-dd HH:mm:ss'))
 
 # Recrawling is independent of article generation and does not use Codex.
-$recrawlAction = New-ScheduledTaskAction -Execute $powershellPath -Argument ('-NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -File "' + $runner + '" -RecrawlOnly') -WorkingDirectory $workspacePath
+$recrawlAction = New-ScheduledTaskAction -Execute $wscriptPath -Argument ('//B //Nologo "' + $vbsLauncher + '" -RecrawlOnly') -WorkingDirectory $workspacePath
 $recrawlTrigger = New-ScheduledTaskTrigger -Once -At (Get-Date).AddMinutes(10) -RepetitionInterval (New-TimeSpan -Hours 1)
 $recrawlSettings = New-ScheduledTaskSettingsSet -StartWhenAvailable -MultipleInstances IgnoreNew -ExecutionTimeLimit (New-TimeSpan -Minutes 5) -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
 $recrawlTask = New-ScheduledTask -Action $recrawlAction -Trigger $recrawlTrigger -Settings $recrawlSettings -Principal $principal -Description 'Retry queued Yandex recrawl requests hourly; never block daily articles.'

@@ -84,7 +84,7 @@ try {
 
   $arguments = @('exec', '-C', $workspacePath, '-c', 'model_provider="openai"', '-c', 'approval_policy="never"', '-c', 'web_search="live"', '--color', 'never', '-o', $resultPath)
   if ($SmokeTest) { $arguments += @('--sandbox', 'read-only', '--ephemeral') }
-  else { $arguments += @('--sandbox', 'danger-full-access', '--output-schema', (Join-Path $PSScriptRoot 'daily-blog-result.schema.json')) }
+  else { $arguments += @('--sandbox', 'workspace-write', '--output-schema', (Join-Path $PSScriptRoot 'daily-blog-result.schema.json')) }
   $arguments += '-'
   $runLog = Join-Path $statePath "$today-run.log"
   if ($SmokeTest) { $runLog = Join-Path $statePath "$today-smoke-run.log" }
@@ -117,8 +117,11 @@ try {
     if ($runExit -ne 0) {
       $failedLog = [IO.File]::ReadAllText($runLog)
       $connectionFailure = $failedLog -match 'workspace routing discovery failed|failed to refresh available models: request timed out|error sending request for url'
+      $quotaFailure = $failedLog -match "hit your usage limit|usage_limit_reached|insufficient_quota"
       $workStarted = $failedLog -match '(?m)^(exec|codex|tool [^\r\n]+)\s*$'
-      if ($connectionFailure -and !$workStarted) {
+      if ($quotaFailure) {
+        @{ count = 4; lastQuotaFailureAt = [DateTime]::UtcNow.ToString('o') } | ConvertTo-Json | Set-Content -LiteralPath $attemptFile -Encoding UTF8
+      } elseif ($connectionFailure -and !$workStarted) {
         @{ count = ($attempt - 1); lastConnectionFailureAt = [DateTime]::UtcNow.ToString('o') } | ConvertTo-Json | Set-Content -LiteralPath $attemptFile -Encoding UTF8
       }
     }

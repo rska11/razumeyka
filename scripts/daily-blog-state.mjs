@@ -56,18 +56,46 @@ export function sameSnapshot(left, right) {
   return left.head === right.head && JSON.stringify(left.changes) === JSON.stringify(right.changes);
 }
 
+export function canResumeSnapshot(current, candidateFiles) {
+  if (!current.changes.length) return true;
+  for (const file of candidateFiles) {
+    if (!fs.existsSync(file)) continue;
+    try {
+      const saved = JSON.parse(fs.readFileSync(file, 'utf8'));
+      if (sameSnapshot(current, saved)) return true;
+    } catch {}
+  }
+  return false;
+}
+
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   try {
     const [command, value] = process.argv.slice(2);
     if (command === '--snapshot') {
-      fs.writeFileSync(value, JSON.stringify(snapshot(), null, 2));
+      const snap = JSON.stringify(snapshot(), null, 2);
+      fs.writeFileSync(value, snap);
+      fs.writeFileSync(path.join(path.dirname(value), 'latest-resume.json'), snap);
     } else if (command === '--check-worktree') {
       const current = snapshot();
       const prefix = execFileSync('git', ['rev-parse', '--show-prefix'], { encoding: 'utf8' }).trim();
       const staged = execFileSync('git', ['diff', '--cached', '--name-only'], { encoding: 'utf8' }).trim().split(/\r?\n/).filter(Boolean);
       if (staged.some((file) => !file.startsWith(prefix))) throw new Error('Unrelated staged files exist.');
-      if (current.changes.length && (!fs.existsSync(value) || !sameSnapshot(current, JSON.parse(fs.readFileSync(value, 'utf8'))))) {
+      const stateDir = path.dirname(value);
+      const candidates = [value, path.join(stateDir, 'latest-resume.json')];
+      if (fs.existsSync(stateDir)) {
+        const recent = fs.readdirSync(stateDir)
+          .filter((name) => /^\d{4}-\d{2}-\d{2}-resume\.json$/.test(name))
+          .sort()
+          .reverse()
+          .slice(0, 14)
+          .map((name) => path.join(stateDir, name));
+        candidates.push(...recent);
+      }
+      if (!canResumeSnapshot(current, candidates)) {
         throw new Error('Unfinished work differs from the previous article attempt. It will not be included in an automated commit.');
+      }
+      if (current.changes.length && !fs.existsSync(value)) {
+        fs.writeFileSync(value, JSON.stringify(current, null, 2));
       }
       console.log(current.changes.length ? 'Resuming the exact previous article changes.' : 'Website checkout is clean.');
     } else {

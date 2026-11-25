@@ -34,6 +34,7 @@ function readingMinutes(body) {
 }
 
 const postMeta = {
+  'risovanie-tsvetnymi-karandashami': { category: 'Рисование', gradient: 'from-[#7257E8] via-[#D946EF] to-[#F05A87]' },
   'razvitie-vospriyatiya-u-detey': { category: 'Восприятие', gradient: 'from-[#079A78] via-[#246BFD] to-[#7257E8]' },
   'razvitie-socialnyh-navykov-detey': { category: 'Общение', gradient: 'from-[#079A78] via-[#246BFD] to-[#7257E8]' },
   'razvitie-slovarya-detey': { category: 'Речь', gradient: 'from-[#079A78] via-[#246BFD] to-[#7257E8]' },
